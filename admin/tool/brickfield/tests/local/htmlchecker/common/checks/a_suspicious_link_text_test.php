@@ -31,7 +31,7 @@ require_once('all_checks.php');
 /**
  * Class a_suspicious_link_text
  */
-final class a_suspicious_link_text_test extends all_checks {
+class a_suspicious_link_text_test extends all_checks {
     /** @var string Check type */
     protected $checktype = 'a_suspicious_link_text';
 

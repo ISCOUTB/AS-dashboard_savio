@@ -418,7 +418,7 @@ if ($allentries) {
 
         // Setting the pivot for the current entry
         if ($printpivot) {
-            $pivot = format_string($entry->{$pivotkey}, false, ["context" => $context]);
+            $pivot = $entry->{$pivotkey};
             $upperpivot = core_text::strtoupper($pivot);
             $pivottoshow = core_text::strtoupper(format_string($pivot, true, $fmtoptions));
 

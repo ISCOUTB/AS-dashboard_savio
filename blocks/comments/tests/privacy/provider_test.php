@@ -36,7 +36,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2018 Shamim Rezaie <shamim@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class provider_test extends \core_privacy\tests\provider_testcase {
+class provider_test extends \core_privacy\tests\provider_testcase {
 
     /** @var stdClass A student who is only enrolled in course1. */
     protected $student1;
@@ -212,7 +212,7 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         $this->assertCount(2, $contextlist);
 
         $contextids = $contextlist->get_contextids();
-        $this->assertEqualsCanonicalizing([$coursecontext1->id, $coursecontext2->id], array_values($contextids));
+        $this->assertEqualsCanonicalizing([$coursecontext1->id, $coursecontext2->id], $contextids);
     }
 
     /**

@@ -458,6 +458,8 @@ class comment {
                 $collapsedimage= 't/collapsed';
                 if (right_to_left()) {
                     $collapsedimage= 't/collapsed_rtl';
+                } else {
+                    $collapsedimage= 't/collapsed';
                 }
                 $html .= html_writer::start_tag('a', array(
                     'class' => 'comment-link',
@@ -466,8 +468,7 @@ class comment {
                     'role' => 'button',
                     'aria-expanded' => 'false')
                 );
-                $html .= html_writer::img($OUTPUT->image_url($collapsedimage), $this->linktext,
-                    ['id' => 'comment-img-' . $this->cid, 'class' => 'icon']);
+                $html .= $OUTPUT->pix_icon($collapsedimage, $this->linktext);
                 $html .= html_writer::tag('span', $this->linktext.' '.$countstring, array('id' => 'comment-link-text-'.$this->cid));
                 $html .= html_writer::end_tag('a');
             }
@@ -506,7 +507,7 @@ class comment {
                 $html .= html_writer::start_tag('div', array('class' => 'db'));
                 $html .= html_writer::tag('label',
                         get_string('comment', 'comment'),
-                        ['for' => 'dlg-content-'.$this->cid, 'class' => 'visually-hidden']);
+                        ['for' => 'dlg-content-'.$this->cid, 'class' => 'sr-only']);
                 $html .= html_writer::tag('textarea', '', $textareaattrs);
                 $html .= html_writer::end_tag('div'); // .db
 

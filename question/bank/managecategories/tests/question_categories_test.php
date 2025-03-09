@@ -39,19 +39,19 @@ final class question_categories_test extends manage_category_test_base {
         $this->resetAfterTest();
 
         // Create question categories for a course.
-        $qbank = $this->create_qbank($this->create_course());
-        $qcat1 = $this->create_question_category_for_a_qbank($qbank);
-        $qcat2 = $this->create_question_category_for_a_qbank($qbank, ['parent' => $qcat1->id]);
-        $qcat3 = $this->create_question_category_for_a_qbank($qbank);
-        $qcat4 = $this->create_question_category_for_a_qbank($qbank, ['parent' => $qcat2->id]);
-        $context = \context_module::instance($qbank->cmid);
+        $course = $this->create_course();
+        $qcat1 = $this->create_question_category_for_a_course($course);
+        $qcat2 = $this->create_question_category_for_a_course($course, ['parent' => $qcat1->id]);
+        $qcat3 = $this->create_question_category_for_a_course($course);
+        $qcat4 = $this->create_question_category_for_a_course($course, ['parent' => $qcat2->id]);
+        $coursecontext = \context_course::instance($course->id);
 
         // Create ordered tree.
         $questioncategories = new question_categories(
             new \moodle_url('/'),
-            [$context],
+            [$coursecontext],
         );
-        $items = $questioncategories->editlists[$context->id]->items;
+        $items = $questioncategories->editlists[$coursecontext->id]->items;
 
         // Two top categories (1 and 3) in the course.
         $this->assertCount(2, $items);

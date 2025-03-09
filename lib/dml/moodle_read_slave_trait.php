@@ -21,15 +21,9 @@
  * @category   dml
  * @copyright  2018 Srdjan Janković, Catalyst IT
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @deprecated Since Moodle 5.0. See MDL-71257.
- * @todo       Final deprecation in Moodle 6.0. See MDL-83171.
  */
-#[\core\attribute\deprecated(
-    replacement: moodle_read_replica_trait::class,
-    since: '5.0',
-    mdl: 'MDL-71257',
-    reason: 'Renamed'
-)]
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Trait to wrap connect() method of database driver classes that gives
@@ -150,17 +144,8 @@ trait moodle_read_slave_trait {
      * @param array $dboptions driver specific options
      * @return bool true
      * @throws dml_connection_exception if error
-     * @deprecated Since Moodle 5.0. See MDL-71257.
-     * @todo Final deprecation in Moodle 6.0. See MDL-83171.
      */
-    #[\core\attribute\deprecated(
-        replacement: 'moodle_read_replica_trait::connect',
-        since: '5.0',
-        mdl: 'MDL-71257',
-        reason: 'Renamed trait'
-    )]
     public function connect($dbhost, $dbuser, $dbpass, $dbname, $prefix, ?array $dboptions = null) {
-        \core\deprecation::emit_deprecation_if_present(__FUNCTION__);
         $this->pdbhost = $dbhost;
         $this->pdbuser = $dbuser;
         $this->pdbpass = $dbpass;
@@ -168,7 +153,6 @@ trait moodle_read_slave_trait {
         $this->pprefix = $prefix;
         $this->pdboptions = $dboptions;
 
-        $logconnection = false;
         if ($dboptions) {
             if (isset($dboptions['readonly'])) {
                 $this->wantreadslave = true;
@@ -196,11 +180,8 @@ trait moodle_read_slave_trait {
                 }
 
                 if (count($slaves) > 1) {
-                    // Don't shuffle for unit tests as order is important for them to pass.
-                    if (!PHPUNIT_TEST) {
-                        // Randomise things a bit.
-                        shuffle($slaves);
-                    }
+                    // Randomise things a bit.
+                    shuffle($slaves);
                 }
 
                 // Find first connectable readonly slave.
@@ -217,17 +198,9 @@ trait moodle_read_slave_trait {
                     try {
                         $this->raw_connect($rodb['dbhost'], $rodb['dbuser'], $rodb['dbpass'], $dbname, $prefix, $dboptions);
                         $this->dbhreadonly = $this->get_db_handle();
-                        if ($logconnection) {
-                            debugging(
-                                "Readonly db connection succeeded for host {$rodb['dbhost']}"
-                            );
-                        }
                         break;
-                    } catch (dml_connection_exception $e) {
-                        debugging(
-                            "Readonly db connection failed for host {$rodb['dbhost']}: {$e->debuginfo}"
-                        );
-                        $logconnection = true;
+                    } catch (dml_connection_exception $e) { // phpcs:ignore
+                        // If readonly slave is not connectable we'll have to do without it.
                     }
                 }
                 // ... lock_db queries always go to master.
@@ -239,19 +212,7 @@ trait moodle_read_slave_trait {
             }
         }
         if (!$this->dbhreadonly) {
-            try {
-                $this->set_dbhwrite();
-            } catch (dml_connection_exception $e) {
-                debugging(
-                    "Readwrite db connection failed for host {$this->pdbhost}: {$e->debuginfo}"
-                );
-                throw $e;
-            }
-            if ($logconnection) {
-                debugging(
-                    "Readwrite db connection succeeded for host {$this->pdbhost}"
-                );
-            }
+            $this->set_dbhwrite();
         }
 
         return true;
@@ -278,51 +239,24 @@ trait moodle_read_slave_trait {
     /**
      * Returns whether we want to connect to slave database for read queries.
      * @return bool Want read only connection
-     * @deprecated Since Moodle 5.0. See MDL-71257.
-     * @todo Final deprecation in Moodle 6.0. See MDL-83171.
      */
-    #[\core\attribute\deprecated(
-        replacement: 'moodle_read_replica_trait::want_read_replica',
-        since: '5.0',
-        mdl: 'MDL-71257',
-        reason: 'Renamed trait'
-    )]
     public function want_read_slave(): bool {
-        \core\deprecation::emit_deprecation_if_present(__FUNCTION__);
         return $this->wantreadslave;
     }
 
     /**
      * Returns the number of reads done by the read only database.
      * @return int Number of reads.
-     * @deprecated Since Moodle 5.0. See MDL-71257.
-     * @todo Final deprecation in Moodle 6.0. See MDL-83171.
      */
-    #[\core\attribute\deprecated(
-        replacement: 'moodle_read_replica_trait::perf_get_reads_replica',
-        since: '5.0',
-        mdl: 'MDL-71257',
-        reason: 'Renamed trait'
-    )]
     public function perf_get_reads_slave(): int {
-        \core\deprecation::emit_deprecation_if_present(__FUNCTION__);
         return $this->readsslave;
     }
 
     /**
      * On DBs that support it, switch to transaction mode and begin a transaction
      * @return moodle_transaction
-     * @deprecated Since Moodle 5.0. See MDL-71257.
-     * @todo Final deprecation in Moodle 6.0. See MDL-83171.
      */
-    #[\core\attribute\deprecated(
-        replacement: 'moodle_read_replica_trait::start_delegated_transaction',
-        since: '5.0',
-        mdl: 'MDL-71257',
-        reason: 'Renamed trait'
-    )]
     public function start_delegated_transaction() {
-        \core\deprecation::emit_deprecation_if_present(__FUNCTION__);
         $this->set_dbhwrite();
         return parent::start_delegated_transaction();
     }
@@ -447,17 +381,8 @@ trait moodle_read_slave_trait {
      * @param moodle_transaction $transaction The transaction to commit
      * @return void
      * @throws dml_transaction_exception Creates and throws transaction related exceptions.
-     * @deprecated Since Moodle 5.0. See MDL-71257.
-     * @todo Final deprecation in Moodle 6.0. See MDL-83171.
      */
-    #[\core\attribute\deprecated(
-        replacement: 'moodle_read_replica_trait::commit_delegated_transaction',
-        since: '5.0',
-        mdl: 'MDL-71257',
-        reason: 'Renamed trait'
-    )]
     public function commit_delegated_transaction(moodle_transaction $transaction) {
-        \core\deprecation::emit_deprecation_if_present(__FUNCTION__);
         if ($this->written) {
             // Adjust the written time.
             $now = microtime(true);

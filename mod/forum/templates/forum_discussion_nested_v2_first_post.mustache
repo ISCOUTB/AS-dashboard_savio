@@ -64,8 +64,8 @@
             {{#unread}}
                 <div class="icon-size-4 text-info text-center mt-3 icon-no-margin">
                     <span
-                        data-bs-toggle="tooltip"
-                        data-bs-placement="left"
+                        data-toggle="tooltip"
+                        data-placement="left"
                         title="{{#str}} unreadpost, mod_forum {{/str}}"
                         tabindex="0"
                     >{{#pix}} i/flagged, core {{/pix}}</span>
@@ -85,7 +85,7 @@
                                             <span class="text-danger">
                                                 {{#str}}
                                                     authorreplyingprivatelytoauthor, mod_forum, {
-                                                        "respondant":"<a class='fw-bold author-name' data-region='author-name' href='{{{urls.profile}}}'>{{fullname}}</a>",
+                                                        "respondant":"<a class='font-weight-bold author-name' data-region='author-name' href='{{{urls.profile}}}'>{{fullname}}</a>",
                                                         "author":"{{parentauthorname}}"
                                                     }
                                                 {{/str}}
@@ -94,14 +94,14 @@
                                         {{^isprivatereply}}
                                             {{#str}}
                                                 authorreplyingtoauthor, mod_forum, {
-                                                    "respondant":"<a class='fw-bold author-name' data-region='author-name' href='{{{urls.profile}}}'>{{fullname}}</a>",
+                                                    "respondant":"<a class='font-weight-bold author-name' data-region='author-name' href='{{{urls.profile}}}'>{{fullname}}</a>",
                                                     "author":"{{parentauthorname}}"
                                                 }
                                             {{/str}}
                                         {{/isprivatereply}}
                                     {{/parentauthorname}}
                                     {{^parentauthorname}}
-                                        <a class='fw-bold author-name' data-region='author-name' href="{{{urls.profile}}}">{{fullname}}</a>
+                                        <a class='font-weight-bold author-name' data-region='author-name' href="{{{urls.profile}}}">{{fullname}}</a>
                                     {{/parentauthorname}}
                                 </h4>
                             {{/author}}
@@ -143,10 +143,10 @@
                                 {{#showactionmenu}}
                                     <div class="dropdown">
                                         <button
-                                            class="btn btn-icon text-muted"
+                                            class="btn btn-icon text-muted icon-no-margin icon-size-3"
                                             type="button"
                                             id="post-actions-menu-{{id}}-{{uniqid}}"
-                                            data-bs-toggle="dropdown"
+                                            data-toggle="dropdown"
                                             aria-haspopup="true"
                                             aria-expanded="false"
                                             aria-label="{{#str}} actionsforpost, mod_forum {{/str}}"
@@ -154,7 +154,7 @@
                                             {{#pix}} i/moremenu {{/pix}}
                                         </button>
                                         <!-- inline style to fix RTL placement bug -->
-                                        <div class="dropdown-menu dropdown-menu-end rounded-3 shadow border-0" aria-labelledby="post-actions-menu-{{id}}-{{uniqid}}" style="right: auto" role="menubar">
+                                        <div class="dropdown-menu dropdown-menu-right rounded-lg shadow border-0" aria-labelledby="post-actions-menu-{{id}}-{{uniqid}}" style="right: auto" role="menubar">
                                             {{#capabilities}}
                                                 {{#view}}
                                                     <a
@@ -241,13 +241,13 @@
                 {{/isdeleted}}
                 {{$subject}}
                     <h2
-                        class="h1 fw-bold post-subject mt-n2"
+                        class="h1 font-weight-bold post-subject mt-n2"
                         data-region-content="forum-post-core-subject"
                         data-reply-subject="{{replysubject}}"
                     >{{{subject}}}</h2>
                 {{/subject}}
                 {{#hasreplycount}}
-                    <span class="visually-hidden">{{#str}} numberofreplies, mod_forum, {{replycount}} {{/str}}</span>
+                    <span class="sr-only">{{#str}} numberofreplies, mod_forum, {{replycount}} {{/str}}</span>
                 {{/hasreplycount}}
             </header>
 
@@ -284,7 +284,7 @@
                                 <a
                                     href="{{{url}}}"
                                     aria-label="{{#str}} attachmentname, mod_forum, {{filename}} {{/str}}"
-                                    class="fw-bold"
+                                    class="font-weight-bold"
                                 >
                                     {{#str}} attachmentnameandfilesize, mod_forum, {"name": "{{filename}}", "size": "{{filesizeformatted}}"} {{/str}}
                                 </a>
@@ -326,7 +326,7 @@
                         <div class="d-flex mt-3">
                             {{#capabilities.reply}}
                                 <button
-                                    class="btn btn-primary btn-lg fw-bold px-4"
+                                    class="btn btn-primary btn-lg font-weight-bold px-4"
                                     data-href="{{{urls.reply}}}"
                                     data-post-id="{{id}}"
                                     data-action="create-inpage-reply"

@@ -53,23 +53,23 @@
         {{^displayonesection}}
             <div class="d-flex align-items-center position-relative">
                 <a role="button"
-                    data-bs-toggle="collapse"
+                    data-toggle="collapse"
                     data-for="sectiontoggler"
-                    href="#coursecontentcollapseid{{id}}"
-                    id="collapsesectionid{{id}}"
+                    href="#coursecontentcollapse{{num}}"
+                    id="collapssesection{{num}}"
                     aria-expanded="{{^contentcollapsed}}true{{/contentcollapsed}}{{#contentcollapsed}}false{{/contentcollapsed}}"
-                    aria-controls="coursecontentcollapseid{{id}}"
-                    class="btn btn-icon me-3 icons-collapse-expand
+                    aria-controls="coursecontentcollapse{{num}}"
+                    class="btn btn-icon me-3 icons-collapse-expand justify-content-center
                         {{#contentcollapsed}} collapsed {{/contentcollapsed}}"
                     aria-label="{{name}}">
                 <span class="expanded-icon icon-no-margin p-2" title="{{#str}} collapse, core {{/str}}">
                     {{#pix}} t/expandedchevron, core {{/pix}}
-                    <span class="visually-hidden">{{#str}} collapse, core {{/str}}</span>
+                    <span class="sr-only">{{#str}} collapse, core {{/str}}</span>
                 </span>
                 <span class="collapsed-icon icon-no-margin p-2" title="{{#str}} expand, core {{/str}}">
                     <span class="dir-rtl-hide">{{#pix}} t/collapsedchevron, core {{/pix}}</span>
                     <span class="dir-ltr-hide">{{#pix}} t/collapsedchevron_rtl, core {{/pix}}</span>
-                    <span class="visually-hidden">{{#str}} expand, core {{/str}}</span>
+                    <span class="sr-only">{{#str}} expand, core {{/str}}</span>
                 </span>
                 </a>
                 <h{{headinglevel}} class="h4 sectionname course-content-item d-flex align-self-stretch align-items-center mb-0"

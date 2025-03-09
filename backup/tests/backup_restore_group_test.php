@@ -33,7 +33,7 @@ require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
  * @copyright 2023 Catalyst IT Pty Ltd
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class backup_restore_group_test extends core_backup_backup_restore_base_testcase {
+class backup_restore_group_test extends core_backup_backup_restore_base_testcase {
 
     /**
      * Test for backup/restore with customfields.

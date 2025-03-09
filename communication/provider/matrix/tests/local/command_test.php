@@ -34,7 +34,7 @@ require_once(dirname(__DIR__) . '/matrix_client_test_trait.php');
  * @covers \communication_matrix\local\command
  * @coversDefaultClass \communication_matrix\local\command
  */
-final class command_test extends \advanced_testcase {
+class command_test extends \advanced_testcase {
     use \communication_matrix\matrix_client_test_trait;
 
     /**
@@ -352,7 +352,7 @@ final class command_test extends \advanced_testcase {
     public static function sendasjson_provider(): array {
         return [
             'As JSON' => [
-                'sendasjson' => true,
+                'sendasjon' => true,
                 'endpoint' => 'example/:id/endpoint',
                 'params' => [
                     ':id' => 12345,

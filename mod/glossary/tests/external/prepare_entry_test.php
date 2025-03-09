@@ -39,7 +39,7 @@ final class prepare_entry_test extends externallib_advanced_testcase {
     /**
      * test_prepare_entry
      */
-    public function test_prepare_entry(): void {
+    public function test_prepare_entry() {
         global $USER;
         $this->resetAfterTest(true);
 

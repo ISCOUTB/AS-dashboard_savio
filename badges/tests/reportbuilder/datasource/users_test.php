@@ -20,12 +20,13 @@ namespace core_badges\reportbuilder\datasource;
 
 use core_badges_generator;
 use core_reportbuilder_generator;
+use core_reportbuilder_testcase;
 use core_reportbuilder\local\filters\{boolean_select, date, select, tags, text};
-use core_reportbuilder\tests\core_reportbuilder_testcase;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
+require_once("{$CFG->dirroot}/reportbuilder/tests/helpers.php");
 require_once("{$CFG->libdir}/badgeslib.php");
 
 /**
@@ -36,7 +37,7 @@ require_once("{$CFG->libdir}/badgeslib.php");
  * @copyright   2023 Paul Holden <paulh@moodle.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class users_test extends core_reportbuilder_testcase {
+class users_test extends core_reportbuilder_testcase {
 
     /**
      * Test default datasource
@@ -192,12 +193,12 @@ final class users_test extends core_reportbuilder_testcase {
         $this->assertEquals(fullname($user), $fullname);
         $this->assertEquals($badgecourse->name, $badgename);
         $this->assertEquals($expectedbadgecourselink, $namewithlink);
-        $this->assertStringContainsString('no-criteria-set', $criteria);
+        $this->assertEquals('Criteria for this badge have not been set up yet.', $criteria);
         $this->assertStringContainsString('Image caption', $image);
         $this->assertEquals('English', $language);
         $this->assertEquals(2, $version);
         $this->assertEquals('Available (criteria locked)', $status);
-        $this->assertEquals('Never: this badge does not expire.', $expiry);
+        $this->assertEquals('Never', $expiry);
         $this->assertEmpty($tag);
         $this->assertEmpty($expires);
         $this->assertEquals('Yes', $visible);
@@ -210,7 +211,7 @@ final class users_test extends core_reportbuilder_testcase {
      *
      * @return array[]
      */
-    public static function datasource_filters_provider(): array {
+    public function datasource_filters_provider(): array {
         return [
             // User.
             'Filter user fullname' => ['user:fullname', [
@@ -336,7 +337,7 @@ final class users_test extends core_reportbuilder_testcase {
         $generator = $this->getDataGenerator()->get_plugin_generator('core_reportbuilder');
 
         // Create report containing single username column, and given filter.
-        $report = $generator->create_report(['name' => 'Badges', 'source' => users::class, 'default' => 0]);
+        $report = $generator->create_report(['name' => 'My report', 'source' => users::class, 'default' => 0]);
         $generator->create_column(['reportid' => $report->get('id'), 'uniqueidentifier' => 'user:username']);
 
         // Add filter, set it's values.

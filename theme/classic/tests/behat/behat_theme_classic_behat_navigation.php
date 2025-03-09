@@ -289,7 +289,7 @@ class behat_theme_classic_behat_navigation extends behat_navigation {
     protected function select_on_administration_page($nodelist) {
         $parentnodes = $nodelist;
         $lastnode = array_pop($parentnodes);
-        $xpath = '//div[@id=\'region-main\']';
+        $xpath = '//section[@id=\'region-main\']';
 
         // Check if there is a separate tab for this submenu of the page. If found go to it.
         if ($parentnodes) {
@@ -376,7 +376,7 @@ class behat_theme_classic_behat_navigation extends behat_navigation {
             $menuxpath = $this->find_header_administration_menu() ?: $this->find_page_administration_menu();
         }
         if ($menuxpath && $this->running_javascript()) {
-            $node = $this->find('xpath', $menuxpath . '//a[@data-bs-toggle=\'dropdown\']');
+            $node = $this->find('xpath', $menuxpath . '//a[@data-toggle=\'dropdown\']');
             $this->execute('behat_general::i_click_on', [$node, 'NodeElement']);
         }
     }

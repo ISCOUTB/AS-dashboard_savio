@@ -20,8 +20,13 @@ namespace core_role\reportbuilder\datasource;
 
 use core\context\course;
 use core_reportbuilder_generator;
+use core_reportbuilder_testcase;
 use core_reportbuilder\local\filters\{date, select, text};
-use core_reportbuilder\tests\core_reportbuilder_testcase;
+
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once("{$CFG->dirroot}/reportbuilder/tests/helpers.php");
 
 /**
  * Unit tests for roles datasource
@@ -149,7 +154,7 @@ final class roles_test extends core_reportbuilder_testcase {
             ], true],
             'Filter role name (no match)' => ['role:name', [
                 'role:name_operator' => select::EQUAL_TO,
-                'role:name_value' => $DB->get_field('role', 'id', ['shortname' => 'teacher']),
+                'role:name_value' => -1,
             ], false],
             'Filter role archetype' => ['role:archetype', [
                 'role:archetype_operator' => select::EQUAL_TO,

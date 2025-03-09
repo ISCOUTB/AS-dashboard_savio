@@ -23,7 +23,7 @@ namespace core_analytics;
  * @copyright 2016 David Monllaó {@link http://www.davidmonllao.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class course_test extends \advanced_testcase {
+class course_test extends \advanced_testcase {
 
     /** @var \stdClass Course record. */
     protected $course;

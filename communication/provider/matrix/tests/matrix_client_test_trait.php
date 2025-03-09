@@ -67,24 +67,19 @@ trait matrix_client_test_trait {
         array &$historycontainer = [],
         ?MockHandler $mock = null,
     ): matrix_client {
-        // If no mock is provided, use get_mocked_http_client to create the mock and client.
         if ($mock === null) {
-            ['mock' => $mock, 'client' => $client] = $this->get_mocked_http_client(
-                history: $historycontainer
-            );
-        } else {
-            // If mock is provided, create the handlerstack and history middleware.
-            $handlerstack = HandlerStack::create($mock);
-            $history = Middleware::history($historycontainer);
-            $handlerstack->push($history);
-            $client = new http_client(['handler' => $handlerstack]);
+            $mock = new MockHandler();
         }
         // Add the version response.
         $mock->append($this->get_mocked_version_response([$version]));
 
+        $handlerstack = HandlerStack::create($mock);
+        $history = Middleware::history($historycontainer);
+        $handlerstack->push($history);
+        $client = new http_client(['handler' => $handlerstack]);
         mocked_matrix_client::set_client($client);
 
-        $instance = mocked_matrix_client::instance(
+        $client = mocked_matrix_client::instance(
             'https://example.com',
             'testtoken',
         );
@@ -92,7 +87,7 @@ trait matrix_client_test_trait {
         // Remove the request that is required to fetch the version from the history.
         array_shift($historycontainer);
 
-        return $instance;
+        return $client;
     }
 
     /**

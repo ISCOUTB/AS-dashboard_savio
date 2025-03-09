@@ -35,7 +35,7 @@ require_once($CFG->dirroot . '/enrol/self/externallib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since     Moodle 2.6
  */
-final class externallib_test extends externallib_advanced_testcase {
+class externallib_test extends externallib_advanced_testcase {
 
     /**
      * Test get_instance_info

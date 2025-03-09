@@ -30,13 +30,13 @@ require_once($CFG->libdir . '/badgeslib.php');
  * @copyright   2021 onwards Peter Dias
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class manage_badge_action_bar_test extends \advanced_testcase {
+class manage_badge_action_bar_test extends \advanced_testcase {
     /**
      * Data provider for test_generate_badge_navigation
      *
      * @return array
      */
-    public static function generate_badge_navigation_provider(): array {
+    public function generate_badge_navigation_provider(): array {
         return [
             "Test tertiary nav as an editing teacher" => [
                 "editingteacher", [
@@ -118,6 +118,9 @@ final class manage_badge_action_bar_test extends \advanced_testcase {
         $badge->status = BADGE_STATUS_ACTIVE;
         $badge->version = '1';
         $badge->language = 'en';
+        $badge->imageauthorname = 'Image author';
+        $badge->imageauthoremail = 'imageauthor@example.com';
+        $badge->imageauthorurl = 'http://image-author-url.domain.co.nz';
         $badge->imagecaption = 'Caption';
         $coursebadgeid = $DB->insert_record('badge', $badge, true);
         $badge = new \core_badges\badge($coursebadgeid);

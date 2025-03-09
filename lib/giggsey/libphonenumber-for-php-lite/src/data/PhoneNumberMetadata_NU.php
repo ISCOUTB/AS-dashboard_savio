@@ -1,5 +1,4 @@
 <?php
-
 /**
  * libphonenumber-for-php-lite data file
  * This file has been @generated from libphonenumber data
@@ -7,82 +6,112 @@
  * @internal
  */
 
-return [
-    'id' => 'NU',
-    'countryCode' => 683,
-    'generalDesc' => [
-        'pattern' => '(?:[4-7]|888\\d)\\d{3}',
-        'posLength' => [
-            4,
-            7,
-        ],
+return  [
+  'generalDesc' =>
+   [
+    'NationalNumberPattern' => '(?:[4-7]|888\\d)\\d{3}',
+    'PossibleLength' =>
+     [
+      0 => 4,
+      1 => 7,
     ],
-    'fixedLine' => [
-        'pattern' => '[47]\\d{3}',
-        'example' => '7012',
-        'posLength' => [
-            4,
-        ],
+  ],
+  'fixedLine' =>
+   [
+    'NationalNumberPattern' => '[47]\\d{3}',
+    'ExampleNumber' => '7012',
+    'PossibleLength' =>
+     [
+      0 => 4,
     ],
-    'mobile' => [
-        'pattern' => '(?:[56]|888[1-9])\\d{3}',
-        'example' => '8884012',
+  ],
+  'mobile' =>
+   [
+    'NationalNumberPattern' => '(?:[56]|888[1-9])\\d{3}',
+    'ExampleNumber' => '8884012',
+  ],
+  'tollFree' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'tollFree' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'premiumRate' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'premiumRate' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'sharedCost' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'sharedCost' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'personalNumber' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'personalNumber' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'voip' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'voip' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'pager' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'pager' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'uan' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'uan' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'voicemail' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'voicemail' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'noInternationalDialling' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'noInternationalDialling' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'id' => 'NU',
+  'countryCode' => 683,
+  'internationalPrefix' => '00',
+  'sameMobileAndFixedLinePattern' => false,
+  'numberFormat' =>
+   [
+    0 =>
+     [
+      'pattern' => '(\\d{3})(\\d{4})',
+      'format' => '$1 $2',
+      'leadingDigitsPatterns' =>
+       [
+        0 => '8',
+      ],
+      'nationalPrefixFormattingRule' => '',
+      'domesticCarrierCodeFormattingRule' => '',
+      'nationalPrefixOptionalWhenFormatting' => false,
     ],
-    'internationalPrefix' => '00',
-    'numberFormat' => [
-        [
-            'pattern' => '(\\d{3})(\\d{4})',
-            'format' => '$1 $2',
-            'leadingDigitsPatterns' => [
-                '8',
-            ],
-            'nationalPrefixFormattingRule' => '',
-            'domesticCarrierCodeFormattingRule' => '',
-        ],
-    ],
+  ],
+  'mainCountryForCode' => false,
+  'mobileNumberPortableRegion' => false,
 ];

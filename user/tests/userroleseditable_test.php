@@ -23,7 +23,7 @@ namespace core_user;
  * @copyright  2017 Damyon Wiese
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class userroleseditable_test extends \advanced_testcase {
+class userroleseditable_test extends \advanced_testcase {
     /**
      * Test user roles editable.
      */

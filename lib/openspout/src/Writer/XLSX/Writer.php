@@ -35,23 +35,6 @@ final class Writer extends AbstractWriterMultiSheets
         return $this->options;
     }
 
-    public function setCreator(string $creator): void
-    {
-        $props = $this->options->getProperties();
-        $this->options->setProperties(new Properties(
-            $props->title,
-            $props->subject,
-            $props->application,
-            $creator,
-            $props->lastModifiedBy,
-            $props->keywords,
-            $props->description,
-            $props->category,
-            $props->language,
-            $props->customProperties
-        ));
-    }
-
     protected function createWorkbookManager(): WorkbookManager
     {
         $workbook = new Workbook();
@@ -60,7 +43,7 @@ final class Writer extends AbstractWriterMultiSheets
             $this->options->getTempFolder(),
             new ZipHelper(),
             new XLSX(),
-            $this->options->getProperties()
+            $this->creator
         );
         $fileSystemHelper->createBaseFilesAndFolders();
 
@@ -68,12 +51,7 @@ final class Writer extends AbstractWriterMultiSheets
         $sharedStringsManager = new SharedStringsManager($xlFolder, new XLSX());
 
         $styleMerger = new StyleMerger();
-        $escaper = new XLSX();
-
-        $styleManager = new StyleManager(
-            new StyleRegistry($this->options->DEFAULT_ROW_STYLE),
-            $escaper
-        );
+        $styleManager = new StyleManager(new StyleRegistry($this->options->DEFAULT_ROW_STYLE));
 
         $commentsManager = new CommentsManager($xlFolder, new XLSX());
 
@@ -83,7 +61,7 @@ final class Writer extends AbstractWriterMultiSheets
             $styleMerger,
             $commentsManager,
             $sharedStringsManager,
-            $escaper,
+            new XLSX(),
             StringHelper::factory()
         );
 

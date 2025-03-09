@@ -35,7 +35,7 @@ use block_timeline\privacy\provider;
  * @copyright  2018 Peter Dias <peter@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class provider_test extends \core_privacy\tests\provider_testcase {
+class provider_test extends \core_privacy\tests\provider_testcase {
 
     /**
      * Ensure that export_user_preferences returns no data if the user has not visited the myoverview block.
@@ -76,7 +76,7 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
      *
      * @return array Array of valid user preferences.
      */
-    public static function user_preference_provider(): array {
+    public function user_preference_provider() {
         return array(
             array('block_timeline_user_sort_preference', 'sortbydates', ''),
             array('block_timeline_user_sort_preference', 'sortbycourses', ''),

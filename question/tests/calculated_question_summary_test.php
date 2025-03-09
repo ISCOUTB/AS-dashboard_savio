@@ -26,14 +26,14 @@ use core_question\statistics\questions\calculated_question_summary;
  * @copyright  2018 Shamim Rezaie <shamim@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class calculated_question_summary_test extends \advanced_testcase {
+class calculated_question_summary_test extends \advanced_testcase {
 
     /**
      * Provider for test_get_min_max_of.
      *
      * @return array
      */
-    public static function get_min_max_provider(): array {
+    public function get_min_max_provider() {
         return [
             'negative number and null' => [
                 [
@@ -105,7 +105,7 @@ final class calculated_question_summary_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function get_sd_min_max_provider(): array {
+    public function get_sd_min_max_provider() {
         return [
             'null and number' => [
                 [

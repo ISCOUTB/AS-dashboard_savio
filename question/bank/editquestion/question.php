@@ -31,7 +31,8 @@ $id = optional_param('id', 0, PARAM_INT); // Question id.
 $makecopy = optional_param('makecopy', 0, PARAM_BOOL);
 $qtype = optional_param('qtype', '', PARAM_COMPONENT);
 $categoryid = optional_param('category', 0, PARAM_INT);
-$cmid = required_param('cmid', PARAM_INT);
+$cmid = optional_param('cmid', 0, PARAM_INT);
+$courseid = optional_param('courseid', 0, PARAM_INT);
 $wizardnow = optional_param('wizardnow', '', PARAM_ALPHA);
 $originalreturnurl = optional_param('returnurl', 0, PARAM_LOCALURL);
 $appendqnumstring = optional_param('appendqnumstring', '', PARAM_ALPHA);
@@ -56,6 +57,9 @@ if ($categoryid !== 0) {
 if ($cmid !== 0) {
     $url->param('cmid', $cmid);
 }
+if ($courseid !== 0) {
+    $url->param('courseid', $courseid);
+}
 if ($wizardnow !== '') {
     $url->param('wizardnow', $wizardnow);
 }
@@ -73,8 +77,11 @@ if ($mdlscrollto) {
 }
 $PAGE->set_url($url);
 
-$questionbankurl = new moodle_url('/question/edit.php', ['cmid' => $cmid]);
-
+if ($cmid) {
+    $questionbankurl = new moodle_url('/question/edit.php', array('cmid' => $cmid));
+} else {
+    $questionbankurl = new moodle_url('/question/edit.php', array('courseid' => $courseid));
+}
 navigation_node::override_active_url($questionbankurl);
 
 if ($originalreturnurl) {
@@ -89,10 +96,18 @@ if ($mdlscrollto) {
     $returnurl->param('mdlscrollto', $mdlscrollto);
 }
 
-list($module, $cm) = get_module_from_cmid($cmid);
-require_login($cm->course, false, $cm);
-$thiscontext = context_module::instance($cmid);
-
+if ($cmid) {
+    list($module, $cm) = get_module_from_cmid($cmid);
+    require_login($cm->course, false, $cm);
+    $thiscontext = context_module::instance($cmid);
+} else if ($courseid) {
+    require_login($courseid, false);
+    $thiscontext = context_course::instance($courseid);
+    $module = null;
+    $cm = null;
+} else {
+    throw new moodle_exception('missingcourseorcmid', 'question');
+}
 $contexts = new core_question\local\bank\question_edit_contexts($thiscontext);
 $PAGE->set_pagelayout('admin');
 
@@ -104,7 +119,10 @@ if ($id) {
     if (!$question = $DB->get_record('question', array('id' => $id))) {
         throw new moodle_exception('questiondoesnotexist', 'question', $returnurl);
     }
-    get_question_options($question, true);
+    // We can use $COURSE here because it's been initialised as part of the
+    // require_login above. Passing it as the third parameter tells the function
+    // to filter the course tags by that course.
+    get_question_options($question, true, [$COURSE]);
 
 } else if ($categoryid && $qtype) { // Only for creating new questions.
     $question = new stdClass();
@@ -310,14 +328,6 @@ if ($mform->is_cancelled()) {
                 $returnurl->param('sesskey', sesskey());
                 $returnurl->param('cmid', $cmid);
             }
-            // Update the filter param to the updated category if the return have any.
-            if (!empty($returnurl->param('filter'))) {
-                $filter = json_decode($returnurl->param('filter'), true);
-                if (isset($filter['category']['values'])) {
-                    $filter['category']['values'][0] = $question->category;
-                    $returnurl->param('filter', json_encode($filter));
-                }
-            }
             redirect($returnurl);
         }
 
@@ -338,14 +348,6 @@ if ($mform->is_cancelled()) {
             $nexturl->param('cmid', $cmid);
         } else {
             $nexturl->param('courseid', $COURSE->id);
-        }
-        // Update the filter param to the updated category if the return url have any.
-        if (!empty($nexturl->param('filter'))) {
-            $filter = json_decode($nexturl->param('filter'), true);
-            if (isset($filter['category']['values'])) {
-                $filter['category']['values'][0] = $question->category;
-                $nexturl->param('filter', json_encode($filter));
-            }
         }
         redirect($nexturl);
     }

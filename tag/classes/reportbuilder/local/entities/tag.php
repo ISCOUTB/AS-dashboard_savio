@@ -20,9 +20,9 @@ namespace core_tag\reportbuilder\local\entities;
 
 use context_system;
 use core_tag_tag;
+use html_writer;
+use lang_string;
 use stdClass;
-use core\lang_string;
-use core\output\html_writer;
 use core_reportbuilder\local\entities\base;
 use core_reportbuilder\local\filters\{boolean_select, date, number, tags};
 use core_reportbuilder\local\helpers\format;
@@ -86,6 +86,8 @@ class tag extends base {
      * @return column[]
      */
     protected function get_all_columns(): array {
+        global $DB;
+
         $tagalias = $this->get_table_alias('tag');
 
         // Name.
@@ -95,6 +97,7 @@ class tag extends base {
             $this->get_entity_name()
         ))
             ->add_joins($this->get_joins())
+            ->set_type(column::TYPE_TEXT)
             ->add_fields("{$tagalias}.rawname, {$tagalias}.name")
             ->set_is_sortable(true)
             ->add_callback(static function($rawname, stdClass $tag): string {
@@ -104,33 +107,6 @@ class tag extends base {
                 return core_tag_tag::make_display_name($tag);
             });
 
-        // Name with badge.
-        $columns[] = (new column(
-            'namewithbadge',
-            new lang_string('namewithbadge', 'core_tag'),
-            $this->get_entity_name()
-        ))
-            ->add_joins($this->get_joins())
-            ->add_fields("{$tagalias}.rawname, {$tagalias}.name, {$tagalias}.flag, {$tagalias}.isstandard")
-            ->set_is_sortable(true)
-            ->add_callback(static function($rawname, stdClass $tag): string {
-                if ($rawname === null) {
-                    return '';
-                }
-
-                $displayname = core_tag_tag::make_display_name($tag);
-                if ($tag->flag > 0) {
-                    $displayname = html_writer::span($displayname, 'flagged-tag');
-                }
-
-                $class = 'badge bg-info text-white';
-                if ($tag->isstandard) {
-                    $class .= ' standardtag';
-                }
-
-                return html_writer::span($displayname, $class);
-            });
-
         // Name with link.
         $columns[] = (new column(
             'namewithlink',
@@ -138,6 +114,7 @@ class tag extends base {
             $this->get_entity_name()
         ))
             ->add_joins($this->get_joins())
+            ->set_type(column::TYPE_TEXT)
             ->add_fields("{$tagalias}.rawname, {$tagalias}.name, {$tagalias}.tagcollid")
             ->set_is_sortable(true)
             ->add_callback(static function($rawname, stdClass $tag): string {
@@ -149,6 +126,10 @@ class tag extends base {
             });
 
         // Description.
+        $descriptionfieldsql = "{$tagalias}.description";
+        if ($DB->get_dbfamily() === 'oracle') {
+            $descriptionfieldsql = $DB->sql_order_by_text($descriptionfieldsql, 1024);
+        }
         $columns[] = (new column(
             'description',
             new lang_string('tagdescription', 'core_tag'),
@@ -156,8 +137,8 @@ class tag extends base {
         ))
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_LONGTEXT)
-            ->add_fields("{$tagalias}.description, {$tagalias}.descriptionformat, {$tagalias}.id")
-            ->set_is_sortable(true)
+            ->add_field($descriptionfieldsql, 'description')
+            ->add_fields("{$tagalias}.descriptionformat, {$tagalias}.id")
             ->add_callback(static function(?string $description, stdClass $tag): string {
                 global $CFG;
                 require_once("{$CFG->libdir}/filelib.php");
@@ -194,7 +175,7 @@ class tag extends base {
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_BOOLEAN)
             ->add_field("CASE WHEN {$tagalias}.flag > 0 THEN 1 ELSE {$tagalias}.flag END", 'flag')
-            ->set_is_sortable(true)
+            ->set_is_sortable(true, ["{$tagalias}.flag"])
             ->add_callback([format::class, 'boolean_as_text']);
 
         // Flag count.

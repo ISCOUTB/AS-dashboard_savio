@@ -33,17 +33,13 @@ define(['tool_moodlenet/validator',
         'core/loadingicon',
         'core/templates',
         'core/notification',
-        'jquery',
-        'theme_boost/bootstrap/carousel',
-        'core/normalise'],
+        'jquery'],
     function(Validator,
              Selectors,
              LoadingIcon,
              Templates,
              Notification,
-             $,
-             Carousel,
-             Normalise) {
+             $) {
 
     /**
      * Add the event listeners to our form.
@@ -82,7 +78,7 @@ define(['tool_moodlenet/validator',
                             validationArea.classList.add('text-danger');
                         }
                         return;
-                }).catch(Notification.exception);
+                }).catch();
             }
         });
     };
@@ -93,7 +89,7 @@ define(['tool_moodlenet/validator',
      * @method chooserNavigateToMnet
      * @param {HTMLElement} showMoodleNet The chooser's area for ment
      * @param {Object} footerData Our footer object to render out
-     * @param {Element} carousel Our carousel instance to manage
+     * @param {jQuery} carousel Our carousel instance to manage
      * @param {jQuery} modal Our modal instance to manage
      */
     var chooserNavigateToMnet = function(showMoodleNet, footerData, carousel, modal) {
@@ -120,11 +116,11 @@ define(['tool_moodlenet/validator',
         registerListenerEvents(showMoodleNet);
 
         // Move to the next slide, and resolve the transition promise when it's done.
-        carousel.addEventListener('slid.bs.carousel', function() {
+        carousel.one('slid.bs.carousel', function() {
             transitionPromiseResolver();
-        }, {once: true});
+        });
         // Trigger the transition between 'pages'.
-        Carousel.getInstance(carousel).to(2);
+        carousel.carousel(2);
         modal.setFooter(Templates.render('tool_moodlenet/chooser_footer_close_mnet', {}));
     };
 
@@ -132,13 +128,13 @@ define(['tool_moodlenet/validator',
      * Given a user no longer wishes to see the MoodleNet profile url form transition them from there.
      *
      * @method chooserNavigateFromMnet
-     * @param {Element} carousel Our carousel instance to manage
+     * @param {jQuery} carousel Our carousel instance to manage
      * @param {jQuery} modal Our modal instance to manage
      * @param {Object} footerData Our footer object to render out
      */
     var chooserNavigateFromMnet = function(carousel, modal, footerData) {
         // Trigger the transition between 'pages'.
-        Carousel.getInstance(carousel).to(0);
+        carousel.carousel(0);
         modal.setFooter(footerData.customfootertemplate);
     };
 
@@ -150,17 +146,16 @@ define(['tool_moodlenet/validator',
          * @param {Object} modal The chooser modal.
          */
     var footerClickListener = function(e, footerData, modal) {
-        const modalBody = Normalise.getFirst(modal.getBody());
         if (e.target.matches(Selectors.action.showMoodleNet) || e.target.closest(Selectors.action.showMoodleNet)) {
             e.preventDefault();
-            const carousel = modalBody.querySelector(Selectors.region.carousel);
-            const showMoodleNet = carousel.querySelector(Selectors.region.moodleNet);
+            const carousel = $(modal.getBody()[0].querySelector(Selectors.region.carousel));
+            const showMoodleNet = carousel.find(Selectors.region.moodleNet)[0];
 
             chooserNavigateToMnet(showMoodleNet, footerData, carousel, modal);
         }
         // From the help screen go back to the module overview.
         if (e.target.matches(Selectors.action.closeOption)) {
-            const carousel = modalBody.querySelector(Selectors.region.carousel);
+            const carousel = $(modal.getBody()[0].querySelector(Selectors.region.carousel));
 
             chooserNavigateFromMnet(carousel, modal, footerData);
         }

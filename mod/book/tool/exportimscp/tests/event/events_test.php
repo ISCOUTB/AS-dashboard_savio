@@ -33,7 +33,7 @@ namespace booktool_exportimscp\event;
  * @copyright  2013 Frédéric Massart
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class events_test extends \advanced_testcase {
+class events_test extends \advanced_testcase {
 
     public function setUp(): void {
         parent::setUp();

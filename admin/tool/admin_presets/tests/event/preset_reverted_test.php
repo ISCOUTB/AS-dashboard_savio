@@ -25,7 +25,7 @@ namespace tool_admin_presets\event;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \tool_admin_presets\event\preset_reverted
  */
-final class preset_reverted_test extends \advanced_testcase {
+class preset_reverted_test extends \advanced_testcase {
 
     /**
      * Test preset_reverted event.

@@ -24,7 +24,7 @@ namespace core_customfield;
  * @copyright  2018 Ruslan Kabalin
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class generator_test extends \advanced_testcase {
+class generator_test extends \advanced_testcase {
 
     /**
      * Get generator

@@ -29,7 +29,7 @@ require_once($CFG->dirroot.'/user/editlib.php');
  * @copyright  2013 Adrian Greeve <adrian@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class editlib_test extends \advanced_testcase {
+class editlib_test extends \advanced_testcase {
 
     /**
      * Test that the required fields are returned in the correct order.
@@ -108,57 +108,5 @@ final class editlib_test extends \advanced_testcase {
 
         // Tidy up after we finish testing.
         $CFG->fullnamedisplay = $originalcfg->fullnamedisplay;
-    }
-
-    /**
-     * Provider for test_useredit_update_user_preference
-     *
-     * @return array
-     */
-    public static function useredit_update_user_preference_provider(): array {
-        return [
-            'Homepage fixed' => [HOMEPAGE_SITE, [], HOMEPAGE_MYCOURSES, null],
-            'Simple user pref' => [HOMEPAGE_USER, [], HOMEPAGE_MYCOURSES, (string)HOMEPAGE_MYCOURSES],
-            'Extra option' => [HOMEPAGE_USER, ['/helloworld'], '/helloworld', '/helloworld'],
-            'Invalid option' => [HOMEPAGE_USER, [], '/helloworld', (string)HOMEPAGE_MY],
-        ];
-    }
-
-    /**
-     * Tests for function useredit_update_user_preference
-     *
-     * @dataProvider useredit_update_user_preference_provider
-     * @covers ::useredit_update_user_preference
-     * @param int $defaulthomepage to be set as the default homepage
-     * @param array $extraoptions additional options for the pref value that are added in the hook callbacks
-     * @param int|string $setting what we are trying to set as a user preference
-     * @param string|null $expected what will be actually set in the user preference
-     */
-    public function test_useredit_update_user_preference(int $defaulthomepage, array $extraoptions,
-            $setting, ?string $expected): void {
-        global $DB, $CFG, $USER;
-        $this->resetAfterTest();
-        $user = $this->getDataGenerator()->create_user();
-        $this->setUser($user);
-
-        if ($extraoptions) {
-            // Pretend we have hook callbacks adding extra allowed options.
-            $testcallback = function(\core_user\hook\extend_default_homepage $hook) use ($extraoptions) {
-                foreach ($extraoptions as $localurl) {
-                    $hook->add_option(new \moodle_url($localurl), new \lang_string('yes'));
-                }
-            };
-            $this->redirectHook(\core_user\hook\extend_default_homepage::class, $testcallback);
-        }
-
-        set_config('defaulthomepage', $defaulthomepage);
-        useredit_update_user_preference([
-            'id' => $user->id,
-            'preference_user_home_page_preference' => $setting,
-        ]);
-
-        // Ensure user preference returns expected value.
-        $preference = get_user_preferences('user_home_page_preference', null, $user);
-        $this->assertSame($expected, $preference);
     }
 }

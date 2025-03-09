@@ -87,7 +87,7 @@ class report_log_renderer extends plugin_renderer_base {
      */
     public function report_selector_form(report_log_renderable $reportlog) {
         echo html_writer::start_tag('form', array('class' => 'logselecform', 'action' => $reportlog->url, 'method' => 'get'));
-        echo html_writer::start_div('d-flex flex-wrap align-items-center gap-2');
+        echo html_writer::start_div();
         echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'chooselog', 'value' => '1'));
         echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'showusers', 'value' => $reportlog->showusers));
         echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'showcourses',
@@ -95,13 +95,36 @@ class report_log_renderer extends plugin_renderer_base {
 
         $selectedcourseid = empty($reportlog->course) ? 0 : $reportlog->course->id;
 
-        echo $this->get_course_selector_field($reportlog, $selectedcourseid);
+        // Add course selector.
+        $sitecontext = context_system::instance();
+        $courses = $reportlog->get_course_list();
+        if (!empty($courses) && $reportlog->showcourses) {
+            echo html_writer::label(get_string('selectacourse'), 'menuid', false, array('class' => 'accesshide'));
+            echo html_writer::select($courses, "id", $selectedcourseid, null, ['class' => 'me-2 mb-2']);
+        } else {
+            $courses = array();
+            $courses[$selectedcourseid] = get_course_display_name_for_list($reportlog->course) . (($selectedcourseid == SITEID) ?
+                ' (' . get_string('site') . ') ' : '');
+            echo html_writer::label(get_string('selectacourse'), 'menuid', false, array('class' => 'accesshide'));
+            echo html_writer::select($courses, "id", $selectedcourseid, false, ['class' => 'me-2 mb-2']);
+            // Check if user is admin and this came because of limitation on number of courses to show in dropdown.
+            if (has_capability('report/log:view', $sitecontext)) {
+                $a = new stdClass();
+                $a->url = new moodle_url('/report/log/index.php', array('chooselog' => 0,
+                    'group' => $reportlog->get_selected_group(), 'user' => $reportlog->userid,
+                    'id' => $selectedcourseid, 'date' => $reportlog->date, 'modid' => $reportlog->modid,
+                    'showcourses' => 1, 'showusers' => $reportlog->showusers));
+                $a->url = $a->url->out(false);
+                print_string('logtoomanycourses', 'moodle', $a);
+            }
+        }
 
         // Add group selector.
         $groups = $reportlog->get_group_list();
         if (!empty($groups)) {
             echo html_writer::label(get_string('selectagroup'), 'menugroup', false, array('class' => 'accesshide'));
-            echo html_writer::select($groups, "group", $reportlog->groupid, get_string("allgroups"));
+            echo html_writer::select($groups, "group", $reportlog->groupid, get_string("allgroups"),
+                ['class' => 'me-2 mb-2']);
         }
 
         // Add user selector.
@@ -109,7 +132,8 @@ class report_log_renderer extends plugin_renderer_base {
 
         if ($reportlog->showusers) {
             echo html_writer::label(get_string('selctauser'), 'menuuser', false, array('class' => 'accesshide'));
-            echo html_writer::select($users, "user", $reportlog->userid, get_string("allparticipants"));
+            echo html_writer::select($users, "user", $reportlog->userid, get_string("allparticipants"),
+                ['class' => 'me-2 mb-2']);
         } else {
             $users = array();
             if (!empty($reportlog->userid)) {
@@ -118,7 +142,7 @@ class report_log_renderer extends plugin_renderer_base {
                 $users[0] = get_string('allparticipants');
             }
             echo html_writer::label(get_string('selctauser'), 'menuuser', false, array('class' => 'accesshide'));
-            echo html_writer::select($users, "user", $reportlog->userid, false);
+            echo html_writer::select($users, "user", $reportlog->userid, false, ['class' => 'me-2 mb-2']);
             $a = new stdClass();
             $a->url = new moodle_url('/report/log/index.php', array('chooselog' => 0,
                 'group' => $reportlog->get_selected_group(), 'user' => $reportlog->userid,
@@ -133,25 +157,30 @@ class report_log_renderer extends plugin_renderer_base {
         // Add date selector.
         $dates = $reportlog->get_date_options();
         echo html_writer::label(get_string('date'), 'menudate', false, array('class' => 'accesshide'));
-        echo html_writer::select($dates, "date", $reportlog->date, get_string("alldays"));
+        echo html_writer::select($dates, "date", $reportlog->date, get_string("alldays"),
+            ['class' => 'me-2 mb-2']);
 
         // Add activity selector.
-        echo $this->get_activity_selector_field($reportlog);
+        [$activities, $disabled] = $reportlog->get_activities_list();
+        echo html_writer::label(get_string('activities'), 'menumodid', false, array('class' => 'accesshide'));
+        echo html_writer::select($activities, "modid", $reportlog->modid, get_string("allactivities"),
+            ['class' => 'me-2 mb-2'], $disabled);
 
         // Add actions selector.
         echo html_writer::label(get_string('actions'), 'menumodaction', false, array('class' => 'accesshide'));
         echo html_writer::select($reportlog->get_actions(), 'modaction', $reportlog->action,
-            get_string("allactions"));
+            get_string("allactions"), ['class' => 'me-2 mb-2']);
 
         // Add origin.
         $origin = $reportlog->get_origin_options();
         echo html_writer::label(get_string('origin', 'report_log'), 'menuorigin', false, array('class' => 'accesshide'));
-        echo html_writer::select($origin, 'origin', $reportlog->origin, false);
+        echo html_writer::select($origin, 'origin', $reportlog->origin, false, ['class' => 'me-2 mb-2']);
 
         // Add edulevel.
         $edulevel = $reportlog->get_edulevel_options();
         echo html_writer::label(get_string('edulevel'), 'menuedulevel', false, array('class' => 'accesshide'));
-        echo html_writer::select($edulevel, 'edulevel', $reportlog->edulevel, false) .$this->help_icon('edulevel');
+        echo html_writer::select($edulevel, 'edulevel', $reportlog->edulevel, false,
+            ['class' => 'me-2 mb-2']) .$this->help_icon('edulevel');
 
         // Add reader option.
         // If there is some reader available then only show submit button.
@@ -163,109 +192,16 @@ class report_log_renderer extends plugin_renderer_base {
             } else {
                 echo html_writer::label(get_string('selectlogreader', 'report_log'), 'menureader', false,
                         array('class' => 'accesshide'));
-                echo html_writer::select($readers, 'logreader', $reportlog->selectedlogreader, false);
+                echo html_writer::select($readers, 'logreader', $reportlog->selectedlogreader, false,
+                    ['class' => 'me-2 mb-2']);
             }
-            echo html_writer::end_div();
-            echo html_writer::start_div('mt-2');
+            echo html_writer::start_div('mt-1');
             echo html_writer::empty_tag('input', array('type' => 'submit',
                 'value' => get_string('gettheselogs'), 'class' => 'btn btn-primary'));
             echo html_writer::end_div();
         }
+        echo html_writer::end_div();
         echo html_writer::end_tag('form');
     }
-
-    /**
-     * Generates the course selector field for the log report.
-     *
-     * @param report_log_renderable $reportlog The output instance.
-     * @param int $selectedcourseid
-     * @return string
-     */
-    private function get_course_selector_field(report_log_renderable $reportlog, int $selectedcourseid): string {
-        // When the log report is accessed vie an activity, we do not need a course selector.
-        if ($reportlog->isactivitypage) {
-            return html_writer::empty_tag(
-                'input',
-                ['type' => 'hidden', 'name' => 'id', 'value' => $selectedcourseid]
-            );
-        }
-
-        $result = '';
-        $sitecontext = context_system::instance();
-        $courses = $reportlog->get_course_list();
-
-        if (!empty($courses) && $reportlog->showcourses) {
-            $result .= html_writer::label(get_string('selectacourse'), 'menuid', false, ['class' => 'accesshide']);
-            $result .= html_writer::select($courses, "id", $selectedcourseid, null);
-            return $result;
-        }
-
-        $courses = [];
-        $courseinfo = ($selectedcourseid == SITEID) ? ' (' . get_string('site') . ') ' : '';
-        $courses[$selectedcourseid] = get_course_display_name_for_list($reportlog->course) . $courseinfo;
-
-        $result .= html_writer::label(get_string('selectacourse'), 'menuid', false, ['class' => 'accesshide']);
-        $result .= html_writer::select($courses, "id", $selectedcourseid, false);
-
-        // Check if user is admin and this came because of limitation on number of courses to show in dropdown.
-        if (has_capability('report/log:view', $sitecontext)) {
-            $a = new stdClass();
-            $a->url = new moodle_url(
-                '/report/log/index.php',
-                [
-                    'chooselog' => 0,
-                    'group' => $reportlog->get_selected_group(),
-                    'user' => $reportlog->userid,
-                    'id' => $selectedcourseid,
-                    'date' => $reportlog->date,
-                    'modid' => $reportlog->modid,
-                    'showcourses' => 1, 'showusers' => $reportlog->showusers,
-                ]
-            );
-            $a->url = $a->url->out(false);
-            $result .= get_string('logtoomanycourses', 'moodle', $a);
-        }
-
-        return $result;
-    }
-
-    /**
-     * Generates the activity selector field for the log report.
-     *
-     * @param report_log_renderable $reportlog The output instance.
-     * @return string
-     */
-    private function get_activity_selector_field(report_log_renderable $reportlog): string {
-        $result = '';
-        // When the log report is accessed vie an activity, we do not need an activity selector.
-        if ($reportlog->isactivitypage) {
-            $result .= html_writer::empty_tag(
-                'input',
-                ['type' => 'hidden', 'name' => 'isactivitypage', 'value' => $reportlog->isactivitypage]
-            );
-            $result .= html_writer::empty_tag(
-                'input',
-                ['type' => 'hidden', 'name' => 'modid', 'value' => $reportlog->modid]
-            );
-            return $result;
-        }
-
-        [$activities, $disabled] = $reportlog->get_activities_list();
-
-        $result .= html_writer::label(
-            text: get_string('activities'),
-            for: 'menumodid',
-            colonize: false,
-            attributes: ['class' => 'accesshide'],
-        );
-        $result .= html_writer::select(
-            options: $activities,
-            name: "modid",
-            selected: $reportlog->modid,
-            nothing: get_string("allactivities"),
-            attributes: [],
-            disabled: $disabled,
-        );
-        return $result;
-    }
 }
+

@@ -40,13 +40,13 @@ use core_privacy\local\metadata\types\user_preference;
  * @copyright   2018 Andrew Nicols <andrew@nicols.co.uk>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class provider_test extends \advanced_testcase {
+class provider_test extends \advanced_testcase {
     /**
      * Returns a list of frankenstyle names of core components (plugins and subsystems).
      *
      * @return array the array of frankenstyle component names with the relevant class name.
      */
-    public static function get_component_list(): array {
+    public function get_component_list() {
         $components = ['core' => [
             'component' => 'core',
             'classname' => manager::get_provider_classname_for_component('core')
@@ -97,12 +97,12 @@ final class provider_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function null_provider_provider(): array {
-        return array_filter(self::get_component_list(), function($component): bool {
-            return static::component_implements(
-                $component['classname'],
-                \core_privacy\local\metadata\null_provider::class
-            );
+    public function null_provider_provider() {
+        return array_filter($this->get_component_list(), function($component) {
+                return static::component_implements(
+                    $component['classname'],
+                    \core_privacy\local\metadata\null_provider::class
+                );
         });
     }
 
@@ -218,12 +218,12 @@ final class provider_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function metadata_provider_provider(): array {
-        return array_filter(self::get_component_list(), function($component): bool {
-            return static::component_implements(
-                $component['classname'],
-                \core_privacy\local\metadata\provider::class
-            );
+    public function metadata_provider_provider() {
+        return array_filter($this->get_component_list(), function($component) {
+                return static::component_implements(
+                    $component['classname'],
+                    \core_privacy\local\metadata\provider::class
+                );
         });
     }
 
@@ -232,16 +232,13 @@ final class provider_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function is_user_data_provider(): array {
-        return array_map(
-            fn ($data) => ['component' => $data['component']],
-            array_filter(self::get_component_list(), function($component): bool {
+    public function is_user_data_provider() {
+        return array_filter($this->get_component_list(), function($component) {
                 return static::component_implements(
                     $component['classname'],
                     \core_privacy\local\request\core_user_data_provider::class
                 );
-            }),
-        );
+        });
     }
 
     /**
@@ -313,7 +310,7 @@ final class provider_test extends \advanced_testcase {
             }
         }
 
-        $componentlist = self::metadata_provider_provider();
+        $componentlist = $this->metadata_provider_provider();
         foreach ($componentlist as $componentarray) {
             $component = $componentarray['component'];
             $classname = $componentarray['classname'];

@@ -16,8 +16,6 @@
 
 namespace core_analytics;
 
-use core_analytics\tests\mlbackend_helper_trait;
-
 defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__ . '/fixtures/test_indicator_max.php');
@@ -33,8 +31,7 @@ require_once(__DIR__ . '/fixtures/test_target_course_level_shortname.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers    \core_analytics\manager
  */
-final class manager_test extends \advanced_testcase {
-    use mlbackend_helper_trait;
+class manager_test extends \advanced_testcase {
 
     /**
      * test_deleted_context
@@ -42,26 +39,23 @@ final class manager_test extends \advanced_testcase {
     public function test_deleted_context(): void {
         global $DB;
 
-        if (!self::is_mlbackend_python_configured()) {
-            $this->markTestSkipped('mlbackend_python is not configured.');
-        }
-
         $this->resetAfterTest(true);
         $this->setAdminuser();
         set_config('enabled_stores', 'logstore_standard', 'tool_log');
 
-        // Create some courses.
-        $this->generate_courses(2, ['visible' => 0]);
-        $this->generate_courses(2, ['visible' => 1]);
-
         $target = \core_analytics\manager::get_target('test_target_course_level_shortname');
-        $indicators = ['test_indicator_max', 'test_indicator_min', 'test_indicator_fullname'];
+        $indicators = array('test_indicator_max', 'test_indicator_min', 'test_indicator_fullname');
         foreach ($indicators as $key => $indicator) {
             $indicators[$key] = \core_analytics\manager::get_indicator($indicator);
         }
 
         $model = \core_analytics\model::create($target, $indicators);
         $modelobj = $model->get_model_obj();
+
+        $coursepredict1 = $this->getDataGenerator()->create_course(array('visible' => 0));
+        $coursepredict2 = $this->getDataGenerator()->create_course(array('visible' => 0));
+        $coursetrain1 = $this->getDataGenerator()->create_course(array('visible' => 1));
+        $coursetrain2 = $this->getDataGenerator()->create_course(array('visible' => 1));
 
         $model->enable('\core\analytics\time_splitting\no_splitting');
 
@@ -71,33 +65,25 @@ final class manager_test extends \advanced_testcase {
         // Generate a prediction action to confirm that it is deleted when there is an important update.
         $predictions = $DB->get_records('analytics_predictions');
         $prediction = reset($predictions);
-        $prediction = new \core_analytics\prediction($prediction, ['whatever' => 'not used']);
+        $prediction = new \core_analytics\prediction($prediction, array('whatever' => 'not used'));
         $prediction->action_executed(\core_analytics\prediction::ACTION_USEFUL, $model->get_target());
 
         $predictioncontextid = $prediction->get_prediction_data()->contextid;
 
-        $npredictions = $DB->count_records('analytics_predictions', ['contextid' => $predictioncontextid]);
-        $npredictionactions = $DB->count_records(
-            'analytics_prediction_actions',
-            ['predictionid' => $prediction->get_prediction_data()->id]
-        );
-        $nindicatorcalc = $DB->count_records('analytics_indicator_calc', ['contextid' => $predictioncontextid]);
+        $npredictions = $DB->count_records('analytics_predictions', array('contextid' => $predictioncontextid));
+        $npredictionactions = $DB->count_records('analytics_prediction_actions',
+            array('predictionid' => $prediction->get_prediction_data()->id));
+        $nindicatorcalc = $DB->count_records('analytics_indicator_calc', array('contextid' => $predictioncontextid));
 
         \core_analytics\manager::cleanup();
 
         // Nothing is incorrectly deleted.
-        $this->assertEquals($npredictions, $DB->count_records(
-            'analytics_predictions',
-            ['contextid' => $predictioncontextid]
-        ));
-        $this->assertEquals($npredictionactions, $DB->count_records(
-            'analytics_prediction_actions',
-            ['predictionid' => $prediction->get_prediction_data()->id]
-        ));
-        $this->assertEquals($nindicatorcalc, $DB->count_records(
-            'analytics_indicator_calc',
-            ['contextid' => $predictioncontextid]
-        ));
+        $this->assertEquals($npredictions, $DB->count_records('analytics_predictions',
+            array('contextid' => $predictioncontextid)));
+        $this->assertEquals($npredictionactions, $DB->count_records('analytics_prediction_actions',
+            array('predictionid' => $prediction->get_prediction_data()->id)));
+        $this->assertEquals($nindicatorcalc, $DB->count_records('analytics_indicator_calc',
+            array('contextid' => $predictioncontextid)));
 
         // Now we delete a context, the course predictions and prediction actions should be deleted.
         $deletedcontext = \context::instance_by_id($predictioncontextid);
@@ -105,12 +91,10 @@ final class manager_test extends \advanced_testcase {
 
         \core_analytics\manager::cleanup();
 
-        $this->assertEmpty($DB->count_records('analytics_predictions', ['contextid' => $predictioncontextid]));
-        $this->assertEmpty($DB->count_records(
-            'analytics_prediction_actions',
-            ['predictionid' => $prediction->get_prediction_data()->id]
-        ));
-        $this->assertEmpty($DB->count_records('analytics_indicator_calc', ['contextid' => $predictioncontextid]));
+        $this->assertEmpty($DB->count_records('analytics_predictions', array('contextid' => $predictioncontextid)));
+        $this->assertEmpty($DB->count_records('analytics_prediction_actions',
+            array('predictionid' => $prediction->get_prediction_data()->id)));
+        $this->assertEmpty($DB->count_records('analytics_indicator_calc', array('contextid' => $predictioncontextid)));
 
         set_config('enabled_stores', '', 'tool_log');
         get_log_manager(true);
@@ -122,16 +106,12 @@ final class manager_test extends \advanced_testcase {
     public function test_deleted_analysable(): void {
         global $DB;
 
-        if (!self::is_mlbackend_python_configured()) {
-            $this->markTestSkipped('mlbackend_python is not configured.');
-        }
-
         $this->resetAfterTest(true);
         $this->setAdminuser();
         set_config('enabled_stores', 'logstore_standard', 'tool_log');
 
         $target = \core_analytics\manager::get_target('test_target_course_level_shortname');
-        $indicators = ['test_indicator_max', 'test_indicator_min', 'test_indicator_fullname'];
+        $indicators = array('test_indicator_max', 'test_indicator_min', 'test_indicator_fullname');
         foreach ($indicators as $key => $indicator) {
             $indicators[$key] = \core_analytics\manager::get_indicator($indicator);
         }
@@ -139,10 +119,10 @@ final class manager_test extends \advanced_testcase {
         $model = \core_analytics\model::create($target, $indicators);
         $modelobj = $model->get_model_obj();
 
-        $coursepredict1 = $this->getDataGenerator()->create_course(['visible' => 0]);
-        $coursepredict2 = $this->getDataGenerator()->create_course(['visible' => 0]);
-        $coursetrain1 = $this->getDataGenerator()->create_course(['visible' => 1]);
-        $coursetrain2 = $this->getDataGenerator()->create_course(['visible' => 1]);
+        $coursepredict1 = $this->getDataGenerator()->create_course(array('visible' => 0));
+        $coursepredict2 = $this->getDataGenerator()->create_course(array('visible' => 0));
+        $coursetrain1 = $this->getDataGenerator()->create_course(array('visible' => 1));
+        $coursetrain2 = $this->getDataGenerator()->create_course(array('visible' => 1));
 
         $model->enable('\core\analytics\time_splitting\no_splitting');
 
@@ -159,9 +139,9 @@ final class manager_test extends \advanced_testcase {
 
         \core_analytics\manager::cleanup();
 
-        $this->assertEmpty($DB->count_records('analytics_predict_samples', ['analysableid' => $coursepredict1->id]));
-        $this->assertEmpty($DB->count_records('analytics_train_samples', ['analysableid' => $coursepredict1->id]));
-        $this->assertEmpty($DB->count_records('analytics_used_analysables', ['analysableid' => $coursepredict1->id]));
+        $this->assertEmpty($DB->count_records('analytics_predict_samples', array('analysableid' => $coursepredict1->id)));
+        $this->assertEmpty($DB->count_records('analytics_train_samples', array('analysableid' => $coursepredict1->id)));
+        $this->assertEmpty($DB->count_records('analytics_used_analysables', array('analysableid' => $coursepredict1->id)));
 
         set_config('enabled_stores', '', 'tool_log');
         get_log_manager(true);
@@ -210,7 +190,7 @@ final class manager_test extends \advanced_testcase {
         $this->resetAfterTest();
 
         // This is expected to run without an exception.
-        $models = self::load_models_from_fixture_file('no_teaching');
+        $models = $this->load_models_from_fixture_file('no_teaching');
         \core_analytics\manager::validate_models_declaration($models);
     }
 
@@ -234,34 +214,34 @@ final class manager_test extends \advanced_testcase {
      *
      * @return array of (string)testcase => [(array)models, (string)expected exception message]
      */
-    public static function validate_models_declaration_exceptions_provider(): array {
+    public function validate_models_declaration_exceptions_provider() {
         return [
             'missing_target' => [
-                self::load_models_from_fixture_file('missing_target'),
+                $this->load_models_from_fixture_file('missing_target'),
                 'Missing target declaration',
             ],
             'invalid_target' => [
-                self::load_models_from_fixture_file('invalid_target'),
+                $this->load_models_from_fixture_file('invalid_target'),
                 'Invalid target classname',
             ],
             'missing_indicators' => [
-                self::load_models_from_fixture_file('missing_indicators'),
+                $this->load_models_from_fixture_file('missing_indicators'),
                 'Missing indicators declaration',
             ],
             'invalid_indicators' => [
-                self::load_models_from_fixture_file('invalid_indicators'),
+                $this->load_models_from_fixture_file('invalid_indicators'),
                 'Invalid indicator classname',
             ],
             'invalid_time_splitting' => [
-                self::load_models_from_fixture_file('invalid_time_splitting'),
+                $this->load_models_from_fixture_file('invalid_time_splitting'),
                 'Invalid time splitting classname',
             ],
             'invalid_time_splitting_fq' => [
-                self::load_models_from_fixture_file('invalid_time_splitting_fq'),
+                $this->load_models_from_fixture_file('invalid_time_splitting_fq'),
                 'Expecting fully qualified time splitting classname',
             ],
             'invalid_enabled' => [
-                self::load_models_from_fixture_file('invalid_enabled'),
+                $this->load_models_from_fixture_file('invalid_enabled'),
                 'Cannot enable a model without time splitting method specified',
             ],
         ];
@@ -273,12 +253,12 @@ final class manager_test extends \advanced_testcase {
      * @param string $filename
      * @return array
      */
-    protected static function load_models_from_fixture_file(string $filename) {
+    protected function load_models_from_fixture_file(string $filename) {
         global $CFG;
 
         $models = null;
 
-        require("{$CFG->dirroot}/analytics/tests/fixtures/db_analytics_php/{$filename}.php");
+        require($CFG->dirroot.'/analytics/tests/fixtures/db_analytics_php/'.$filename.'.php');
 
         return $models;
     }
@@ -450,9 +430,9 @@ final class manager_test extends \advanced_testcase {
      */
     public function test_model_declaration_identifier(): void {
 
-        $noteaching1 = self::load_models_from_fixture_file('no_teaching');
-        $noteaching2 = self::load_models_from_fixture_file('no_teaching');
-        $noteaching3 = self::load_models_from_fixture_file('no_teaching');
+        $noteaching1 = $this->load_models_from_fixture_file('no_teaching');
+        $noteaching2 = $this->load_models_from_fixture_file('no_teaching');
+        $noteaching3 = $this->load_models_from_fixture_file('no_teaching');
 
         // Same model declaration should always lead to same identifier.
         $this->assertEquals(
@@ -494,9 +474,9 @@ final class manager_test extends \advanced_testcase {
     public function test_get_declared_target_and_indicators_instances(): void {
         $this->resetAfterTest();
 
-        $definition = self::load_models_from_fixture_file('no_teaching');
+        $definition = $this->load_models_from_fixture_file('no_teaching');
 
-        [$target, $indicators] = \core_analytics\manager::get_declared_target_and_indicators_instances($definition[0]);
+        list($target, $indicators) = \core_analytics\manager::get_declared_target_and_indicators_instances($definition[0]);
 
         $this->assertTrue($target instanceof \core_analytics\local\target\base);
         $this->assertNotEmpty($indicators);

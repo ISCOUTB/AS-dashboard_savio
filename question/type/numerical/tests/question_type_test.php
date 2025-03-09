@@ -38,7 +38,7 @@ require_once($CFG->dirroot . '/question/type/numerical/edit_numerical_form.php')
  * @covers \question_type
  * @covers \qtype_numerical
  */
-final class question_type_test extends \advanced_testcase {
+class question_type_test extends \advanced_testcase {
     protected $tolerance = 0.00000001;
     protected $qtype;
 

@@ -38,7 +38,7 @@ require_once("{$CFG->dirroot}/webservice/tests/helpers.php");
  * @copyright   2021 Paul Holden <paulh@moodle.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class reorder_test extends externallib_advanced_testcase {
+class reorder_test extends externallib_advanced_testcase {
 
     /**
      * Text execute method

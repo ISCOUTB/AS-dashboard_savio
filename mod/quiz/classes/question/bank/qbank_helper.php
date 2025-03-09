@@ -17,7 +17,6 @@
 namespace mod_quiz\question\bank;
 
 use context_module;
-use core_question\local\bank\version_options;
 use core_question\local\bank\question_version_status;
 use core_question\local\bank\random_question_loader;
 use core_question\question_reference_manager;
@@ -47,14 +46,25 @@ class qbank_helper {
      * @return stdClass[] other versions of this question. Each object has fields versionid,
      *       version and questionid. Array is returned most recent version first.
      */
-    #[\core\attribute\deprecated(
-        'core_question\local\bank::get_version_options',
-        since: 5.0,
-        mdl: 'MDL-77713')
-    ]
     public static function get_version_options(int $questionid): array {
-        \core\deprecation::emit_deprecation_if_present([self::class, __FUNCTION__]);
-        return version_options::get_version_options($questionid);
+        global $DB;
+
+        return $DB->get_records_sql("
+                SELECT allversions.id AS versionid,
+                       allversions.version,
+                       allversions.questionid
+
+                  FROM {question_versions} allversions
+
+                 WHERE allversions.questionbankentryid = (
+                            SELECT givenversion.questionbankentryid
+                              FROM {question_versions} givenversion
+                             WHERE givenversion.questionid = ?
+                       )
+                   AND allversions.status <> ?
+
+              ORDER BY allversions.version DESC
+              ", [$questionid, question_version_status::QUESTION_STATUS_DRAFT]);
     }
 
     /**
@@ -129,7 +139,6 @@ class qbank_helper {
              -- version we could consider digging the old code out of git history from
              -- just before the commit that added this comment.
              -- For relevant question_bank_entries, this gets the latest non-draft slot number.
-             -- TODO: Optimise the query, as Oracle-specific constraints no longer apply.
              LEFT JOIN (
                    SELECT lv.questionbankentryid,
                           MAX(CASE WHEN lv.status <> :draft THEN lv.version END) AS usableversion,

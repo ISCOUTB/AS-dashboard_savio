@@ -95,6 +95,8 @@ class badge extends base {
      * @return column[]
      */
     protected function get_all_columns(): array {
+        global $DB;
+
         $badgealias = $this->get_table_alias('badge');
         $contextalias = $this->get_table_alias('context');
 
@@ -129,6 +131,10 @@ class badge extends base {
             });
 
         // Description (note, this column contains plaintext so requires no post-processing).
+        $descriptionfieldsql = "{$badgealias}.description";
+        if ($DB->get_dbfamily() === 'oracle') {
+            $descriptionfieldsql = $DB->sql_order_by_text($descriptionfieldsql, 1024);
+        }
         $columns[] = (new column(
             'description',
             new lang_string('description', 'core_badges'),
@@ -136,8 +142,7 @@ class badge extends base {
         ))
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_LONGTEXT)
-            ->add_field("{$badgealias}.description")
-            ->set_is_sortable(true);
+            ->add_field($descriptionfieldsql, 'description');
 
         // Criteria.
         $columns[] = (new column(
@@ -155,9 +160,7 @@ class badge extends base {
                     return '';
                 }
                 $badge = new \core_badges\badge($badgeid);
-                if (empty($badge->criteria)) {
-                    return '<span class="no-criteria-set d-none"></span>';
-                }
+
                 $renderer = $PAGE->get_renderer('core_badges');
                 return $renderer->print_badge_criteria($badge, 'short');
             });
@@ -172,7 +175,8 @@ class badge extends base {
             ->add_join("LEFT JOIN {context} {$contextalias}
                     ON {$contextalias}.contextlevel = " . CONTEXT_COURSE . "
                    AND {$contextalias}.instanceid = {$badgealias}.courseid")
-            ->add_fields("{$badgealias}.id, {$badgealias}.type, {$badgealias}.courseid, {$badgealias}.imagecaption")
+            ->add_fields("{$badgealias}.id, {$badgealias}.type, {$badgealias}.courseid")
+            ->add_field($DB->sql_cast_to_char("{$badgealias}.imagecaption"), 'imagecaption')
             ->add_fields(context_helper::get_preload_record_columns_sql($contextalias))
             ->add_callback(static function($value, stdClass $badge): string {
                 if ($badge->id === null) {
@@ -256,6 +260,19 @@ class badge extends base {
                 }
             });
 
+        // Image author details.
+        foreach (['imageauthorname', 'imageauthoremail', 'imageauthorurl'] as $imageauthorfield) {
+            $columns[] = (new column(
+                $imageauthorfield,
+                new lang_string($imageauthorfield, 'core_badges'),
+                $this->get_entity_name()
+            ))
+                ->add_joins($this->get_joins())
+                ->set_type(column::TYPE_TEXT)
+                ->add_field("{$badgealias}.{$imageauthorfield}")
+                ->set_is_sortable(true);
+        }
+
         return $columns;
     }
 
@@ -265,6 +282,8 @@ class badge extends base {
      * @return filter[]
      */
     protected function get_all_filters(): array {
+        global $DB;
+
         $badgealias = $this->get_table_alias('badge');
 
         // Name.

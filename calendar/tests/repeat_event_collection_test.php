@@ -45,7 +45,7 @@ require_once($CFG->dirroot . '/calendar/lib.php');
  * @copyright 2017 Ryan Wyllie <ryan@moodle.com>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class repeat_event_collection_test extends \advanced_testcase {
+class repeat_event_collection_test extends \advanced_testcase {
     /**
      * Test that the collection id is set to the parent id if the repeat id
      * is falsey.

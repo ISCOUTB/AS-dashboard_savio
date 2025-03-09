@@ -29,7 +29,7 @@ use mod_bigbluebuttonbn\test\testcase_helper_trait;
  * @covers \mod_bigbluebuttonbn\local\helpers\roles
  * @coversDefaultClass \mod_bigbluebuttonbn\local\helpers\roles
  */
-final class roles_test extends \advanced_testcase {
+class roles_test extends \advanced_testcase {
     use testcase_helper_trait;
 
     /**

@@ -34,10 +34,10 @@ define('DEBUG_NONE', 0);
 define('DEBUG_MINIMAL', E_ERROR | E_PARSE);
 /** Errors, warnings and notices */
 define('DEBUG_NORMAL', E_ERROR | E_PARSE | E_WARNING | E_NOTICE);
-/** All problems. Formerly, all problems, except the erstwhile strict PHP warnings before E_STRICT got deprecated. */
-define('DEBUG_ALL', E_ALL);
-/** Same as DEBUG_ALL since E_STRICT was deprecated. */
-define('DEBUG_DEVELOPER', E_ALL);
+/** All problems except strict PHP warnings */
+define('DEBUG_ALL', E_ALL & ~E_STRICT);
+/** DEBUG_ALL with all debug messages and strict warnings */
+define('DEBUG_DEVELOPER', E_ALL | E_STRICT);
 
 /** Remove any memory limits */
 define('MEMORY_UNLIMITED', -1);
@@ -75,7 +75,7 @@ function get_whoops(): ?\Whoops\Run {
         return null;
     }
 
-    if (empty($CFG->debug_developer_use_pretty_exceptions)) {
+    if (!$CFG->debug_developer_use_pretty_exceptions) {
         return null;
     }
 
@@ -845,14 +845,41 @@ function setup_get_remote_url() {
         }
         $_SERVER['REQUEST_URI'] = $rurl['fullpath']; // extra IIS compatibility
 
+/* NOTE: following servers are not fully tested! */
+
+    } else if (stripos($_SERVER['SERVER_SOFTWARE'], 'lighttpd') !== false) {
+        //lighttpd - not officially supported
+        $rurl['fullpath'] = $_SERVER['REQUEST_URI']; // TODO: verify this is always properly encoded
+
     } else if (stripos($_SERVER['SERVER_SOFTWARE'], 'nginx') !== false) {
+        //nginx - not officially supported
         if (!isset($_SERVER['SCRIPT_NAME'])) {
             die('Invalid server configuration detected, please try to add "fastcgi_param SCRIPT_NAME $fastcgi_script_name;" to the nginx server configuration.');
         }
+        $rurl['fullpath'] = $_SERVER['REQUEST_URI']; // TODO: verify this is always properly encoded
+
+     } else if (stripos($_SERVER['SERVER_SOFTWARE'], 'cherokee') !== false) {
+         //cherokee - not officially supported
+         $rurl['fullpath'] = $_SERVER['REQUEST_URI']; // TODO: verify this is always properly encoded
+
+     } else if (stripos($_SERVER['SERVER_SOFTWARE'], 'zeus') !== false) {
+         //zeus - not officially supported
+         $rurl['fullpath'] = $_SERVER['REQUEST_URI']; // TODO: verify this is always properly encoded
+
+    } else if (stripos($_SERVER['SERVER_SOFTWARE'], 'LiteSpeed') !== false) {
+        //LiteSpeed - not officially supported
+        $rurl['fullpath'] = $_SERVER['REQUEST_URI']; // TODO: verify this is always properly encoded
+
+    } else if ($_SERVER['SERVER_SOFTWARE'] === 'HTTPD') {
+        //obscure name found on some servers - this is definitely not supported
+        $rurl['fullpath'] = $_SERVER['REQUEST_URI']; // TODO: verify this is always properly encoded
+
+    } else if (strpos($_SERVER['SERVER_SOFTWARE'], 'PHP') === 0) {
+        // built-in PHP Development Server
         $rurl['fullpath'] = $_SERVER['REQUEST_URI'];
+
     } else {
-        // Any other servers we can assume will pass the request_uri normally.
-        $rurl['fullpath'] = $_SERVER['REQUEST_URI'];
+        throw new moodle_exception('unsupportedwebserver', 'error', '', $_SERVER['SERVER_SOFTWARE']);
     }
 
     // sanitize the url a bit more, the encoding style may be different in vars above

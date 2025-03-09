@@ -21,11 +21,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+import $ from 'jquery';
 import Modal from './add_question_modal';
 import * as Fragment from 'core/fragment';
 import * as FormChangeChecker from 'core_form/changechecker';
 import * as ModalEvents from 'core/modal_events';
-import * as Notification from 'core/notification';
 
 const SELECTORS = {
     ADD_TO_QUIZ_CONTAINER: 'td.addtoquizaction',
@@ -33,12 +33,6 @@ const SELECTORS = {
     PREVIEW_CONTAINER: 'td.previewquestionaction',
     ADD_QUESTIONS_FORM: 'form#questionsubmit',
     SORTERS: '.sorters',
-    SWITCH_TO_OTHER_BANK: 'button[data-action="switch-question-bank"]',
-    NEW_BANKMOD_ID: 'data-newmodid',
-    BANK_SEARCH: '#searchbanks',
-    GO_BACK_BUTTON: 'button[data-action="go-back"]',
-    ADD_ON_PAGE_FORM_ELEMENT: 'input[name="addonpage"]',
-    CMID_FORM_ELEMENT: 'form#questionsubmit input[name="cmid"]',
 };
 
 export default class ModalQuizQuestionBank extends Modal {
@@ -47,11 +41,9 @@ export default class ModalQuizQuestionBank extends Modal {
     /**
      * Create the question bank modal.
      *
-     * @param {Number} contextId Current module context id.
-     * @param {Number} bankCmId Current question bank course module id.
-     * @param {Number} quizCmId Current quiz course module id.
+     * @param {Number} contextId Current context id.
      */
-    static init(contextId, bankCmId, quizCmId) {
+    static init(contextId) {
         const selector = '.menu [data-action="questionbank"]';
         document.addEventListener('click', (e) => {
             const trigger = e.target.closest(selector);
@@ -62,8 +54,6 @@ export default class ModalQuizQuestionBank extends Modal {
 
             ModalQuizQuestionBank.create({
                 contextId,
-                quizCmId,
-                bankCmId,
                 title: trigger.dataset.header,
                 addOnPage: trigger.dataset.addonpage,
                 templateContext: {
@@ -100,17 +90,13 @@ export default class ModalQuizQuestionBank extends Modal {
      * @param {string} querystring URL encoded string.
      */
     reloadBodyContent(querystring) {
-        // Load the question bank fragment to be displayed in the modal and hide the 'go back' button.
-        this.hideFooter();
-        this.setTitle(this.originalTitle);
+        // Load the question bank fragment to be displayed in the modal.
         this.setBody(Fragment.loadFragment(
             'mod_quiz',
             'quiz_question_bank',
             this.getContextId(),
             {
                 querystring,
-                quizcmid: this.quizCmId,
-                bankcmid: this.bankCmId,
             }
         ));
     }
@@ -126,12 +112,11 @@ export default class ModalQuizQuestionBank extends Modal {
     handleAddToQuizEvent(e, anchorElement) {
         // If the user clicks the plus icon to add the question to the page
         // directly then we need to intercept the click in order to adjust the
-        // href and include the correct add on page id and cmid before the page is
+        // href and include the correct add on page id before the page is
         // redirected.
-        const href = new URL(anchorElement.getAttribute('href'));
+        const href = new URL(anchorElement.attr('href'));
         href.searchParams.set('addonpage', this.getAddOnPageId());
-        href.searchParams.set('cmid', this.quizCmId);
-        anchorElement.setAttribute('href', href);
+        anchorElement.attr('href', href);
     }
 
     /**
@@ -145,68 +130,38 @@ export default class ModalQuizQuestionBank extends Modal {
 
         this.getModal().on('submit', SELECTORS.ADD_QUESTIONS_FORM, (e) => {
             // If the user clicks on the "Add selected questions to the quiz" button to add some questions to the page
-            // then we need to intercept the submit in order to include the correct "add on page id"
-            // and the quizmod id before the form is submitted.
-            const formElement = e.currentTarget;
-            document.querySelector(SELECTORS.ADD_ON_PAGE_FORM_ELEMENT).setAttribute('value', this.getAddOnPageId());
+            // then we need to intercept the submit in order to include the correct "add on page id" before the form is
+            // submitted.
+            const formElement = $(e.currentTarget);
 
-            // We also need to set the form cmid & action as the quiz modid as this could be coming from a module that isn't a quiz.
-            document.querySelector(SELECTORS.CMID_FORM_ELEMENT).setAttribute('value', this.quizCmId);
-            const actionUrl = new URL(formElement.getAttribute('action'));
-            actionUrl.searchParams.set('cmid', this.quizCmId);
-            formElement.setAttribute('action', actionUrl.toString());
-        });
-
-        this.getModal().on('click', SELECTORS.SWITCH_TO_OTHER_BANK, () => {
-            this.handleSwitchBankContentReload(SELECTORS.BANK_SEARCH)
-                .then(function(ModalQuizQuestionBank) {
-                        document.querySelector(SELECTORS.BANK_SEARCH)?.addEventListener('change', (e) => {
-                            const bankCmId = e.currentTarget.value;
-                            if (bankCmId > 0) {
-                                ModalQuizQuestionBank.bankCmId = bankCmId;
-                                ModalQuizQuestionBank.reloadBodyContent(window.location.search);
-                            }
-                        });
-                        document.querySelector(SELECTORS.GO_BACK_BUTTON).addEventListener('click', (e) => {
-                            ModalQuizQuestionBank.bankCmId = e.currentTarget.value;
-                            ModalQuizQuestionBank.reloadBodyContent(window.location.search);
-                        });
-                    }
-                )
-                .catch(Notification.exception);
+            $('<input />').attr('type', 'hidden')
+                .attr('name', "addonpage")
+                .attr('value', this.getAddOnPageId())
+                .appendTo(formElement);
         });
 
         this.getModal().on('click', SELECTORS.ANCHOR, (e) => {
-            const anchorElement = e.currentTarget;
+            const anchorElement = $(e.currentTarget);
 
             // If the anchor element was the add to quiz link.
-            if (anchorElement.closest(SELECTORS.ADD_TO_QUIZ_CONTAINER)) {
+            if (anchorElement.closest(SELECTORS.ADD_TO_QUIZ_CONTAINER).length) {
                 this.handleAddToQuizEvent(e, anchorElement);
                 return;
             }
 
             // If the anchor element was a preview question link.
-            if (anchorElement.closest(SELECTORS.PREVIEW_CONTAINER)) {
+            if (anchorElement.closest(SELECTORS.PREVIEW_CONTAINER).length) {
                 return;
             }
 
             // Sorting links have their own handler.
-            if (anchorElement.closest(SELECTORS.SORTERS)) {
+            if (anchorElement.closest(SELECTORS.SORTERS).length) {
                 return;
-            }
-
-            if (anchorElement.closest('a[' + SELECTORS.NEW_BANKMOD_ID + ']')) {
-                this.bankCmId = anchorElement.getAttribute(SELECTORS.NEW_BANKMOD_ID);
-
-                // We need to clear the filter as we are about to reload the content.
-                const url = new URL(location.href);
-                url.searchParams.delete('filter');
-                history.pushState({}, '', url);
             }
 
             // Anything else means reload the pop-up contents.
             e.preventDefault();
-            this.reloadBodyContent(anchorElement.search);
+            this.reloadBodyContent(anchorElement.prop('search'));
         });
 
         // Disable the form change checker when the body is rendered.

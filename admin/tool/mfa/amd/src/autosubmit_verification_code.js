@@ -28,12 +28,10 @@ export const init = () => {
     const submitButton = codeForm.querySelector("#id_submitbutton");
 
     // Event listener for code input field.
-    codeInput.addEventListener('input', function() {
+    codeInput.addEventListener('keyup', function() {
         if (this.value.length >= 6) {
-            // Submits the closest form (parent) and prevents accidental resubmission.
+            // Submits the closes form (parent).
             codeForm.submit();
-            codeInput.readOnly = true;
-            submitButton.disabled = true;
         }
     });
 

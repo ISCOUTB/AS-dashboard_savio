@@ -31,7 +31,7 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  * @copyright   2023 Andrew Lyons <andrew@nicols.co.uk>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class set_block_protection_test extends \externallib_advanced_testcase {
+class set_block_protection_test extends \externallib_advanced_testcase {
     /**
      * Test execute method with no login.
      */
@@ -85,7 +85,7 @@ final class set_block_protection_test extends \externallib_advanced_testcase {
      *
      * @return array
      */
-    public static function execute_provider(): array {
+    public function execute_provider(): array {
         return [
             [
                 'block_login',

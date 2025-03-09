@@ -479,8 +479,6 @@ class template {
             'name' => 'delcheck[]',
             'classes' => 'recordcheckbox',
             'value' => $entry->id,
-            'label' => get_string('selectfordeletion', 'data'),
-            'labelclasses' => 'sr-only',
         ]);
         return $OUTPUT->render($checkbox);
     }

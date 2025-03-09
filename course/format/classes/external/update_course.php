@@ -16,11 +16,12 @@
 
 namespace core_courseformat\external;
 
-use core\exception\moodle_exception;
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_multiple_structure;
 use core_external\external_value;
+use moodle_exception;
+use coding_exception;
 use context_course;
 use core_courseformat\base as course_format;
 
@@ -105,25 +106,38 @@ class update_course extends external_api {
 
         self::validate_context(context_course::instance($courseid));
 
-        $format = course_get_format($courseid);
+        $courseformat = course_get_format($courseid);
 
-        $updates = $format->get_stateupdates_instance();
-        $actions = $format->get_stateactions_instance();
+        // Create a course changes tracker object.
+        $defaultupdatesclass = 'core_courseformat\\stateupdates';
+        $updatesclass = 'format_' . $courseformat->get_format() . '\\courseformat\\stateupdates';
+        if (!class_exists($updatesclass)) {
+            $updatesclass = $defaultupdatesclass;
+        }
+        $updates = new $updatesclass($courseformat);
+
+        if (!is_a($updates, $defaultupdatesclass)) {
+            throw new coding_exception("The \"$updatesclass\" class must extend \"$defaultupdatesclass\"");
+        }
+
+        // Get the actions class from the course format.
+        $actionsclass = 'format_'. $courseformat->get_format().'\\courseformat\\stateactions';
+        if (!class_exists($actionsclass)) {
+            $actionsclass = 'core_courseformat\\stateactions';
+        }
+        $actions = new $actionsclass();
 
         if (!is_callable([$actions, $action])) {
             throw new moodle_exception("Invalid course state action $action in ".get_class($actions));
         }
 
-        $course = $format->get_course();
+        $course = $courseformat->get_course();
 
         // Execute the action.
         $actions->$action($updates, $course, $ids, $targetsectionid, $targetcmid);
 
-        // Dispatch the hook for post course content update.
-        $hook = new \core_courseformat\hook\after_course_content_updated(
-            course: $course,
-        );
-        \core\di::get(\core\hook\manager::class)->dispatch($hook);
+        // Any state action mark the state cache as dirty.
+        course_format::session_cache_reset($course);
 
         return json_encode($updates);
     }

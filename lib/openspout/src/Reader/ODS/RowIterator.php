@@ -37,8 +37,8 @@ final class RowIterator implements RowIteratorInterface
     /** @var XMLProcessor Helper Object to process XML nodes */
     private readonly XMLProcessor $xmlProcessor;
 
-    /** @var CellValueFormatter Helper to format cell values */
-    private readonly CellValueFormatter $cellValueFormatter;
+    /** @var Helper\CellValueFormatter Helper to format cell values */
+    private readonly Helper\CellValueFormatter $cellValueFormatter;
 
     /** @var bool Whether the iterator has already been rewound once */
     private bool $hasAlreadyBeenRewound = false;

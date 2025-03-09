@@ -44,7 +44,7 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers \moodle_database
  */
-final class dml_test extends \database_driver_testcase {
+class dml_test extends \database_driver_testcase {
 
     protected function setUp(): void {
         parent::setUp();
@@ -487,8 +487,7 @@ final class dml_test extends \database_driver_testcase {
         $DB = $this->tdb;
 
         require_once($CFG->dirroot . '/lib/dml/tests/fixtures/test_dml_sql_debugging_fixture.php');
-        $databasemock = $this->getMockBuilder(\moodle_database::class)->getMock();
-        $fixture = new \test_dml_sql_debugging_fixture($databasemock);
+        $fixture = new \test_dml_sql_debugging_fixture($this);
 
         $sql = "SELECT * FROM {users}";
 
@@ -500,31 +499,31 @@ final class dml_test extends \database_driver_testcase {
         $CFG->debugsqltrace = 1;
         $out = $fixture->four($sql);
         $expected = <<<EOD
-SELECT \* FROM {users}
--- line \d+ of /lib/dml/tests/fixtures/test_dml_sql_debugging_fixture.php: call to ReflectionMethod->invoke\(\)
+SELECT * FROM {users}
+-- line 64 of /lib/dml/tests/fixtures/test_dml_sql_debugging_fixture.php: call to ReflectionMethod->invoke()
 EOD;
-        $this->assertMatchesRegularExpression('@' . $this->unix_to_os_dirsep($expected) . '@', $out);
+        $this->assertEquals($this->unix_to_os_dirsep($expected), $out);
 
         $CFG->debugsqltrace = 2;
         $out = $fixture->four($sql);
         $expected = <<<EOD
-SELECT \* FROM {users}
--- line \d+ of /lib/dml/tests/fixtures/test_dml_sql_debugging_fixture.php: call to ReflectionMethod->invoke\(\)
--- line \d+ of /lib/dml/tests/fixtures/test_dml_sql_debugging_fixture.php: call to test_dml_sql_debugging_fixture->one\(\)
+SELECT * FROM {users}
+-- line 64 of /lib/dml/tests/fixtures/test_dml_sql_debugging_fixture.php: call to ReflectionMethod->invoke()
+-- line 73 of /lib/dml/tests/fixtures/test_dml_sql_debugging_fixture.php: call to test_dml_sql_debugging_fixture->one()
 EOD;
-        $this->assertMatchesRegularExpression('@' . $this->unix_to_os_dirsep($expected) . '@', $out);
+        $this->assertEquals($this->unix_to_os_dirsep($expected), $out);
 
         $CFG->debugsqltrace = 5;
         $out = $fixture->four($sql);
         $expected = <<<EOD
-SELECT \* FROM {users}
--- line \d+ of /lib/dml/tests/fixtures/test_dml_sql_debugging_fixture.php: call to ReflectionMethod->invoke\(\)
--- line \d+ of /lib/dml/tests/fixtures/test_dml_sql_debugging_fixture.php: call to test_dml_sql_debugging_fixture->one\(\)
--- line \d+ of /lib/dml/tests/fixtures/test_dml_sql_debugging_fixture.php: call to test_dml_sql_debugging_fixture->two\(\)
--- line \d+ of /lib/dml/tests/fixtures/test_dml_sql_debugging_fixture.php: call to test_dml_sql_debugging_fixture->three\(\)
--- line \d+ of /lib/dml/tests/dml_test.php: call to test_dml_sql_debugging_fixture->four\(\)
+SELECT * FROM {users}
+-- line 64 of /lib/dml/tests/fixtures/test_dml_sql_debugging_fixture.php: call to ReflectionMethod->invoke()
+-- line 73 of /lib/dml/tests/fixtures/test_dml_sql_debugging_fixture.php: call to test_dml_sql_debugging_fixture->one()
+-- line 82 of /lib/dml/tests/fixtures/test_dml_sql_debugging_fixture.php: call to test_dml_sql_debugging_fixture->two()
+-- line 91 of /lib/dml/tests/fixtures/test_dml_sql_debugging_fixture.php: call to test_dml_sql_debugging_fixture->three()
+-- line 517 of /lib/dml/tests/dml_test.php: call to test_dml_sql_debugging_fixture->four()
 EOD;
-        $this->assertMatchesRegularExpression('@' . $this->unix_to_os_dirsep($expected) . '@', $out);
+        $this->assertEquals($this->unix_to_os_dirsep($expected), $out);
 
         $CFG->debugsqltrace = 0;
     }
@@ -572,6 +571,150 @@ EOD;
         $DB->get_records($tablename, array('id'=>1));
 
         $this->assertSame(strtok('?'), 'b');
+    }
+
+    public function test_tweak_param_names(): void {
+
+        // Note the tweak_param_names() method is only available in the oracle driver,
+        // hence we look for expected results indirectly, by testing various DML methods.
+        // with some "extreme" conditions causing the tweak to happen.
+        $DB = $this->tdb;
+        $dbman = $this->tdb->get_manager();
+
+        $table = $this->get_test_table();
+        $tablename = $table->getName();
+
+        // Prepare some long column names.
+        $intnearmax = str_pad('long_int_columnname_near_', \xmldb_field::NAME_MAX_LENGTH - 1, 'x');
+        $decnearmax = str_pad('long_dec_columnname_near_', \xmldb_field::NAME_MAX_LENGTH - 1, 'x');
+        $strnearmax = str_pad('long_str_columnname_near_', \xmldb_field::NAME_MAX_LENGTH - 1, 'x');
+        $intmax = str_pad('long_int_columnname_max', \xmldb_field::NAME_MAX_LENGTH, 'x');
+        $decmax = str_pad('long_dec_columnname_max', \xmldb_field::NAME_MAX_LENGTH, 'x');
+        $strmax = str_pad('long_str_columnname_max', \xmldb_field::NAME_MAX_LENGTH, 'x');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        // Add some correct columns with \xmldb_field::NAME_MAX_LENGTH minus 1 chars in the name.
+        $table->add_field($intnearmax, XMLDB_TYPE_INTEGER, '10');
+        $table->add_field($decnearmax, XMLDB_TYPE_NUMBER, '10,2');
+        $table->add_field($strnearmax, XMLDB_TYPE_CHAR, '100');
+        // Add some correct columns with xmldb_table::NAME_MAX_LENGTH chars in the name.
+        $table->add_field($intmax, XMLDB_TYPE_INTEGER, '10');
+        $table->add_field($decmax, XMLDB_TYPE_NUMBER, '10,2');
+        $table->add_field($strmax, XMLDB_TYPE_CHAR, '100');
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+
+        $dbman->create_table($table);
+
+        $this->assertTrue($dbman->table_exists($tablename));
+
+        // Test insert record.
+        $rec1 = new \stdClass();
+        $rec1->{$intnearmax} = 62;
+        $rec1->{$decnearmax} = 62.62;
+        $rec1->{$strnearmax} = '62';
+        $rec1->{$intmax} = 63;
+        $rec1->{$decmax} = 63.63;
+        $rec1->{$strmax} = '63';
+
+        // Insert_record().
+        $rec1->id = $DB->insert_record($tablename, $rec1);
+        $this->assertEquals($rec1, $DB->get_record($tablename, array('id' => $rec1->id)));
+
+        // Update_record().
+        $DB->update_record($tablename, $rec1);
+        $this->assertEquals($rec1, $DB->get_record($tablename, array('id' => $rec1->id)));
+
+        // Set_field().
+        $rec1->{$intnearmax} = 620;
+        $DB->set_field($tablename, $intnearmax, $rec1->{$intnearmax},
+            array('id' => $rec1->id, $intnearmax => 62));
+        $rec1->{$decnearmax} = 620.62;
+        $DB->set_field($tablename, $decnearmax, $rec1->{$decnearmax},
+            array('id' => $rec1->id, $decnearmax => 62.62));
+        $rec1->{$strnearmax} = '620';
+        $DB->set_field($tablename, $strnearmax, $rec1->{$strnearmax},
+            array('id' => $rec1->id, $strnearmax => '62'));
+        $rec1->{$intmax} = 630;
+        $DB->set_field($tablename, $intmax, $rec1->{$intmax},
+            array('id' => $rec1->id, $intmax => 63));
+        $rec1->{$decmax} = 630.63;
+        $DB->set_field($tablename, $decmax, $rec1->{$decmax},
+            array('id' => $rec1->id, $decmax => 63.63));
+        $rec1->{$strmax} = '630';
+        $DB->set_field($tablename, $strmax, $rec1->{$strmax},
+            array('id' => $rec1->id, $strmax => '63'));
+        $this->assertEquals($rec1, $DB->get_record($tablename, array('id' => $rec1->id)));
+
+        // Delete_records().
+        $rec2 = $DB->get_record($tablename, array('id' => $rec1->id));
+        $rec2->id = $DB->insert_record($tablename, $rec2);
+        $this->assertEquals(2, $DB->count_records($tablename));
+        $DB->delete_records($tablename, (array) $rec2);
+        $this->assertEquals(1, $DB->count_records($tablename));
+
+        // Get_recordset().
+        $rs = $DB->get_recordset($tablename, (array) $rec1);
+        $iterations = 0;
+        foreach ($rs as $rec2) {
+            $iterations++;
+        }
+        $rs->close();
+        $this->assertEquals(1, $iterations);
+        $this->assertEquals($rec1, $rec2);
+
+        // Get_records().
+        $recs = $DB->get_records($tablename, (array) $rec1);
+        $this->assertCount(1, $recs);
+        $this->assertEquals($rec1, reset($recs));
+
+        // Get_fieldset_select().
+        $select = "id = :id AND
+                   $intnearmax = :$intnearmax AND
+                   $decnearmax = :$decnearmax AND
+                   $strnearmax = :$strnearmax AND
+                   $intmax = :$intmax AND
+                   $decmax = :$decmax AND
+                   $strmax = :$strmax";
+        $fields = $DB->get_fieldset_select($tablename, $intnearmax, $select, (array)$rec1);
+        $this->assertCount(1, $fields);
+        $this->assertEquals($rec1->{$intnearmax}, reset($fields));
+        $fields = $DB->get_fieldset_select($tablename, $decnearmax, $select, (array)$rec1);
+        $this->assertEquals($rec1->{$decnearmax}, reset($fields));
+        $fields = $DB->get_fieldset_select($tablename, $strnearmax, $select, (array)$rec1);
+        $this->assertEquals($rec1->{$strnearmax}, reset($fields));
+        $fields = $DB->get_fieldset_select($tablename, $intmax, $select, (array)$rec1);
+        $this->assertEquals($rec1->{$intmax}, reset($fields));
+        $fields = $DB->get_fieldset_select($tablename, $decmax, $select, (array)$rec1);
+        $this->assertEquals($rec1->{$decmax}, reset($fields));
+        $fields = $DB->get_fieldset_select($tablename, $strmax, $select, (array)$rec1);
+        $this->assertEquals($rec1->{$strmax}, reset($fields));
+
+        // Overlapping placeholders (progressive str_replace).
+        $nearmaxparam = str_pad('allowed_long_param', \xmldb_field::NAME_MAX_LENGTH - 1, 'x');
+        $maxparam = str_pad('allowed_long_param', \xmldb_field::NAME_MAX_LENGTH, 'x');
+        $overlapselect = "id = :p AND
+                   $intnearmax = :param1 AND
+                   $decnearmax = :param2 AND
+                   $strnearmax = :{$nearmaxparam} AND
+                   $intmax = :{$maxparam} AND
+                   $decmax = :param_ AND
+                   $strmax = :param__";
+        $overlapparams = array(
+            'p' => $rec1->id,
+            'param1' => $rec1->{$intnearmax},
+            'param2' => $rec1->{$decnearmax},
+            $nearmaxparam => $rec1->{$strnearmax},
+            $maxparam => $rec1->{$intmax},
+            'param_' => $rec1->{$decmax},
+            'param__' => $rec1->{$strmax});
+        $recs = $DB->get_records_select($tablename, $overlapselect, $overlapparams);
+        $this->assertCount(1, $recs);
+        $this->assertEquals($rec1, reset($recs));
+
+        // Execute().
+        $DB->execute("DELETE FROM {{$tablename}} WHERE $select", (array)$rec1);
+        $this->assertEquals(0, $DB->count_records($tablename));
     }
 
     public function test_get_tables(): void {
@@ -3941,8 +4084,8 @@ EOD;
         $DB->insert_record($tablename, array('name'=>'aaaa', 'description'=>'aaaacccccccccccccccccc'));
         $DB->insert_record($tablename, array('name'=>'xxxx',   'description'=>'123456789a123456789b123456789c123456789d'));
 
-        // Only some supported databases truncate TEXT fields for comparisons, currently MSSQL.
-        $dbtruncatestextfields = ($DB->get_dbfamily() == 'mssql');
+        // Only some supported databases truncate TEXT fields for comparisons, currently MSSQL and Oracle.
+        $dbtruncatestextfields = ($DB->get_dbfamily() == 'mssql' || $DB->get_dbfamily() == 'oracle');
 
         if ($dbtruncatestextfields) {
             // Ensure truncation behaves as expected.
@@ -4019,7 +4162,7 @@ EOD;
             if ($family === 'mysql' or $family === 'mssql') {
                 $this->fail("Unique index is accent insensitive, this may cause problems for non-ascii languages. This is usually caused by accent insensitive default collation.");
             } else {
-                // This should not happen, PostgreSQL does not support accent insensitive uniqueness.
+                // This should not happen, PostgreSQL and Oracle do not support accent insensitive uniqueness.
                 $this->fail("Unique index is accent insensitive, this may cause problems for non-ascii languages.");
             }
             throw($e);
@@ -4271,8 +4414,7 @@ EOD;
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
         $dbman->create_table($table);
 
-        // Regarding the 1300 length - all supported drivers allow larger values (2K+),
-        // previously limited by Oracle, which no longer applies as Oracle support has been removed.
+        // Regarding 1300 length - all drivers except Oracle support larger values (2K+), but this hits a limit on Oracle.
         $DB->insert_record($tablename, [
             'charshort' => 'áéíóú',
             'charlong' => str_repeat('A', 512),
@@ -4331,7 +4473,7 @@ EOD;
 
     }
 
-    public static function sql_concat_join_provider(): array {
+    public function sql_concat_join_provider() {
         return array(
             // All strings.
             array(
@@ -4524,7 +4666,7 @@ EOD;
                 'name' => 'Bob',
                 'falias' => 'Dan, Grace',
             ],
-        ], array_values($DB->get_records_sql($sql)));
+        ], $DB->get_records_sql($sql));
     }
 
     /**
@@ -4928,9 +5070,9 @@ EOD;
         $DB->insert_record($tablename, array('course' => 2, 'content' => 'universe', 'name'=>'abc'));
 
         // Test grouping by expressions in the query. MDL-26819. Note that there are 4 ways:
-        // - By column position (GROUP by 1) - Not supported by mssql
+        // - By column position (GROUP by 1) - Not supported by mssql & oracle
         // - By column name (GROUP by course) - Supported by all, but leading to wrong results
-        // - By column alias (GROUP by casecol) - Not supported by mssql
+        // - By column alias (GROUP by casecol) - Not supported by mssql & oracle
         // - By complete expression (GROUP BY CASE ...) - 100% cross-db, this test checks it
         $sql = "SELECT (CASE WHEN course = 3 THEN 1 ELSE 0 END) AS casecol,
                        COUNT(1) AS countrecs,
@@ -5001,7 +5143,7 @@ EOD;
         $this->assertCount(1, $records);
         $this->assertEquals(5, reset($records)->course);
 
-        // We have sql like this in moodle.
+        // We have sql like this in moodle, this syntax breaks on older versions of sqlite for example..
         $sql = "SELECT a.id AS id, a.course AS course
                   FROM {{$tablename}} a
                   JOIN (SELECT * FROM {{$tablename}}) b ON a.id = b.id
@@ -5564,9 +5706,9 @@ EOD;
         if (!isset($cfg->dboptions)) {
             $cfg->dboptions = array();
         }
-        // If we have a readonly replica situation, we need to either observe
+        // If we have a readonly slave situation, we need to either observe
         // the latency, or if the latency is not specified we need to take
-        // the replica out because the table may not have propagated yet.
+        // the slave out because the table may not have propagated yet.
         if (isset($cfg->dboptions['readonly'])) {
             if (isset($cfg->dboptions['readonly']['latency'])) {
                 usleep(intval(1000000 * $cfg->dboptions['readonly']['latency']));
@@ -6173,7 +6315,7 @@ EOD;
      * @return array[]
      * @see \mysqli_native_moodle_database::get_server_info
      */
-    public static function get_server_info_mysql_provider(): array {
+    public function get_server_info_mysql_provider() {
         return [
             'MySQL 5.7.39 - MySQLi version' => [
                 '5.7.39-log',

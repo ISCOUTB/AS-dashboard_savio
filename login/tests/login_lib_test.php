@@ -35,7 +35,7 @@ require_once($CFG->dirroot . '/login/lib.php');
  * @copyright  2017 Juan Leyva
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class login_lib_test extends \advanced_testcase {
+class login_lib_test extends \advanced_testcase {
 
     public function test_core_login_process_password_reset_one_time_without_username_protection(): void {
         global $CFG;
@@ -183,8 +183,8 @@ final class login_lib_test extends \advanced_testcase {
         global $CFG;
 
         $this->resetAfterTest();
-        $CFG->auth = $CFG->auth . ',ldap';
-        $user = $this->getDataGenerator()->create_user(['auth' => 'ldap']);
+        $CFG->auth = $CFG->auth . ',mnet';
+        $user = $this->getDataGenerator()->create_user(array('auth' => 'mnet'));
 
         $sink = $this->redirectEmails();
 
@@ -233,7 +233,7 @@ final class login_lib_test extends \advanced_testcase {
     /**
      * Data provider for \core_login_lib_testcase::test_core_login_validate_forgot_password_data().
      */
-    public static function forgot_password_data_provider(): array {
+    public function forgot_password_data_provider() {
         return [
             'Both username and password supplied' => [
                 [

@@ -24,7 +24,7 @@ namespace enrol_lti\local\ltiadvantage\utility;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \enrol_lti\local\ltiadvantage\utility\message_helper
  */
-final class message_helper_test extends \base_testcase {
+class message_helper_test extends \base_testcase {
 
     /**
      * Test the static helper is_instructor_launch.
@@ -43,7 +43,7 @@ final class message_helper_test extends \base_testcase {
      *
      * @return array the array of test JWT data.
      */
-    public static function message_roles_provider(): array {
+    public function message_roles_provider(): array {
         return [
             'Roles claim present, includes learner role only' => [
                 'jwtdata' => [

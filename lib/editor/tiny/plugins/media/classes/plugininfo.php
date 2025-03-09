@@ -31,8 +31,15 @@ use editor_tiny\plugin_with_menuitems;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class plugininfo extends plugin implements plugin_with_buttons, plugin_with_menuitems, plugin_with_configuration {
-
-    #[\Override]
+    /**
+     * Whether the plugin is enabled
+     *
+     * @param context $context The context that the editor is used within
+     * @param array $options The options passed in when requesting the editor
+     * @param array $fpoptions The filepicker options passed in when requesting the editor
+     * @param editor $editor The editor instance in which the plugin is initialised
+     * @return boolean
+     */
     public static function is_enabled(
         context $context,
         array $options,
@@ -43,12 +50,10 @@ class plugininfo extends plugin implements plugin_with_buttons, plugin_with_menu
         // - Not logged in or guest.
         // - Files are not allowed.
         // - Only URL are supported.
-        // - Don't have the correct capability.
         $canhavefiles = !empty($options['maxfiles']);
         $canhaveexternalfiles = !empty($options['return_types']) && ($options['return_types'] & FILE_EXTERNAL);
 
-        return isloggedin() && !isguestuser() && ($canhavefiles || $canhaveexternalfiles) &&
-                has_capability('tiny/media:use', $context);
+        return isloggedin() && !isguestuser() && ($canhavefiles || $canhaveexternalfiles);
     }
 
     public static function get_available_buttons(): array {

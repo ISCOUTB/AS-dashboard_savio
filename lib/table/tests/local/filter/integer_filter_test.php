@@ -38,7 +38,7 @@ use TypeError;
  * @copyright 2020 Andrew Nicols <andrew@nicols.co.uk>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class integer_filter_test extends advanced_testcase {
+class integer_filter_test extends advanced_testcase {
     /**
      * Ensure that the add_filter_value function works as expected with valid values.
      */
@@ -91,7 +91,7 @@ final class integer_filter_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function add_filter_value_invalid_types_provider(): array {
+    public function add_filter_value_invalid_types_provider(): array {
         return [
             'Null' => [null, 'NULL'],
             'Empty string' => ['', 'string'],

@@ -24,7 +24,7 @@ namespace message_email;
  * @copyright 2019 Mark Nelson <markn@moodle.com>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class event_observers_test extends \advanced_testcase {
+class event_observers_test extends \advanced_testcase {
 
     /**
      * Test the message viewed event observer.

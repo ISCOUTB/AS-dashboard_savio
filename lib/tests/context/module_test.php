@@ -28,7 +28,7 @@ use core\context, core\context_helper;
  * @license   https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \core\context\module
  */
-final class module_test extends \advanced_testcase {
+class module_test extends \advanced_testcase {
     /**
      * Tests legacy class.
      * @coversNothing
@@ -189,16 +189,13 @@ final class module_test extends \advanced_testcase {
         $this->resetAfterTest();
 
         $course = $this->getDataGenerator()->create_course();
-        $mod = $this->getDataGenerator()->create_module('book', ['course' => $course->id, 'name' => 'Pokus']);
-        $context = module::instance($mod->cmid);
+        $page = $this->getDataGenerator()->create_module('page', ['course' => $course->id, 'name' => 'Pokus']);
+        $context = module::instance($page->cmid);
 
         $capabilities = $context->get_capabilities();
         $capabilities = convert_to_array($capabilities);
         $capabilities = array_column($capabilities, 'name');
-
-        $this->assertContains('mod/book:read', $capabilities);
-        $this->assertContains('booktool/exportimscp:export', $capabilities);
-        $this->assertContains('booktool/importhtml:import', $capabilities);
+        $this->assertContains('mod/page:view', $capabilities);
         $this->assertNotContains('mod/url:view', $capabilities);
         $this->assertNotContains('moodle/course:view', $capabilities);
         $this->assertNotContains('moodle/category:manage', $capabilities);

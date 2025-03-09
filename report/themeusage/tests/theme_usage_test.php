@@ -26,7 +26,7 @@ use core\output\theme_usage;
  * @copyright  2023 David Woloszyn <david.woloszyn@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class theme_usage_test extends \advanced_testcase {
+class theme_usage_test extends \advanced_testcase {
 
     /** @var testing_data_generator Data generator. */
     private testing_data_generator $generator;

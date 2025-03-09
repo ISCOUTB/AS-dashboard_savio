@@ -22,7 +22,7 @@ use core\router\schema\parameters\path_parameter;
 use core\router\schema\response\content\payload_response_type;
 use core\router\schema\response\response;
 use core\router\schema\specification;
-use core\tests\router\route_testcase;
+use core\tests\route_testcase;
 
 /**
  * Tests for the specification.
@@ -139,25 +139,13 @@ final class specification_test extends route_testcase {
         $this->assertObjectHasProperty('/core/example/path/with/{option}', $schema->paths);
     }
 
-    /**
-     * Test add_path with optional parameters.
-     *
-     * @param string $component
-     * @param string $path
-     * @param array $expectedpaths
-     * @dataProvider add_path_with_options_provider
-     */
-    public function test_add_path_with_options(
-        string $component,
-        string $path,
-        array $expectedpaths,
-    ): void {
+    public function test_add_path_with_options(): void {
         $spec = new specification();
 
         $spec->add_path(
-            $component,
+            'core',
             new route(
-                path: $path,
+                path: '/example/path/with[/{optional}][/{extras}]',
                 pathtypes: [
                     new path_parameter(name: 'optional', type: param::INT),
                     new path_parameter(name: 'extras', type: param::INT),
@@ -166,44 +154,9 @@ final class specification_test extends route_testcase {
         );
 
         $schema = $spec->get_schema();
-        foreach ($expectedpaths as $expectedpath) {
-            $this->assertObjectHasProperty($expectedpath, $schema->paths);
-        }
-    }
-
-    /**
-     * Data provider for add_path with optional parameters.
-     *
-     * @return \Iterator
-     */
-    public static function add_path_with_options_provider(): \Iterator {
-        yield 'With options' => [
-            'component' => 'core',
-            'path' => '/example/path/with[/{optional}][/{extras}]',
-            'expectedpaths' => [
-                '/core/example/path/with',
-                '/core/example/path/with/{optional}',
-                '/core/example/path/with/{optional}/{extras}',
-            ],
-        ];
-        yield 'With greedy unlimited options' => [
-            'component' => 'core',
-            'path' => '/example/path/with[/{optional}][/{extras:.*}]',
-            'expectedpaths' => [
-                '/core/example/path/with',
-                '/core/example/path/with/{optional}',
-                '/core/example/path/with/{optional}/{extras}',
-            ],
-        ];
-        yield 'With non-greedy unlimited options' => [
-            'component' => 'core',
-            'path' => '/example/path/with[/{optional}][/{extras:.*?}]',
-            'expectedpaths' => [
-                '/core/example/path/with',
-                '/core/example/path/with/{optional}',
-                '/core/example/path/with/{optional}/{extras}',
-            ],
-        ];
+        $this->assertObjectHasProperty('/core/example/path/with', $schema->paths);
+        $this->assertObjectHasProperty('/core/example/path/with/{optional}', $schema->paths);
+        $this->assertObjectHasProperty('/core/example/path/with/{optional}/{extras}', $schema->paths);
     }
 
     public function test_add_parameter(): void {

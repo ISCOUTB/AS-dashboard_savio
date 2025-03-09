@@ -37,7 +37,7 @@ require_once($CFG->dirroot.'/mod/book/tool/importhtml/locallib.php');
  * @copyright  2013 Frédéric Massart
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class locallib_test extends \advanced_testcase {
+class locallib_test extends \advanced_testcase {
 
     public function setUp(): void {
         parent::setUp();
@@ -58,7 +58,7 @@ final class locallib_test extends \advanced_testcase {
         $record->filename = 'chapters.zip';
 
         $fs = get_file_storage();
-        $file = $fs->create_file_from_pathname($record, self::get_fixture_path(__NAMESPACE__, 'chapters.zip'));
+        $file = $fs->create_file_from_pathname($record, __DIR__ . '/fixtures/chapters.zip');
 
         // Importing the chapters.
         $sink = $this->redirectEvents();

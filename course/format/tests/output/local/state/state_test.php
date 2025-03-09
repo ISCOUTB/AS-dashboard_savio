@@ -24,7 +24,7 @@ namespace core_courseformat\output\local\state;
  * @copyright  2021 Ilya Tregubov <ilya@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class state_test extends \advanced_testcase {
+class state_test extends \advanced_testcase {
 
     /**
      * Setup to ensure that fixtures are loaded.
@@ -111,8 +111,8 @@ final class state_test extends \advanced_testcase {
         $sections = $modinfo->get_section_info_all();
 
         foreach ($sections as $key => $section) {
+            $this->assertEquals($section->id, $result->course->sectionlist[$key]);
             if (!$issocialformat || $format == 'theunittest') {
-                $this->assertEquals($section->id, $result->course->sectionlist[$key]);
                 if (!empty($section->uservisible)) {
                     $sectionstate = new $sectionclass($courseformat, $section);
                     $result->section[$key] = $sectionstate->export_for_template($renderer);
@@ -151,7 +151,7 @@ final class state_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function state_provider(): array {
+    public function state_provider(): array {
         return [
             // COURSEFORMAT. Test behaviour depending on course formats.
             'Single activity format' => [

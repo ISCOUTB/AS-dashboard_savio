@@ -24,8 +24,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use core\context;
-use core\notification;
 use core_external\external_api;
 use core_external\external_description;
 use core_external\external_value;
@@ -33,7 +31,6 @@ use core_external\external_single_structure;
 use core_external\external_multiple_structure;
 use core_external\external_function_parameters;
 use core_external\external_warnings;
-use core_question\local\bank\filter_condition_manager;
 
 defined('MOODLE_INTERNAL') || die();
 

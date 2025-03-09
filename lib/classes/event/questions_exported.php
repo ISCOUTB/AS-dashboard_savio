@@ -77,8 +77,14 @@ class questions_exported extends question_base {
      */
     public function get_url() {
         $cat = $this->other['categoryid'] . ',' . $this->contextid;
-
-        return new \moodle_url('/question/edit.php', ['cmid' => $this->contextinstanceid, 'cat' => $cat]);
+        if ($this->courseid) {
+            if ($this->contextlevel == CONTEXT_MODULE) {
+                return new \moodle_url('/question/edit.php', ['cmid' => $this->contextinstanceid, 'cat' => $cat]);
+            }
+            return new \moodle_url('/question/edit.php', ['courseid' => $this->courseid, 'cat' => $cat]);
+        }
+        return new \moodle_url('/question/edit.php',
+                                ['courseid' => SITEID, 'cat' => $cat]);
     }
 
     /**

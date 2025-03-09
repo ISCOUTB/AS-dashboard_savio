@@ -28,7 +28,7 @@ use mod_quiz\quiz_settings;
  * @author     2021 Safat Shahin <safatshahin@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class tags_test extends \advanced_testcase {
+class tags_test extends \advanced_testcase {
     public function test_restore_random_question_by_tag(): void {
         global $CFG, $USER, $DB;
 
@@ -49,14 +49,7 @@ final class tags_test extends \advanced_testcase {
         $rc = new \restore_controller($backupid, $newcourseid, \backup::INTERACTIVE_NO, \backup::MODE_GENERAL, $USER->id,
                 \backup::TARGET_NEW_COURSE);
 
-        $rc->execute_precheck();
-        $results = $rc->get_precheck_results();
-        // Backup contains categories attached to deprecated contexts so the results should only contain warnings for these.
-        $this->assertCount(2, $results['warnings']);
-        foreach ($results['warnings'] as $warning) {
-            $this->assertStringContainsString('will be created at a question bank module context by restore', $warning);
-        }
-        $this->assertArrayNotHasKey('errors', $results);
+        $this->assertTrue($rc->execute_precheck());
         $rc->execute_plan();
         $rc->destroy();
 
@@ -92,13 +85,7 @@ final class tags_test extends \advanced_testcase {
         $slottags = explode(',', $slottags);
         $this->assertEquals("{$tag2->id},{$tag2->name}", "{$slottags[0]},{$slottags[1]}");
 
-        // Course context question cats get restored to a default qbank module instance.
-        $modinfo = get_fast_modinfo($newcourseid);
-        $qbanks = $modinfo->get_instances_of('qbank');
-        $this->assertCount(1, $qbanks);
-        $qbank = reset($qbanks);
-
-        $defaultcategory = question_get_default_category(\context_module::instance($qbank->id)->id, true);
+        $defaultcategory = question_get_default_category(\context_course::instance($newcourseid)->id);
         $this->assertEquals($defaultcategory->id, $question->category);
         $randomincludingsubcategories = $DB->get_record('question_set_references',
             ['itemid' => reset($slots)->id, 'component' => 'mod_quiz', 'questionarea' => 'slot']);

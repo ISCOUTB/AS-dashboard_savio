@@ -357,10 +357,17 @@ class core_badges_assertion {
                 if (!empty($relatedbadges = $this->get_related_badges($badge))) {
                     $json['related'] = $relatedbadges;
                 }
+                if ($endorsement = $this->get_endorsement()) {
+                    $endorsementurl = new moodle_url('/badges/endorsement_json.php', array('id' => $this->_data->id));
+                    $json['endorsement'] = $endorsementurl->out(false);
+                }
                 if ($alignments = $this->get_alignments()) {
                     $json['alignments'] = $alignments;
                 }
-                if ($this->_data->imagecaption) {
+                if ($this->_data->imageauthorname ||
+                        $this->_data->imageauthoremail ||
+                        $this->_data->imageauthorurl ||
+                        $this->_data->imagecaption) {
                     $storage = get_file_storage();
                     $imagefile = $storage->get_file($context->id, 'badges', 'badgeimage', $this->_data->id, '/', 'f3.png');
                     if ($imagefile) {

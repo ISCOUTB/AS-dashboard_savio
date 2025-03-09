@@ -24,11 +24,14 @@
  */
 namespace tool_policy\privacy;
 
-use core_privacy\local\request\approved_contextlist;
-use core_privacy\local\request\writer;
+use core_privacy\local\metadata\collection;
+use tool_policy\privacy\provider;
 use tool_policy\api;
 use tool_policy\policy_version;
-use tool_policy\privacy\provider;
+use core_privacy\local\request\approved_contextlist;
+use core_privacy\local\request\writer;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Privacy provider tests class.
@@ -36,7 +39,7 @@ use tool_policy\privacy\provider;
  * @copyright  2018 Sara Arjona <sara@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class provider_test extends \core_privacy\tests\provider_testcase {
+class provider_test extends \core_privacy\tests\provider_testcase {
     /** @var stdClass The user object. */
     protected $user;
 
@@ -73,9 +76,9 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         global $CFG;
 
         // When there are no policies or agreements context list is empty.
-        $contextlist = provider::get_contexts_for_userid($this->manager->id);
+        $contextlist = \tool_policy\privacy\provider::get_contexts_for_userid($this->manager->id);
         $this->assertEmpty($contextlist);
-        $contextlist = provider::get_contexts_for_userid($this->user->id);
+        $contextlist = \tool_policy\privacy\provider::get_contexts_for_userid($this->user->id);
         $this->assertEmpty($contextlist);
 
         // Create a policy.
@@ -85,11 +88,11 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         api::make_current($policy->get('id'));
 
         // After creating a policy, there should be manager context.
-        $contextlist = provider::get_contexts_for_userid($this->manager->id);
+        $contextlist = \tool_policy\privacy\provider::get_contexts_for_userid($this->manager->id);
         $this->assertEquals(1, $contextlist->count());
 
         // But when there are no agreements, user context list is empty.
-        $contextlist = provider::get_contexts_for_userid($this->user->id);
+        $contextlist = \tool_policy\privacy\provider::get_contexts_for_userid($this->user->id);
         $this->assertEmpty($contextlist);
 
         // Agree to the policy.
@@ -97,7 +100,7 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         api::accept_policies([$policy->get('id')]);
 
         // There should be user context.
-        $contextlist = provider::get_contexts_for_userid($this->user->id);
+        $contextlist = \tool_policy\privacy\provider::get_contexts_for_userid($this->user->id);
         $this->assertEquals(1, $contextlist->count());
     }
 
@@ -275,7 +278,7 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         $this->assertCount(3, $contextlist);
         $this->assertEqualsCanonicalizing(
             [$managercontext->id, $usercontext->id, $systemcontext->id],
-            array_values($contextlist->get_contextids()),
+            $contextlist->get_contextids()
         );
 
         $approvedcontextlist = new approved_contextlist($this->user, 'tool_policy', [$usercontext->id]);

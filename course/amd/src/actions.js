@@ -16,8 +16,6 @@
 /**
  * Various actions on modules and sections in the editing mode - hiding, duplicating, deleting, etc.
  *
- * TODO remove this module as part of MDL-83627.
- *
  * @module     core_course/actions
  * @copyright  2016 Marina Glancy
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -60,7 +58,6 @@ define(
         InplaceEditableEvents,
         CourseEvents
     ) {
-        log.debug('The course/actions module is deprecated. Please, add support_components to your course format.');
 
         // Eventually, core_courseformat/local/content/actions will handle all actions for
         // component compatible formats and the default actions.js won't be necessary anymore.

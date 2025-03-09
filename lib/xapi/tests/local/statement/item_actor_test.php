@@ -38,7 +38,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2020 Ferran Recio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class item_actor_test extends advanced_testcase {
+class item_actor_test extends advanced_testcase {
 
     /**
      * Test item creation with agent.

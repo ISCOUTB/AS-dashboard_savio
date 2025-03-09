@@ -51,7 +51,7 @@
         </div>
         <div class="w-100">
             {{#loggedinuser}}
-                <h4 class="h5 fw-bold reply-author">{{#str}} replyauthorself, mod_forum, {{firstname}}{{/str}}</h4>
+                <h4 class="h5 font-weight-bold reply-author">{{#str}} replyauthorself, mod_forum, {{firstname}}{{/str}}</h4>
             {{/loggedinuser}}
             {{#throttlingwarningmsg}}
                 <div class="alert alert-danger alert-block fade in " role="alert">
@@ -78,7 +78,7 @@
                 <input type="hidden" name="reply" value="{{postid}}"/>
                 <input type="hidden" name="sesskey" value="{{sesskey}}"/>
                 <div class="d-flex mt-3 align-items-center flex-wrap">
-                    <button class="btn btn-primary fw-bold px-3" data-action="forum-inpage-submit">
+                    <button class="btn btn-primary font-weight-bold px-3" data-action="forum-inpage-submit">
                         <span data-region="submit-text">{{#str}} posttoforum, mod_forum {{/str}}</span>
                         <span data-region="loading-icon-container" class="hidden">{{> core/loading }}</span>
                     </button>
@@ -87,16 +87,16 @@
                     </button>
                     {{#canreplyprivately}}
                     <div class="form-check form-check-inline">
-                        <div class="form-check form-switch">
-                            <input name="privatereply" type="checkbox" class="form-check-input" id="private-reply-checkbox-{{uniqid}}">
-                            <label class="form-check-label" for="private-reply-checkbox-{{uniqid}}">
+                        <div class="custom-control custom-switch">
+                            <input name="privatereply" type="checkbox" class="custom-control-input" id="private-reply-checkbox-{{uniqid}}">
+                            <label class="custom-control-label" for="private-reply-checkbox-{{uniqid}}">
                                 {{#str}} privatereply, forum {{/str}}
                             </label>
                         </div>
                     </div>
                     {{/canreplyprivately}}
                     <button
-                        class="btn btn-icon icon-size-4 text-muted"
+                        class="btn btn-icon icon-no-margin icon-size-4 text-muted"
                         title="{{#str}} cancelreply, mod_forum {{/str}}"
                         data-action="cancel-inpage-reply"
                     >

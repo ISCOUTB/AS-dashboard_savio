@@ -56,10 +56,11 @@ class activity_header implements renderable, templatable {
     public function __construct(moodle_page $page, \stdClass $user) {
         $this->page = $page;
         $this->user = $user;
+        $pageoptions = $this->page->theme->activityheaderconfig ?? [];
         $layoutoptions = $this->page->layout_options['activityheader'] ?? [];
         // Do a basic setup for the header based on theme/page options.
         if ($page->activityrecord) {
-            if ($this->is_title_allowed()) {
+            if (empty($pageoptions['notitle']) && empty($layoutoptions['notitle'])) {
                 $this->title = format_string($page->activityrecord->name);
             }
 
@@ -78,22 +79,10 @@ class activity_header implements renderable, templatable {
     /**
      * Checks if the theme has specified titles to be displayed.
      *
-     * First checks if the current layout has the notitle option set. If it is, uses that option to decide whether the title is
-     * displayed. If not, then checks whether the theme has the notitle option set and uses that. If neither is set, the title
-     * is allowed by default.
-     *
      * @return bool
      */
     public function is_title_allowed(): bool {
-        $layoutoptions = $this->page->layout_options['activityheader'] ?? [];
-        $themeoptions = $this->page->theme->activityheaderconfig;
-        if (isset($layoutoptions['notitle'])) {
-            return !$layoutoptions['notitle'];
-        } else if (isset($themeoptions['notitle'])) {
-            return !$themeoptions['notitle'];
-        } else {
-            return true;
-        }
+        return empty($this->page->theme->activityheaderconfig['notitle']);
     }
 
     /**

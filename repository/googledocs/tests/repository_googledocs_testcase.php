@@ -32,12 +32,9 @@ abstract class repository_googledocs_testcase extends \advanced_testcase {
      * @param string $modified The date of the last modification
      * @return array The repository folder node array
      */
-    protected static function create_folder_content_node_array(
-        string $id,
-        string $name,
-        string $path,
-        string $modified = '',
-    ): array {
+    protected function create_folder_content_node_array(string $id, string $name, string $path,
+            string $modified = ''): array {
+
         global $CFG, $OUTPUT;
 
         return [
@@ -66,17 +63,10 @@ abstract class repository_googledocs_testcase extends \advanced_testcase {
      * @param string|null $googledoctype The type of the Google Doc file (if applicable)
      * @return array The repository file node array
      */
-    protected static function create_file_content_node_array(
-        string $id,
-        string $name,
-        string $title,
-        ?string $size = null,
-        string $modified = '',
-        string $thumbnail = '',
-        string $link = '',
-        string $exportformat = '',
-        ?string $googledoctype = null,
-    ): array {
+    protected function create_file_content_node_array(string $id, string $name, string $title, ?string $size = null,
+            string $modified = '', string $thumbnail = '' , string $link = '', string $exportformat = '',
+            ?string $googledoctype = null): array {
+
         return [
             'id' => $id,
             'title' => $title,
@@ -85,7 +75,7 @@ abstract class repository_googledocs_testcase extends \advanced_testcase {
                 'name' => $name,
                 'link' => $link,
                 'exportformat' => $exportformat,
-                'googledoctype' => $googledoctype,
+                'googledoctype' => $googledoctype
             ]),
             'date' => $modified,
             'size' => $size,
@@ -102,8 +92,8 @@ abstract class repository_googledocs_testcase extends \advanced_testcase {
      * @param string $name The name of the shared drive
      * @return \stdClass The shared drive object
      */
-    protected static function create_google_drive_shared_drive_object(string $id, string $name): \stdClass {
-        return (object) [
+    protected function create_google_drive_shared_drive_object(string $id, string $name): \stdClass {
+        return (object)[
             'kind' => 'drive#drive',
             'id' => $id,
             'name' => $name,
@@ -118,7 +108,7 @@ abstract class repository_googledocs_testcase extends \advanced_testcase {
      * @param string|null $modified The date of the last modification
      * @return \stdClass The folder object
      */
-    protected static function create_google_drive_folder_object(string $id, string $name, ?string $modified = null): \stdClass {
+    protected function create_google_drive_folder_object(string $id, string $name, ?string $modified = null): \stdClass {
         return (object)[
             'id' => $id,
             'name' => $name,
@@ -142,16 +132,10 @@ abstract class repository_googledocs_testcase extends \advanced_testcase {
      * @param string|null $webviewlink The link for opening the file in a browser
      * @return \stdClass The file object
      */
-    protected static function create_google_drive_file_object(
-        string $id,
-        string $name,
-        string $mimetype,
-        ?string $extension = null,
-        ?string $size = null,
-        ?string $modified = null,
-        ?string $webcontentlink = null,
-        ?string $webviewlink = null,
-    ): \stdClass {
+    protected function create_google_drive_file_object(string $id, string $name, string $mimetype,
+            ?string $extension = null, ?string $size = null, ?string $modified = null, ?string $webcontentlink = null,
+            ?string $webviewlink = null): \stdClass {
+
         $googledrivefile = [
             'id' => $id,
             'name' => $name,

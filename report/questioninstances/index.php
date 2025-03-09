@@ -69,10 +69,8 @@ if ($requestedqtype) {
         $othertypes = array_keys($qtypes);
         $key = array_search('missingtype', $othertypes);
         unset($othertypes[$key]);
-
-        [$sqlqtypetest, $sqlqtypetestparams] = $DB->get_in_or_equal($othertypes, SQL_PARAMS_QM, '', false);
+        list($sqlqtypetest, $params) = $DB->get_in_or_equal($othertypes, SQL_PARAMS_QM, '', false);
         $sqlqtypetest = 'WHERE qtype ' . $sqlqtypetest;
-        $params = array_merge($params, $sqlqtypetestparams);
 
     } else if ($requestedqtype == '_all_') {
         $title = get_string('reportforallqtypes', 'report_questioninstances');

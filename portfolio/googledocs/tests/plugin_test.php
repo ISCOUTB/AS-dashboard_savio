@@ -32,7 +32,7 @@ require_once($CFG->libdir . '/portfolio/forms.php');
  * @copyright  2016 Marina Glancy
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class plugin_test extends \advanced_testcase {
+class plugin_test extends \advanced_testcase {
 
     /** @var string name of the portfolio plugin */
     protected $pluginname = 'googledocs';

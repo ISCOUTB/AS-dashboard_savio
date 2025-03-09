@@ -38,7 +38,7 @@ require_once($CFG->dirroot . '/question/type/calculated/tests/helper.php');
  * @covers \question_type
  * @covers \qtype_calculated
  */
-final class question_type_test extends \advanced_testcase {
+class question_type_test extends \advanced_testcase {
     protected $tolerance = 0.00000001;
     protected $qtype;
 
@@ -105,7 +105,7 @@ final class question_type_test extends \advanced_testcase {
         $this->assertEquals($question->createdby, $questiondata->createdby);
         $this->assertEquals($question->createdby, $questiondata->modifiedby);
         $this->assertEquals('', $questiondata->idnumber);
-        $this->assertEquals($category->contextid, $questiondata->contextid);
+        $this->assertEquals($syscontext->id, $questiondata->contextid);
         $this->assertEquals([], $questiondata->hints);
 
         // Options.

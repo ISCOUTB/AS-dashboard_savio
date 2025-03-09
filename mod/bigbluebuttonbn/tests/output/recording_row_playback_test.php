@@ -28,7 +28,7 @@ use mod_bigbluebuttonbn\test\testcase_helper_trait;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @author    Laurent David  (laurent.david [at] call-learning [dt] fr)
  */
-final class recording_row_playback_test extends \advanced_testcase {
+class recording_row_playback_test extends \advanced_testcase {
     use testcase_helper_trait;
 
     /**
@@ -130,7 +130,7 @@ final class recording_row_playback_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function should_be_included_data_provider(): array {
+    public function should_be_included_data_provider() {
         return [
             'editingteacher user should see all' => [
                 'role' => 'editingteacher',

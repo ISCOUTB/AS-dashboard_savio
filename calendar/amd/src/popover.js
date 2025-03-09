@@ -22,7 +22,8 @@
  * @since 4.0
  */
 
-import Popover from 'theme_boost/bootstrap/popover';
+import 'theme_boost/popover';
+import jQuery from 'jquery';
 import * as CalendarSelectors from 'core_calendar/selectors';
 
 /**
@@ -35,27 +36,33 @@ const isPopoverAvailable = (dateContainer) => {
 };
 
 const isPopoverConfigured = new Map();
+
 const showPopover = target => {
     const dateContainer = target.closest(CalendarSelectors.elements.dateContainer);
     if (!isPopoverConfigured.has(dateContainer)) {
-        const config = {
+        const dateEle = jQuery(target);
+        dateEle.popover({
             trigger: 'manual',
             placement: 'top',
             html: true,
             title: dateContainer.dataset.title,
             content: () => {
-                const source = dateContainer.querySelector(CalendarSelectors.elements.dateContent);
-                return source ? source.querySelector('.hidden').innerHTML : '';
+                const source = jQuery(dateContainer).find(CalendarSelectors.elements.dateContent);
+                const content = jQuery('<div>');
+                if (source.length) {
+                    const temptContent = source.find('.hidden').clone(false);
+                    content.html(temptContent.html());
+                }
+                return content.html();
             },
             'animation': false,
-        };
-        new Popover(target, config);
+        });
 
         isPopoverConfigured.set(dateContainer, true);
     }
 
     if (isPopoverAvailable(dateContainer)) {
-        Popover.getInstance(target).show();
+        jQuery(target).popover('show');
         target.addEventListener('mouseleave', hidePopover);
         target.addEventListener('focusout', hidePopover);
         // Set up the hide function to the click event type.
@@ -78,9 +85,9 @@ const hidePopover = e => {
 
         let removeListener = true;
         if (!isTargetActive && !isTargetHover) {
-            Popover.getOrCreateInstance(target).hide();
+            jQuery(target).popover('hide');
         } else if (isTargetClicked) {
-            Popover.getOrCreateInstance(document.activeElement).hide();
+            jQuery(document.activeElement).popover('hide');
         } else {
             removeListener = false;
         }

@@ -64,8 +64,6 @@ $string['errorotherhubsnotsupported'] = 'This page can no longer be used for reg
 $string['errorws'] = '{$a}';
 $string['errorwstokenreset'] = '{$a}. Registration token on this site has been reset. You can now register your site again.';
 $string['errorregistrationupdate'] = 'An error occurred during registration update ({$a})';
-$string['experttipsandinsights'] = 'Expert tips and insights';
-$string['experttipsandinsightsdesc'] = 'Yes, sign me up for exclusive tips, strategies, and insights from Moodle experts and Certified Partners. Update your preferences or unsubscribe any time, as covered in our <a href="{$a}">Privacy Notice</a>.';
 $string['geolocation'] = 'Geolocation';
 $string['geolocation_help'] = 'In future we may provide location-based searching. If you want to specify the location for your course use a latitude/longitude value here (eg: -31.947884,115.871285).  One way to find this is to use Google Maps.';
 $string['imageurl'] = 'Image URL';
@@ -132,6 +130,9 @@ $string['sendfollowinginfo_help'] = 'The following information will be sent to M
 $string['sent'] = '...finished';
 $string['siteadmin'] = 'Administrator';
 $string['siteadmin_help'] = 'The full name of the site administrator.';
+$string['sitecommnews'] = 'Moodle newsletter';
+$string['sitecommnews_help'] = 'You have the option of subscribing to our Moodle newsletter. You may unsubscribe at any time.';
+$string['sitecommnewsyes'] = 'Yes, I would like to receive the Moodle newsletter';
 $string['sitecountry'] = 'Country';
 $string['sitecountry_help'] = 'The country your organisation or institution is located in.';
 $string['sitedesc'] = 'Description';
@@ -203,8 +204,3 @@ $string['sitecommnewsno'] = 'No, I do not wish to receive any emails';
 $string['registerwithmoodleorginfoapp'] = 'About the Moodle app';
 $string['siteregistrationcontact'] = 'Display contact form';
 $string['siteregistrationcontact_help'] = 'If you allow it, other people in our Moodle community (who need a login account) can contact you via a form on our Moodle community site. However, they will never be able to see your email address.';
-
-// Deprecated since 5.0.
-$string['sitecommnews'] = 'Moodle newsletter';
-$string['sitecommnews_help'] = 'You have the option of subscribing to our Moodle newsletter. You may unsubscribe at any time.';
-$string['sitecommnewsyes'] = 'Yes, I would like to receive the Moodle newsletter';

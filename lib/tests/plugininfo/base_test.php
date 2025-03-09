@@ -29,7 +29,7 @@ use testable_plugininfo_base;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers \core\plugininfo\base
  */
-final class base_test extends \advanced_testcase {
+class base_test extends \advanced_testcase {
 
     /**
      * Setup to ensure that fixtures are loaded.
@@ -86,7 +86,7 @@ final class base_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function load_disk_version_invalid_supported_version_provider(): array {
+    public function load_disk_version_invalid_supported_version_provider(): array {
         return [
             'Invalid supported range.' => [
                 'supported' => [31, 29],
@@ -152,7 +152,7 @@ final class base_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function load_disk_version_invalid_incompatible_version_provider(): array {
+    public function load_disk_version_invalid_incompatible_version_provider(): array {
         return [
             [[38]],
             [['38']],
@@ -200,7 +200,7 @@ final class base_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function load_disk_version_branch_supports_provider(): array {
+    public function load_disk_version_branch_supports_provider(): array {
         return [
             'Range, branch in support, lowest' => [
                 'supported' => [29, 31],
@@ -313,7 +313,7 @@ final class base_test extends \advanced_testcase {
      *
      * @return string[]
      */
-    public static function plugins_not_supporting_ordering(): array {
+    public function plugins_not_supporting_ordering(): array {
         return [
             ['mod_assign'],
             ['block_login'],

@@ -2,7 +2,8 @@
 Feature: Subsection behavior in Log report.
 
   Background:
-    Given the following "courses" exist:
+    Given I enable "subsection" "mod" plugin
+    And the following "courses" exist:
       | fullname | shortname  | category  | numsections | initsections |
       | Course 1 | C1         | 0         | 2           | 1            |
     And the following "users" exist:

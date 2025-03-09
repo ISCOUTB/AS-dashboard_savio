@@ -37,7 +37,7 @@ require_once($CFG->dirroot . '/mod/scorm/lib.php');
  * @copyright  2013 onwards Ankit Agarwal
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class events_test extends \advanced_testcase {
+class events_test extends \advanced_testcase {
 
     /** @var stdClass store course object */
     protected $eventcourse;
@@ -220,7 +220,7 @@ final class events_test extends \advanced_testcase {
     /**
      * dataProvider for test_scoreraw_submitted_event_validations().
      */
-    public static function get_scoreraw_submitted_event_validations(): array {
+    public function get_scoreraw_submitted_event_validations() {
         return array(
             'scoreraw_submitted => missing cmielement' => array(
                 null, '50',
@@ -307,7 +307,7 @@ final class events_test extends \advanced_testcase {
     /**
      * dataProvider for test_status_submitted_event_validations().
      */
-    public static function get_status_submitted_event_validations(): array {
+    public function get_status_submitted_event_validations() {
         return array(
             'status_submitted => missing cmielement' => array(
                 null, 'passed',

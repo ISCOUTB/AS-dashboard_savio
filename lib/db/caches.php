@@ -239,9 +239,6 @@ $definitions = array(
         'mode' => cache_store::MODE_SESSION,
         'simplekeys' => true,
         'simpledata' => true,
-        'invalidationevents' => [
-            'changesincoursestate',
-        ],
     ],
     // Course actions instances cache.
     'courseactionsinstances' => [
@@ -640,7 +637,7 @@ $definitions = array(
         'canuselocalstore' => true,
     ],
     // Cache to store AI rate limits.
-    // Used by AI provider plugins to limit the number of requests to external services.
+    // Used by AI Provider plugins to limit the number of requests to external services.
     'ai_ratelimit' => [
         'mode' => cache_store::MODE_APPLICATION,
         'simplekeys' => true, // Cache must use simple keys (a-zA-Z0-9_).

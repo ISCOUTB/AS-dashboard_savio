@@ -45,12 +45,12 @@
                 <h5 class="d-inline px-0 mb-0">{{moduleName}}</h5>
             </button>
             <span class="text-muted icon-no-margin">{{#pix}} i/breadcrumbdivider, core {{/pix}}</span>
-            <h5 class="d-inline px-2 mb-0 fw-bold">{{#str}}grading, forum{{/str}}</h5>
+            <h5 class="d-inline px-2 mb-0 font-weight-bold">{{#str}}grading, forum{{/str}}</h5>
         </div>
 
         <div class="ms-1 ms-sm-auto">
             <button
-                class="btn btn-icon drawer-button me-1 active"
+                class="btn btn-icon icon-no-margin drawer-button me-1 active"
                 data-action="expand-grading-drawer"
                 aria-controls="grading-drawer-{{uniqid}}"
                 aria-expanded="true"
@@ -61,7 +61,7 @@
                 <span class="dir-rtl-hide" aria-hidden="true">{{#pix}} show-grader-panel, mod_forum, {{#str}} showgraderpanel, mod_forum {{/str}} {{/pix}}</span>
             </button>
             <button
-                class="btn btn-icon drawer-button me-1 d-none d-sm-inline-block"
+                class="btn btn-icon icon-no-margin drawer-button me-1 d-none d-sm-inline-block"
                 aria-label="{{#str}} hidegraderpanel, mod_forum {{/str}}"
                 data-action="collapse-grading-drawer"
                 aria-controls="grading-drawer-{{uniqid}}"
@@ -72,13 +72,13 @@
                 <span aria-hidden="true">{{#pix}} hide-grader-panel, mod_forum, {{#str}} hidegraderpanel, mod_forum {{/str}} {{/pix}}</span>
             </button>
             <button
-                class="btn btn-primary fw-bold ms-sm-2 px-4"
+                class="btn btn-primary font-weight-bold ms-sm-2 px-4"
                 data-action="savegrade"
             >
                 {{#str}} save {{/str}}
             </button>
             <button
-                class="btn btn-secondary fw-bold ms-1 ms-sm-2 px-4"
+                class="btn btn-secondary font-weight-bold ms-1 ms-sm-2 px-4"
                 aria-label="{{#str}} closegrader, mod_forum {{/str}}"
                 data-action="closegrader"
                 type="button"
@@ -90,14 +90,14 @@
                     class="btn btn-icon text-muted icon-no-margin icon-size-3 ms-2"
                     type="button"
                     id="grader-actions-menu-{{uniqid}}"
-                    data-bs-toggle="dropdown"
+                    data-toggle="dropdown"
                     aria-haspopup="true"
                     aria-expanded="false"
                     aria-label="{{#str}} actionsforgraderinterface, mod_forum {{/str}}"
                 >
                     {{#pix}} i/menu, core {{/pix}}
                 </button>
-                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="grader-actions-menu-{{uniqid}}">
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="grader-actions-menu-{{uniqid}}">
                     <button
                         class="dropdown-item"
                         type="button"

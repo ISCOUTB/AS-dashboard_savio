@@ -247,7 +247,8 @@ class report_loglive_table_log extends table_sql {
      * @return string HTML for the description column
      */
     public function col_description($event) {
-        return format_text($event->get_description(), FORMAT_PLAIN);
+        // Description.
+        return $event->get_description();
     }
 
     /**

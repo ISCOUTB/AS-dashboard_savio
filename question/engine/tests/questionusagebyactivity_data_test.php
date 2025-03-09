@@ -34,7 +34,7 @@ require_once(__DIR__ . '/helpers.php');
  * @copyright 2012 The Open University
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class questionusagebyactivity_data_test extends \data_loading_method_test_base {
+class questionusagebyactivity_data_test extends \data_loading_method_test_base {
     public function test_load(): void {
         $scid = \context_system::instance()->id;
         $records = new question_test_recordset(array(

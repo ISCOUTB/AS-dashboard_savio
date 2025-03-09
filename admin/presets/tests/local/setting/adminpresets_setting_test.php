@@ -25,7 +25,7 @@ namespace core_adminpresets\local\setting;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \core_adminpresets\local\setting\adminpresets_setting
  */
-final class adminpresets_setting_test extends \advanced_testcase {
+class adminpresets_setting_test extends \advanced_testcase {
 
     /**
      * Test the behaviour of save_value() method.
@@ -77,34 +77,34 @@ final class adminpresets_setting_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function save_value_provider(): array {
+    public function save_value_provider(): array {
         return [
             'Core setting with the same value is not saved' => [
                 'category' => 'optionalsubsystems',
                 'settingplugin' => 'core',
                 'settingname' => 'enablebadges',
-                'settingvalue' => '1',
+                'setttingvalue' => '1',
                 'expectedsaved' => false,
             ],
             'Core setting with a different value is saved' => [
                 'category' => 'optionalsubsystems',
                 'settingplugin' => 'core',
                 'settingname' => 'enablebadges',
-                'settingvalue' => '0',
+                'setttingvalue' => '0',
                 'expectedsaved' => true,
             ],
             'Plugin setting with the same value is not saved' => [
                 'category' => 'modsettinglesson',
                 'settingplugin' => 'mod_lesson',
                 'settingname' => 'mediawidth',
-                'settingvalue' => '640',
+                'setttingvalue' => '640',
                 'expectedsaved' => false,
             ],
             'Plugin setting with different value is saved' => [
                 'category' => 'modsettinglesson',
                 'settingplugin' => 'mod_lesson',
                 'settingname' => 'mediawidth',
-                'settingvalue' => '900',
+                'setttingvalue' => '900',
                 'expectedsaved' => true,
             ],
         ];
@@ -167,14 +167,14 @@ final class adminpresets_setting_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function save_attributes_values_provider(): array {
+    public function save_attributes_values_provider(): array {
         return [
             'Plugin setting with the same value is not saved' => [
                 'category' => 'modsettinglesson',
                 'settingplugin' => 'mod_lesson',
                 'settingname' => 'maxanswers',
                 'advsettingname' => 'maxanswers_adv',
-                'advsettingvalue' => '1',
+                'advsetttingvalue' => '1',
                 'expectedsaved' => false,
             ],
             'Plugin setting with different value is saved' => [
@@ -182,7 +182,7 @@ final class adminpresets_setting_test extends \advanced_testcase {
                 'settingplugin' => 'mod_lesson',
                 'settingname' => 'maxanswers',
                 'advsettingname' => 'maxanswers_adv',
-                'advsettingvalue' => '0',
+                'advsetttingvalue' => '0',
                 'expectedsaved' => true,
             ],
             'Plugin setting without advanced attributes are not saved' => [
@@ -190,7 +190,7 @@ final class adminpresets_setting_test extends \advanced_testcase {
                 'settingplugin' => 'mod_lesson',
                 'settingname' => 'maxanswers',
                 'advsettingname' => null,
-                'advsettingvalue' => '0',
+                'advsetttingvalue' => '0',
                 'expectedsaved' => false,
             ],
         ];

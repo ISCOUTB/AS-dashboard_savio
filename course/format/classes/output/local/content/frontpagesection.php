@@ -89,7 +89,6 @@ class frontpagesection implements named_templatable, renderable {
         }
 
         $data = (object)[
-            'editing' => $format->show_editor(),
             'sections' => [$sectionoutput->export_for_template($output)],
         ];
 

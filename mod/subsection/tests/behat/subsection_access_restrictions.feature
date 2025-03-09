@@ -5,7 +5,8 @@ Feature: Testing subsection_access_restrictions in mod_subsection
   I need to set subsection conditions which prevent student access
 
   Background:
-    Given the following "users" exist:
+    Given I enable "subsection" "mod" plugin
+    And the following "users" exist:
       | username | firstname | lastname |
       | teacher1 | Teacher   | 1        |
       | student1 | Student   | 1        |

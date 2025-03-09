@@ -31,7 +31,7 @@ require_once("{$CFG->dirroot}/mod/forum/lib.php");
  * @copyright  2013 Frédéric Massart
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class subscriptions_test extends \advanced_testcase {
+class subscriptions_test extends \advanced_testcase {
     // Include the mod_forum test helpers.
     // This includes functions to create forums, users, discussions, and posts.
     use mod_forum_tests_generator_trait;
@@ -1355,7 +1355,7 @@ final class subscriptions_test extends \advanced_testcase {
         $this->assertGreaterThan($suppliedcmcount, $calculatedcmcount);
     }
 
-    public static function is_subscribable_forums(): array {
+    public function is_subscribable_forums() {
         return [
             [
                 'forcesubscribe' => FORUM_DISALLOWSUBSCRIBE,
@@ -1372,9 +1372,9 @@ final class subscriptions_test extends \advanced_testcase {
         ];
     }
 
-    public static function is_subscribable_provider(): array {
+    public function is_subscribable_provider() {
         $data = [];
-        foreach (self::is_subscribable_forums() as $forum) {
+        foreach ($this->is_subscribable_forums() as $forum) {
             $data[] = [$forum];
         }
 
@@ -1413,7 +1413,7 @@ final class subscriptions_test extends \advanced_testcase {
         $this->assertFalse(\mod_forum\subscriptions::is_subscribable($forum));
     }
 
-    public static function is_subscribable_loggedin_provider(): array {
+    public function is_subscribable_loggedin_provider() {
         return [
             [
                 ['forcesubscribe' => FORUM_DISALLOWSUBSCRIBE],

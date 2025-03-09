@@ -38,7 +38,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2020 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class report_viewed_test extends advanced_testcase {
+class report_viewed_test extends advanced_testcase {
 
     /**
      * Test report_viewed event.
@@ -114,7 +114,7 @@ final class report_viewed_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function report_viewed_data(): array {
+    public function report_viewed_data(): array {
         return [
             // Exception cases.
             'Event withour other data (exception)' => [

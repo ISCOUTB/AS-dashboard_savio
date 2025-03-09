@@ -15,6 +15,7 @@
 
 import {getDropdownDialog} from 'core/local/dropdown/dialog';
 import {getUserPreference} from 'core_user/repository';
+import $ from 'jquery';
 
 /**
  * Module for the extra filters dropdown on the submissions page.
@@ -64,7 +65,7 @@ const registerEventListeners = (extraFiltersDropdown) => {
     });
 
     // Event listener triggered upon hiding of the dropdown.
-    extraFiltersDropdown.getElement().addEventListener('hide.bs.dropdown', () => {
+    $(extraFiltersDropdown.getElement()).on('hide.bs.dropdown', () => {
         // Restore the filters to their stored preference values once the dropdown is closed.
         restoreAppliedWorkflowFilter(extraFiltersDropdown);
         restoreAppliedMarkerFilter(extraFiltersDropdown);

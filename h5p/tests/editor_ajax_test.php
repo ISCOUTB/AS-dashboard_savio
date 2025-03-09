@@ -38,7 +38,7 @@ use Moodle\H5PCore;
  *
  * @runTestsInSeparateProcesses
  */
-final class editor_ajax_test extends \advanced_testcase {
+class editor_ajax_test extends \advanced_testcase {
 
     /** @var editor_ajax H5P editor ajax instance */
     protected $editorajax;
@@ -161,7 +161,7 @@ final class editor_ajax_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function get_translations_provider(): array {
+    public function get_translations_provider(): array {
         return [
             'No library' => [
                 [],

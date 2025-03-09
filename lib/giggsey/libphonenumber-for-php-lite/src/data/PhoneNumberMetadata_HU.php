@@ -1,5 +1,4 @@
 <?php
-
 /**
  * libphonenumber-for-php-lite data file
  * This file has been @generated from libphonenumber data
@@ -7,117 +6,153 @@
  * @internal
  */
 
-return [
-    'id' => 'HU',
-    'countryCode' => 36,
-    'generalDesc' => [
-        'pattern' => '[235-7]\\d{8}|[1-9]\\d{7}',
-        'posLength' => [
-            8,
-            9,
-        ],
-        'posLengthLocal' => [
-            6,
-            7,
-        ],
+return  [
+  'generalDesc' =>
+   [
+    'NationalNumberPattern' => '[235-7]\\d{8}|[1-9]\\d{7}',
+    'PossibleLength' =>
+     [
+      0 => 8,
+      1 => 9,
     ],
-    'fixedLine' => [
-        'pattern' => '(?:1\\d|[27][2-9]|3[2-7]|4[24-9]|5[2-79]|6[23689]|8[2-57-9]|9[2-69])\\d{6}',
-        'example' => '12345678',
-        'posLength' => [
-            8,
-        ],
-        'posLengthLocal' => [
-            6,
-            7,
-        ],
+    'PossibleLengthLocalOnly' =>
+     [
+      0 => 6,
+      1 => 7,
     ],
-    'mobile' => [
-        'pattern' => '(?:[257]0|3[01])\\d{7}',
-        'example' => '201234567',
-        'posLength' => [
-            9,
-        ],
+  ],
+  'fixedLine' =>
+   [
+    'NationalNumberPattern' => '(?:1\\d|[27][2-9]|3[2-7]|4[24-9]|5[2-79]|6[23689]|8[2-57-9]|9[2-69])\\d{6}',
+    'ExampleNumber' => '12345678',
+    'PossibleLength' =>
+     [
+      0 => 8,
     ],
-    'tollFree' => [
-        'pattern' => '(?:[48]0\\d|680[29])\\d{5}',
-        'example' => '80123456',
+    'PossibleLengthLocalOnly' =>
+     [
+      0 => 6,
+      1 => 7,
     ],
-    'premiumRate' => [
-        'pattern' => '9[01]\\d{6}',
-        'example' => '90123456',
-        'posLength' => [
-            8,
-        ],
+  ],
+  'mobile' =>
+   [
+    'NationalNumberPattern' => '(?:[257]0|3[01])\\d{7}',
+    'ExampleNumber' => '201234567',
+    'PossibleLength' =>
+     [
+      0 => 9,
     ],
-    'sharedCost' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'tollFree' =>
+   [
+    'NationalNumberPattern' => '(?:[48]0\\d|680[29])\\d{5}',
+    'ExampleNumber' => '80123456',
+  ],
+  'premiumRate' =>
+   [
+    'NationalNumberPattern' => '9[01]\\d{6}',
+    'ExampleNumber' => '90123456',
+    'PossibleLength' =>
+     [
+      0 => 8,
     ],
-    'personalNumber' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'sharedCost' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'voip' => [
-        'pattern' => '21\\d{7}',
-        'example' => '211234567',
-        'posLength' => [
-            9,
-        ],
+  ],
+  'personalNumber' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'pager' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'voip' =>
+   [
+    'NationalNumberPattern' => '21\\d{7}',
+    'ExampleNumber' => '211234567',
+    'PossibleLength' =>
+     [
+      0 => 9,
     ],
-    'uan' => [
-        'pattern' => '38\\d{7}',
-        'example' => '381234567',
-        'posLength' => [
-            9,
-        ],
+  ],
+  'pager' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'voicemail' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'uan' =>
+   [
+    'NationalNumberPattern' => '38\\d{7}',
+    'ExampleNumber' => '381234567',
+    'PossibleLength' =>
+     [
+      0 => 9,
     ],
-    'noInternationalDialling' => [
-        'pattern' => '(?:[48]0\\d|680[29])\\d{5}',
+  ],
+  'voicemail' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'internationalPrefix' => '00',
-    'nationalPrefix' => '06',
-    'nationalPrefixForParsing' => '06',
-    'numberFormat' => [
-        [
-            'pattern' => '(\\d)(\\d{3})(\\d{4})',
-            'format' => '$1 $2 $3',
-            'leadingDigitsPatterns' => [
-                '1',
-            ],
-            'nationalPrefixFormattingRule' => '(06 $1)',
-            'domesticCarrierCodeFormattingRule' => '',
-        ],
-        [
-            'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
-            'format' => '$1 $2 $3',
-            'leadingDigitsPatterns' => [
-                '[27][2-9]|3[2-7]|4[24-9]|5[2-79]|6|8[2-57-9]|9[2-69]',
-            ],
-            'nationalPrefixFormattingRule' => '(06 $1)',
-            'domesticCarrierCodeFormattingRule' => '',
-        ],
-        [
-            'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})',
-            'format' => '$1 $2 $3',
-            'leadingDigitsPatterns' => [
-                '[2-9]',
-            ],
-            'nationalPrefixFormattingRule' => '06 $1',
-            'domesticCarrierCodeFormattingRule' => '',
-        ],
+  ],
+  'noInternationalDialling' =>
+   [
+    'NationalNumberPattern' => '(?:[48]0\\d|680[29])\\d{5}',
+  ],
+  'id' => 'HU',
+  'countryCode' => 36,
+  'internationalPrefix' => '00',
+  'nationalPrefix' => '06',
+  'nationalPrefixForParsing' => '06',
+  'sameMobileAndFixedLinePattern' => false,
+  'numberFormat' =>
+   [
+    0 =>
+     [
+      'pattern' => '(\\d)(\\d{3})(\\d{4})',
+      'format' => '$1 $2 $3',
+      'leadingDigitsPatterns' =>
+       [
+        0 => '1',
+      ],
+      'nationalPrefixFormattingRule' => '(06 $1)',
+      'domesticCarrierCodeFormattingRule' => '',
+      'nationalPrefixOptionalWhenFormatting' => false,
     ],
-    'mobileNumberPortableRegion' => true,
+    1 =>
+     [
+      'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
+      'format' => '$1 $2 $3',
+      'leadingDigitsPatterns' =>
+       [
+        0 => '[27][2-9]|3[2-7]|4[24-9]|5[2-79]|6|8[2-57-9]|9[2-69]',
+      ],
+      'nationalPrefixFormattingRule' => '(06 $1)',
+      'domesticCarrierCodeFormattingRule' => '',
+      'nationalPrefixOptionalWhenFormatting' => false,
+    ],
+    2 =>
+     [
+      'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})',
+      'format' => '$1 $2 $3',
+      'leadingDigitsPatterns' =>
+       [
+        0 => '[2-9]',
+      ],
+      'nationalPrefixFormattingRule' => '06 $1',
+      'domesticCarrierCodeFormattingRule' => '',
+      'nationalPrefixOptionalWhenFormatting' => false,
+    ],
+  ],
+  'mainCountryForCode' => false,
+  'mobileNumberPortableRegion' => true,
 ];

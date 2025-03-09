@@ -23,8 +23,8 @@
  */
 
 import {BaseComponent, DragDrop} from 'core/reactive';
+import $ from 'jquery';
 import {categorymanager} from 'qbank_managecategories/categorymanager';
-import Tooltip from 'theme_boost/bootstrap/tooltip';
 
 export default class extends BaseComponent {
     create(descriptor) {
@@ -85,13 +85,13 @@ export default class extends BaseComponent {
     showDropZone(dropData, event) {
         const dropTarget = event.target.closest(this.selectors.NEW_CHILD);
         dropTarget.classList.add(this.classes.DROP_TARGET);
-        Tooltip.getOrCreateInstance(dropTarget).show();
+        $(dropTarget).tooltip('show');
     }
 
     hideDropZone(dropData, event) {
         const dropTarget = event.target.closest(this.selectors.NEW_CHILD);
         dropTarget.classList.remove(this.classes.DROP_TARGET);
-        Tooltip.getOrCreateInstance(dropTarget).hide();
+        $(dropTarget).tooltip('hide');
     }
 
     drop(dropData, event) {

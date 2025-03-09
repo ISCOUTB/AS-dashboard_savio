@@ -21,6 +21,13 @@ use question_bank;
 use question_finder;
 use quiz_statistics_report;
 
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->dirroot . '/mod/quiz/tests/attempt_walkthrough_from_csv_test.php');
+require_once($CFG->dirroot . '/mod/quiz/report/statistics/report.php');
+require_once($CFG->dirroot . '/mod/quiz/report/reportlib.php');
+
 /**
  * Quiz attempt walk through using data from csv file.
  *
@@ -38,47 +45,39 @@ use quiz_statistics_report;
  * @author     Jamie Pratt <me@jamiep.org>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class stats_from_steps_walkthrough_test extends \mod_quiz\tests\attempt_walkthrough_testcase {
+class stats_from_steps_walkthrough_test extends \mod_quiz\attempt_walkthrough_from_csv_test {
+
     /**
      * @var quiz_statistics_report object to do stats calculations.
      */
     protected $report;
 
-    #[\Override]
-    public static function setUpBeforeClass(): void {
-        global $CFG;
-
-        parent::setUpBeforeClass();
-
-        require_once($CFG->dirroot . '/mod/quiz/report/statistics/report.php');
-        require_once($CFG->dirroot . '/mod/quiz/report/reportlib.php');
+    protected function get_full_path_of_csv_file(string $setname, string $test): string {
+        // Overridden here so that __DIR__ points to the path of this file.
+        return  __DIR__."/fixtures/{$setname}{$test}.csv";
     }
 
-    #[\Override]
-    protected static function get_test_files(): array {
-        return ['questions', 'steps', 'results', 'qstats', 'responsecounts'];
-    }
+    /**
+     * @var string[] names of the files which contain the test data.
+     */
+    protected $files = ['questions', 'steps', 'results', 'qstats', 'responsecounts'];
 
     /**
      * Create a quiz add questions to it, walk through quiz attempts and then check results.
      *
      * @param array $csvdata data read from csv file "questionsXX.csv", "stepsXX.csv" and "resultsXX.csv".
-     * // phpcs:ignore moodle.PHPUnit.TestCaseProvider.dataProviderSyntaxMethodNotFound
      * @dataProvider get_data_for_walkthrough
      */
     public function test_walkthrough_from_csv($quizsettings, $csvdata): void {
+
         $this->create_quiz_simulate_attempts_and_check_results($quizsettings, $csvdata);
 
         $whichattempts = QUIZ_GRADEAVERAGE; // All attempts.
         $whichtries = question_attempt::ALL_TRIES;
         $groupstudentsjoins = new \core\dml\sql_join();
-        [$questions, $quizstats, $questionstats, $qubaids] =
-                    $this->check_stats_calculations_and_response_analysis(
-                        $csvdata,
-                        $whichattempts,
-                        $whichtries,
-                        $groupstudentsjoins
-                    );
+        list($questions, $quizstats, $questionstats, $qubaids) =
+                    $this->check_stats_calculations_and_response_analysis($csvdata,
+                            $whichattempts, $whichtries, $groupstudentsjoins);
         if ($quizsettings['testnumber'] === '00') {
             $this->check_variants_count_for_quiz_00($questions, $questionstats, $whichtries, $qubaids);
             $this->check_quiz_stats_for_quiz_00($quizstats);
@@ -95,25 +94,21 @@ final class stats_from_steps_walkthrough_test extends \mod_quiz\tests\attempt_wa
         foreach ($qstats as $slotqstats) {
             foreach ($slotqstats as $statname => $slotqstat) {
                 if (!in_array($statname, ['slot', 'subqname'])  && $slotqstat !== '') {
-                    $this->assert_stat_equals(
-                        $slotqstat,
-                        $questionstats,
-                        $slotqstats['slot'],
-                        $slotqstats['subqname'],
-                        $slotqstats['variant'],
-                        $statname
-                    );
+                    $this->assert_stat_equals($slotqstat,
+                                              $questionstats,
+                                              $slotqstats['slot'],
+                                              $slotqstats['subqname'],
+                                              $slotqstats['variant'],
+                                              $statname);
                 }
             }
             // Check that sub-question boolean field is correctly set.
-            $this->assert_stat_equals(
-                !empty($slotqstats['subqname']),
-                $questionstats,
-                $slotqstats['slot'],
-                $slotqstats['subqname'],
-                $slotqstats['variant'],
-                'subquestion'
-            );
+            $this->assert_stat_equals(!empty($slotqstats['subqname']),
+                                      $questionstats,
+                                      $slotqstats['slot'],
+                                      $slotqstats['subqname'],
+                                      $slotqstats['variant'],
+                                      'subquestion');
         }
     }
 
@@ -143,13 +138,13 @@ final class stats_from_steps_walkthrough_test extends \mod_quiz\tests\attempt_wa
             $this->assertEquals($expected, $actual, $message);
         } else if (is_numeric($expected)) {
             switch ($statname) {
-                case 'covariance':
-                case 'discriminationindex':
-                case 'discriminativeefficiency':
-                case 'effectiveweight':
+                case 'covariance' :
+                case 'discriminationindex' :
+                case 'discriminativeefficiency' :
+                case 'effectiveweight' :
                     $precision = 1e-5;
                     break;
-                default:
+                default :
                     $precision = 1e-6;
             }
             $delta = abs($expected) * $precision;
@@ -159,15 +154,7 @@ final class stats_from_steps_walkthrough_test extends \mod_quiz\tests\attempt_wa
         }
     }
 
-    /**
-     * Assertion helper to check that response counts are as expected.
-     *
-     * @param $question
-     * @param $qubaids
-     * @param $expected
-     * @param $whichtries
-     */
-    protected function assert_response_count_equals($question, $qubaids, $expected, $whichtries): void {
+    protected function assert_response_count_equals($question, $qubaids, $expected, $whichtries) {
         $responesstats = new \core_question\statistics\responses\analyser($question);
         $analysis = $responesstats->load_cached($qubaids, $whichtries);
         if (!isset($expected['subpart'])) {
@@ -175,11 +162,9 @@ final class stats_from_steps_walkthrough_test extends \mod_quiz\tests\attempt_wa
         } else {
             $subpart = $expected['subpart'];
         }
-        [$subpartid, $responseclassid] = $this->get_response_subpart_and_class_id(
-            $question,
-            $subpart,
-            $expected['modelresponse']
-        );
+        list($subpartid, $responseclassid) = $this->get_response_subpart_and_class_id($question,
+                                                                                      $subpart,
+                                                                                      $expected['modelresponse']);
 
         $subpartanalysis = $analysis->get_analysis_for_subpart($expected['variant'], $subpartid);
         $responseclassanalysis = $subpartanalysis->get_response_class($responseclassid);
@@ -188,29 +173,21 @@ final class stats_from_steps_walkthrough_test extends \mod_quiz\tests\attempt_wa
         foreach ($actualresponsecounts as $actualresponsecount) {
             if ($actualresponsecount->response == $expected['actualresponse'] || count($actualresponsecounts) == 1) {
                 $i = 1;
-                $partofanalysis = " slot {$expected['slot']}, rand q '{$expected['randq']}', variant {$expected['variant']}, " .
-                                    "for expected model response {$expected['modelresponse']}, " .
+                $partofanalysis = " slot {$expected['slot']}, rand q '{$expected['randq']}', variant {$expected['variant']}, ".
+                                    "for expected model response {$expected['modelresponse']}, ".
                                     "actual response {$expected['actualresponse']}";
-                while (isset($expected['count' . $i])) {
-                    if ($expected['count' . $i] != 0) {
-                        $this->assertTrue(
-                            isset($actualresponsecount->trycount[$i]),
-                            "There is no count at all for try $i on " . $partofanalysis
-                        );
-                        $this->assertEquals(
-                            $expected['count' . $i],
-                            $actualresponsecount->trycount[$i],
-                            "Count for try $i on " . $partofanalysis
-                        );
+                while (isset($expected['count'.$i])) {
+                    if ($expected['count'.$i] != 0) {
+                        $this->assertTrue(isset($actualresponsecount->trycount[$i]),
+                            "There is no count at all for try $i on ".$partofanalysis);
+                        $this->assertEquals($expected['count'.$i], $actualresponsecount->trycount[$i],
+                                            "Count for try $i on ".$partofanalysis);
                     }
                     $i++;
                 }
                 if (isset($expected['totalcount'])) {
-                    $this->assertEquals(
-                        $expected['totalcount'],
-                        $actualresponsecount->totalcount,
-                        "Total count on " . $partofanalysis
-                    );
+                    $this->assertEquals($expected['totalcount'], $actualresponsecount->totalcount,
+                                        "Total count on ".$partofanalysis);
                 }
                 return;
             }
@@ -218,15 +195,7 @@ final class stats_from_steps_walkthrough_test extends \mod_quiz\tests\attempt_wa
         throw new \coding_exception("Expected response '{$expected['actualresponse']}' not found.");
     }
 
-    /**
-     * Get the subpart id and response class id for a given subpart and model response.
-     *
-     * @param $question
-     * @param $subpart
-     * @param $modelresponse
-     * @return array
-     */
-    protected function get_response_subpart_and_class_id($question, $subpart, $modelresponse): array {
+    protected function get_response_subpart_and_class_id($question, $subpart, $modelresponse) {
         $qtypeobj = question_bank::get_qtype($question->qtype, false);
         $possibleresponses = $qtypeobj->get_possible_responses($question);
         $possibleresponsesubpartids = array_keys($possibleresponses);
@@ -237,6 +206,7 @@ final class stats_from_steps_walkthrough_test extends \mod_quiz\tests\attempt_wa
 
         if ($modelresponse == '[NO RESPONSE]') {
             return [$subpartid, null];
+
         } else if ($modelresponse == '[NO MATCH]') {
             return [$subpartid, 0];
         }
@@ -251,8 +221,6 @@ final class stats_from_steps_walkthrough_test extends \mod_quiz\tests\attempt_wa
     }
 
     /**
-     * Assertion helper to check that response counts are as expected.
-     *
      * @param $responsecounts
      * @param $qubaids
      * @param $questions
@@ -277,8 +245,6 @@ final class stats_from_steps_walkthrough_test extends \mod_quiz\tests\attempt_wa
     }
 
     /**
-     * Assertion helper to check that variant counts are as expected for quiz 00.
-     *
      * @param $questions
      * @param $questionstats
      * @param $whichtries
@@ -309,6 +275,7 @@ final class stats_from_steps_walkthrough_test extends \mod_quiz\tests\attempt_wa
             }
             $totalspervariantno = [];
             foreach ($variantsnos as $variantno) {
+
                 $subpartids = $analysis->get_subpart_ids($variantno);
                 foreach ($subpartids as $subpartid) {
                     if (!isset($totalspervariantno[$subpartid])) {
@@ -339,17 +306,13 @@ final class stats_from_steps_walkthrough_test extends \mod_quiz\tests\attempt_wa
                     if (isset($expectedvariantcounts[$slot])) {
                         // If we know how many attempts there are at each variant we can check
                         // that we have counted the correct amount of responses for each variant.
-                        $this->assertEqualsCanonicalizing(
-                            $expectedvariantcounts[$slot],
-                            $totalpervariantno,
-                            "Totals responses do not add up in response analysis for slot {$slot}."
-                        );
+                        $this->assertEqualsCanonicalizing($expectedvariantcounts[$slot],
+                                            $totalpervariantno,
+                                            "Totals responses do not add up in response analysis for slot {$slot}.");
                     } else {
-                        $this->assertEquals(
-                            25,
-                            array_sum($totalpervariantno),
-                            "Totals responses do not add up in response analysis for slot {$slot}."
-                        );
+                        $this->assertEquals(25,
+                                            array_sum($totalpervariantno),
+                                            "Totals responses do not add up in response analysis for slot {$slot}.");
                     }
                 }
             }
@@ -363,8 +326,6 @@ final class stats_from_steps_walkthrough_test extends \mod_quiz\tests\attempt_wa
     }
 
     /**
-     * Assertion helper to ensure that quiz states are as expected.
-     *
      * @param $quizstats
      */
     protected function check_quiz_stats_for_quiz_00($quizstats) {
@@ -379,7 +340,7 @@ final class stats_from_steps_walkthrough_test extends \mod_quiz\tests\attempt_wa
             'kurtosis'           => -0.7073968557,
             'cic'                => -87.2230935542,
             'errorratio'         => 136.8294900795,
-            'standarderror'      => 1.1106813066,
+            'standarderror'      => 1.1106813066
         ];
 
         foreach ($quizstatsexpected as $statname => $statvalue) {
@@ -397,21 +358,15 @@ final class stats_from_steps_walkthrough_test extends \mod_quiz\tests\attempt_wa
      * @return array with contents 0 => $questions, 1 => $quizstats, 2 => $questionstats, 3 => $qubaids Might be needed for further
      *               testing.
      */
-    protected function check_stats_calculations_and_response_analysis(
-        $csvdata,
-        $whichattempts,
-        $whichtries,
-        \core\dml\sql_join $groupstudentsjoins
-    ) {
+    protected function check_stats_calculations_and_response_analysis($csvdata, $whichattempts, $whichtries,
+            \core\dml\sql_join $groupstudentsjoins) {
         $this->report = new quiz_statistics_report();
         $questions = $this->report->load_and_initialise_questions_for_calculations($this->quiz);
-        [$quizstats, $questionstats] = $this->report->get_all_stats_and_analysis(
-            $this->quiz,
-            $whichattempts,
-            $whichtries,
-            $groupstudentsjoins,
-            $questions
-        );
+        list($quizstats, $questionstats) = $this->report->get_all_stats_and_analysis($this->quiz,
+                                                                                     $whichattempts,
+                                                                                     $whichtries,
+                                                                                     $groupstudentsjoins,
+                                                                                     $questions);
 
         $qubaids = quiz_statistics_qubaids_condition($this->quiz->id, $groupstudentsjoins, $whichattempts);
 
@@ -433,4 +388,5 @@ final class stats_from_steps_walkthrough_test extends \mod_quiz\tests\attempt_wa
         }
         return [$questions, $quizstats, $questionstats, $qubaids];
     }
+
 }

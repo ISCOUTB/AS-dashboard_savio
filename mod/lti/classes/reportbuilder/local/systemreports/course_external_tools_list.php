@@ -182,7 +182,7 @@ class course_external_tools_list extends system_report {
                     'disabled' => $disabled,
                     'dataattributes' => $attributes,
                     'label' => $label,
-                    'labelclasses' => 'visually-hidden',
+                    'labelclasses' => 'sr-only'
                 ]);
             })
         );
@@ -219,7 +219,7 @@ class course_external_tools_list extends system_report {
                 // Build and display an action menu.
                 $menu = new \action_menu();
                 $menu->set_menu_trigger($OUTPUT->pix_icon('i/moremenu', get_string('actions', 'core')),
-                    'btn btn-icon d-flex'); // TODO check 'actions' lang string with UX.
+                    'btn btn-icon d-flex align-items-center justify-content-center'); // TODO check 'actions' lang string with UX.
 
                 $menu->add(new \action_menu_link(
                     new \moodle_url('/mod/lti/coursetooledit.php', ['course' => $row->course, 'typeid' => $row->id]),

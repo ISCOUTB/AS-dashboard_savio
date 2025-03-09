@@ -39,7 +39,7 @@ require_once(__DIR__ . '/fixtures/testable.php');
 /**
  * Test cases for the internal workshop api
  */
-final class locallib_test extends \advanced_testcase {
+class locallib_test extends \advanced_testcase {
 
     /** @var object */
     protected $course;
@@ -478,6 +478,7 @@ final class locallib_test extends \advanced_testcase {
         $this->assertEquals(array($student2->id), array_keys($result[$group2->id]));
         $this->assertEquals(array($student3->id), array_keys($result[$group3->id]));
 
+        // Test get_users_with_capability_sql (via get_potential_authors).
         $users = $this->workshop->get_potential_authors(false);
         $this->assertCount(3, $users);
         $users = $this->workshop->get_potential_authors(false, $group2->id);
@@ -501,6 +502,7 @@ final class locallib_test extends \advanced_testcase {
         $this->assertEquals(array($student1->id), array_keys($result[$group1->id]));
         $this->assertEquals(array($student2->id), array_keys($result[$group2->id]));
 
+        // Test get_users_with_capability_sql (via get_potential_authors).
         $users = $workshopgrouping->get_potential_authors(false);
         $userids = array_keys($users);
         sort($userids);
@@ -528,6 +530,7 @@ final class locallib_test extends \advanced_testcase {
         $this->assertCount(4, $result);
         $this->assertCount(3, $result[0]);
 
+        // The get_users_with_capability_sql-based functions should apply it.
         $users = $workshoprestricted->get_potential_authors(false);
         $userids = array_keys($users);
         sort($userids);

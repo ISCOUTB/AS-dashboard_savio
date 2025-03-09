@@ -53,7 +53,7 @@
     <div class="py-3">
         {{#forum.capabilities.create}}
             {{#enablediscussioncreation}}
-                <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseAddForm">
+                <a class="btn btn-primary" data-toggle="collapse" href="#collapseAddForm">
                     {{$discussion_create_text}}
                         {{#str}}addanewdiscussion, forum{{/str}}
                     {{/discussion_create_text}}
@@ -96,7 +96,7 @@
         <div class="position-relative">
             <div class="no-overflow">
                 <table class="table discussion-list generaltable">
-                    <caption id="discussion-table-description-{{uniqid}}" class="visually-hidden">
+                    <caption id="discussion-table-description-{{uniqid}}" class="sr-only">
                         {{#str}} showingcountoftotaldiscussions, mod_forum, {"count": "{{visiblediscussioncount}}", "total":"{{totaldiscussioncount}}"} {{/str}}
                     </caption>
                     {{$discussion_list_header}}
@@ -221,9 +221,9 @@
                                             {{#discussion.timed.istimed}}
                                             <span>
                                                  <button class="btn badge bg-primary text-white rounded border-0" data-region="timed-label"
-                                                    data-bs-toggle="popover" data-bs-container="body" data-bs-placement="right" data-bs-html="true"
-                                                    data-bs-content="{{#discussion.timed}}{{#discussion.times}}{{> mod_forum/discussion_times}}{{/discussion.times}}{{/discussion.timed}}"
-                                                    data-bs-trigger="click" aria-label="{{#str}}timeddiscussion, forum{{/str}}" title="{{#str}}timeddiscussion, forum{{/str}}">
+                                                    data-toggle="popover" data-container="body" data-placement="right" data-html="true"
+                                                    data-content="{{#discussion.timed}}{{#discussion.times}}{{> mod_forum/discussion_times}}{{/discussion.times}}{{/discussion.timed}}"
+                                                    data-trigger="click" aria-label="{{#str}}timeddiscussion, forum{{/str}}" title="{{#str}}timeddiscussion, forum{{/str}}">
                                                      {{#str}}timed, forum{{/str}}
                                                  </button>
                                             </span>
@@ -304,7 +304,7 @@
                                             {{#unread}}
                                             {{! TODO Rewrite as AJAX}}
                                                 <span class="lead">
-                                                    <a href="{{{discussion.urls.viewfirstunread}}}" class="badge bg-primary text-white rounded-pill fw-normal"
+                                                    <a href="{{{discussion.urls.viewfirstunread}}}" class="badge bg-primary text-white rounded-pill font-weight-normal"
                                                        title="{{#str}}unreadpostsnumber, mod_forum, {{unread}}{{/str}}" aria-label="{{#str}}unreadpostsnumber, mod_forum, {{unread}}{{/str}}">
                                                         {{unread}}
                                                     </a>
@@ -316,10 +316,10 @@
                                 {{#forum.capabilities.subscribe}}
                                     <td class="text-center align-middle fit-content px-2">
                                         {{#discussion}}
-                                            <div class="form-check form-switch mb-1">
+                                            <div class="d-inline custom-control custom-switch mb-1">
                                                 <input
                                                     type="checkbox"
-                                                    class="form-check-input"
+                                                    class="custom-control-input"
                                                     id="subscription-toggle-{{id}}"
                                                     data-type="subscription-toggle"
                                                     data-action="toggle"
@@ -327,8 +327,8 @@
                                                     data-forumid="{{forumid}}"
                                                     {{#userstate.subscribed}}data-targetstate="0" checked{{/userstate.subscribed}}
                                                     {{^userstate.subscribed}}data-targetstate="1"{{/userstate.subscribed}}>
-                                                <label class="form-check-label" for="subscription-toggle-{{id}}">
-                                                    <span class="visually-hidden">
+                                                <label class="custom-control-label" for="subscription-toggle-{{id}}">
+                                                    <span class="sr-only">
                                                         {{#userstate.subscribed}}
                                                             {{#str}}unsubscribediscussion, forum{{/str}}
                                                         {{/userstate.subscribed}}

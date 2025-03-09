@@ -24,7 +24,7 @@ namespace quizaccess_seb;
  * @copyright 2020 Catalyst IT
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class link_generator_test extends \advanced_testcase {
+class link_generator_test extends \advanced_testcase {
 
     /**
      * Called before every test.

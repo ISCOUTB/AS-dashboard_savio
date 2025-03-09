@@ -71,7 +71,7 @@
             {{#subname}}
                 <p class="m-0 text-truncate">{{.}}</p>
             {{/subname}}
-            <p class="m-0 fw-light text-truncate last-message" data-region="last-message">
+            <p class="m-0 font-weight-light text-truncate last-message" data-region="last-message">
                 {{#sentfromcurrentuser}}
                     {{#str}} you, core_message {{/str}}
                 {{/sentfromcurrentuser}}
@@ -104,7 +104,7 @@
                     data-region="unread-count"
                 >
                     <span aria-hidden="true">{{unreadcount}}</span>
-                    <span class="visually-hidden">{{#str}} unreadmessages, core_message, {{unreadcount}} {{/str}}</span>
+                    <span class="sr-only">{{#str}} unreadmessages, core_message, {{unreadcount}} {{/str}}</span>
                 </span>
 
                 <div class="text-muted ms-auto">

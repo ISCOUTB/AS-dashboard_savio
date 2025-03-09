@@ -56,7 +56,7 @@ $PAGE->set_title($course->shortname . ': ' . get_string('import'));
 $PAGE->set_heading($course->fullname);
 $PAGE->set_url(new moodle_url('/backup/import.php', array('id'=>$courseid)));
 $PAGE->set_context($context);
-$PAGE->set_pagelayout('admin');
+$PAGE->set_pagelayout('incourse');
 
 // Prepare the backup renderer
 $renderer = $PAGE->get_renderer('core','backup');

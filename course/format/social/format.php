@@ -64,7 +64,7 @@ if (trim($forum->intro) != '') {
     echo $OUTPUT->box($introcontent, 'generalbox', 'intro');
 }
 
-echo html_writer::div(forum_get_subscribe_link($forum, $modcontext), 'subscribelink text-end');
+echo html_writer::div(forum_get_subscribe_link($forum, $modcontext), 'subscribelink');
 
 $numdiscussions = course_get_format($course)->get_course()->numdiscussions;
 if ($numdiscussions < 1) {

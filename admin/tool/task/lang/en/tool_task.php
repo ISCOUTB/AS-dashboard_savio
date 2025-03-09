@@ -22,7 +22,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['actions'] = 'Actions';
 $string['adhoc'] = 'Ad hoc';
 $string['adhoctaskid'] = 'Ad hoc task ID: {$a}';
 $string['adhoctaskrun'] = 'Ad hoc task run initiated';
@@ -31,7 +30,7 @@ $string['adhoctasksdue'] = 'Ad hoc tasks due';
 $string['adhoctasksfailed'] = 'Ad hoc tasks failed';
 $string['adhoctasksfuture'] = 'Future ad hoc tasks';
 $string['adhoctasksrunning'] = 'Ad hoc tasks running';
-$string['asap'] = '<abbr title="As soon as possible">ASAP</abbr>';
+$string['asap'] = 'ASAP';
 $string['adhocempty'] = 'Ad hoc task queue is empty';
 $string['adhocqueuesize'] = 'Ad hoc task queue has {$a} tasks';
 $string['adhocqueueold'] = 'Oldest unprocessed task is {$a->age}, which is more than {$a->max}';
@@ -47,13 +46,11 @@ $string['checklongrunningtasks'] = 'Long running tasks';
 $string['checklongrunningtaskcount'] = 'Long running tasks: {$a}';
 $string['clearfaildelay_confirm'] = 'Are you sure you want to clear the fail delay for task \'{$a}\'? After clearing the delay, the task will run according to its normal schedule.';
 $string['component'] = 'Component';
-$string['confirmdeletetaskwithid'] = 'Are you sure you want to delete the task with ID {$a->id}?';
 $string['corecomponent'] = 'Core';
 $string['crondisabled'] = 'Cron is disabled. No new tasks will be started. The system will not operate properly until it is enabled again.';
 $string['cronok'] = 'Cron is running frequently';
 $string['default'] = 'Default';
 $string['defaultx'] = 'Default: {$a}';
-$string['deleteadhoctask'] = 'Delete ad hoc task {$a}';
 $string['disabled'] = 'Disabled';
 $string['disabled_help'] = 'Disabled scheduled tasks are not executed from cron, however they can still be executed manually via the CLI tool.';
 $string['edittaskschedule'] = 'Edit task schedule: {$a}';
@@ -88,7 +85,6 @@ $string['runadhoctasks'] = 'Run all \'{$a}\' tasks';
 $string['runadhoctasksfailed'] = 'Run failed \'{$a}\' tasks';
 $string['runnow_confirm'] = 'Are you sure you want to run this task \'{$a}\' now? The task will run on the web server and may take some time to complete.';
 $string['runclassname'] = 'Run all';
-$string['runclassnamedueonly'] = 'Run due only';
 $string['runclassnamefailedonly'] = 'Run all failed';
 $string['runpattern'] = 'Run pattern';
 $string['scheduled'] = 'Scheduled';

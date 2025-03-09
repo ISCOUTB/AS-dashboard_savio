@@ -14,9 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-use core\output\html_writer;
-use core\user;
-
 /**
  * Mentees block.
  *
@@ -44,7 +41,7 @@ class block_mentees extends block_base {
     }
 
     function get_content() {
-        global $USER, $DB;
+        global $CFG, $USER, $DB;
 
         if ($this->content !== NULL) {
             return $this->content;
@@ -54,23 +51,17 @@ class block_mentees extends block_base {
 
         // get all the mentees, i.e. users you have a direct assignment to
         $userfieldsapi = \core_user\fields::for_name();
-        $userfieldssql = $userfieldsapi->get_sql('u', false, '', '', false);
-
-        [$usersort] = users_order_by_sql('u', null, $this->context, $userfieldssql->mappings);
-
-        if ($users = $DB->get_records_sql("SELECT u.id, $userfieldssql->selects
+        $allusernames = $userfieldsapi->get_sql('u', false, '', '', false)->selects;
+        if ($usercontexts = $DB->get_records_sql("SELECT c.instanceid, c.instanceid, $allusernames
                                                     FROM {role_assignments} ra, {context} c, {user} u
                                                    WHERE ra.userid = ?
                                                          AND ra.contextid = c.id
                                                          AND c.instanceid = u.id
-                                                         AND c.contextlevel = ?
-                                                   ORDER BY $usersort", [$USER->id, CONTEXT_USER])) {
+                                                         AND c.contextlevel = ".CONTEXT_USER, array($USER->id))) {
 
             $this->content->text = '<ul>';
-            foreach ($users as $user) {
-                $userprofileurl = user::get_profile_url($user);
-                $userfullname = user::get_fullname($user, $this->context);
-                $this->content->text .= '<li>' . html_writer::link($userprofileurl, $userfullname) . '</li>';
+            foreach ($usercontexts as $usercontext) {
+                $this->content->text .= '<li><a href="'.$CFG->wwwroot.'/user/view.php?id='.$usercontext->instanceid.'&amp;course='.SITEID.'">'.fullname($usercontext).'</a></li>';
             }
             $this->content->text .= '</ul>';
         }

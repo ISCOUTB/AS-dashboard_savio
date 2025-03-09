@@ -1775,7 +1775,7 @@ class MoodleQuickForm extends HTML_QuickForm_DHTMLRulesTableless {
             $this->updateAttributes(array('class'=>'mform'));
         }
         $this->_reqHTML = '<span class="req">' . $OUTPUT->pix_icon('req', get_string('requiredelement', 'form')) . '</span>';
-        $this->_advancedHTML = '<span class="adv"></span>';
+        $this->_advancedHTML = '<span class="adv">' . $OUTPUT->pix_icon('adv', get_string('advancedelement', 'form')) . '</span>';
         $this->setRequiredNote(get_string('somefieldsrequired', 'form', $OUTPUT->pix_icon('req', get_string('requiredelement', 'form'))));
     }
 
@@ -2746,10 +2746,11 @@ require([
         ' . $valFunc . '
     });
 ';
-
-                    // This handles both randomised (MDL-65217) and non-randomised IDs.
-                    $errorid = preg_replace('/^id_/', 'id_error_', $elem->_attributes['id']);
-                    $validateJS .= '
+                }
+            }
+            // This handles both randomised (MDL-65217) and non-randomised IDs.
+            $errorid = preg_replace('/^id_/', 'id_error_', $elem->_attributes['id']);
+            $validateJS .= '
       ret = validate_' . $this->_formName . '_' . $escapedElementName.'(frm.elements[\''.$elementName.'\'], \''.$escapedElementName.'\') && ret;
       if (!ret && !first_focus) {
         first_focus = true;
@@ -2761,8 +2762,6 @@ require([
       }
 ';
 
-                }
-            }
             // Fix for bug displaying errors for elements in a group
             //unset($element);
             //$element =& $this->getElement($elementName);

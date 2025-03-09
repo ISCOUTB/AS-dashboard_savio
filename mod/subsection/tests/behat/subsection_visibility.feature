@@ -5,7 +5,8 @@ Feature: Subsection visibility should work as a module
   I need subsections to behave as any other module
 
   Background:
-    Given the following "course" exists:
+    Given I enable "subsection" "mod" plugin
+    And the following "course" exists:
       | fullname     | Course 1 |
       | shortname    | C1       |
       | category     | 0        |

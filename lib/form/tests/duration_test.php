@@ -35,7 +35,7 @@ require_once($CFG->libdir . '/form/duration.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \MoodleQuickForm_duration
  */
-final class duration_test extends \basic_testcase {
+class duration_test extends \basic_testcase {
 
     /**
      * Get a form that can be used for testing.
@@ -96,7 +96,7 @@ final class duration_test extends \basic_testcase {
      *
      * @return array test cases.
      */
-    public static function seconds_to_unit_cases(): array {
+    public function seconds_to_unit_cases(): array {
         return [
             [[0, MINSECS], 0], // Zero minutes, for a nice default unit.
             [[1, 1], 1],
@@ -137,7 +137,7 @@ final class duration_test extends \basic_testcase {
      *
      * @return array test cases.
      */
-    public static function export_value_cases(): array {
+    public function export_value_cases(): array {
         return [
             [10, '10', 1],
             [9, '9.3', 1],

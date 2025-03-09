@@ -35,7 +35,7 @@ use stdClass;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers      \core\content\export\exportable_items\exportable_textarea
  */
-final class exportable_textarea_test extends advanced_testcase {
+class exportable_textarea_test extends advanced_testcase {
 
     /**
      * Ensure that an exportable textarea which does not relate to any content, does not attempt to export any content.
@@ -320,18 +320,15 @@ EOF;
             $filepathinzip = dirname($subdir) . $file->get_filearea() . '/' . $file->get_filepath() . $file->get_filename();
             $filepathinzip = ltrim(preg_replace('#/+#', '/', $filepathinzip), '/');
             $storedfileargs[] = [
-                $context,
-                $filepathinzip,
-                $file,
+                $this->equalTo($context),
+                $this->equalTo($filepathinzip),
+                $this->equalTo($file),
             ];
         }
 
-        $invocations = $this->exactly(count($expectedfiles));
-        $archive->expects($invocations)
+        $archive->expects($this->exactly(count($expectedfiles)))
             ->method('add_file_from_stored_file')
-            ->willReturnCallback(function (...$args) use ($invocations, $storedfileargs) {
-                $this->assertEquals($storedfileargs[self::getInvocationCount($invocations) - 1], $args);
-            });
+            ->withConsecutive(...$storedfileargs);
 
         $archive->expects($this->never())
             ->method('add_file_from_string');

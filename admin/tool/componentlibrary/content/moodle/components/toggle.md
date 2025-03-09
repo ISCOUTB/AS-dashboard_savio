@@ -26,7 +26,7 @@ The parameters for the template context are:
 ## Examples
 
 <div class="small">
-Checked toggle and with "visually-hidden" label.
+Checked toggle and with "sr-only" label.
 </div>
 {{< mustache template="core/toggle" >}}
     {
@@ -38,7 +38,7 @@ Checked toggle and with "visually-hidden" label.
         }],
         "title": "Toggle Enabled",
         "label": "Enable/disable status",
-        "labelclasses": "visually-hidden"
+        "labelclasses": "sr-only"
     }
 {{< /mustache >}}
 

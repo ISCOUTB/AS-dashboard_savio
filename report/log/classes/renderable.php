@@ -96,8 +96,12 @@ class report_log_renderable implements renderable {
     /** @var array Index of delegated sections (indexed by component and itemid) */
     protected $delegatedbycm;
 
-    /** @var bool if the page is activity page */
-    public $isactivitypage;
+    /**
+     * @var array group ids
+     * @deprecated since Moodle 4.4 - please do not use this public property
+     * @todo MDL-81155 remove this property as it is not used anymore.
+     */
+    public $grouplist;
 
     /**
      * Constructor.
@@ -119,30 +123,10 @@ class report_log_renderable implements renderable {
      * @param int $page (optional) page number.
      * @param int $perpage (optional) number of records to show per page.
      * @param string $order (optional) sortorder of fetched records
-     * @param string $origin (optional) origin of the event.
-     * @param bool $isactivitypage (optional) if the page is activity page.
      */
-    public function __construct(
-        $logreader = "",
-        $course = 0,
-        $userid = 0,
-        $modid = 0,
-        $action = "",
-        $groupid = 0,
-        $edulevel = -1,
-        $showcourses = false,
-        $showusers = false,
-        $showreport = true,
-        $showselectorform = true,
-        $url = "",
-        $date = 0,
-        $logformat='showashtml',
-        $page = 0,
-        $perpage = 100,
-        $order = "timecreated ASC",
-        $origin ='',
-        bool $isactivitypage = false,
-    ) {
+    public function __construct($logreader = "", $course = 0, $userid = 0, $modid = 0, $action = "", $groupid = 0, $edulevel = -1,
+            $showcourses = false, $showusers = false, $showreport = true, $showselectorform = true, $url = "", $date = 0,
+            $logformat='showashtml', $page = 0, $perpage = 100, $order = "timecreated ASC", $origin ='') {
 
         global $PAGE;
 
@@ -187,7 +171,6 @@ class report_log_renderable implements renderable {
         $this->showselectorform = $showselectorform;
         $this->logformat = $logformat;
         $this->origin = $origin;
-        $this->isactivitypage = $isactivitypage;
     }
 
     /**
@@ -243,7 +226,7 @@ class report_log_renderable implements renderable {
                     $sectioninfo = $modinfo->get_section_info($cm->sectionnum);
 
                     // Don't show subsections here. We are showing them in the corresponding module.
-                    if ($sectioninfo->get_component_instance()) {
+                    if ($sectioninfo->is_delegated()) {
                         continue;
                     }
 
@@ -440,6 +423,7 @@ class report_log_renderable implements renderable {
         if (!empty($cgroups)) {
             $grouplist = array_column($cgroups, 'name', 'id');
         }
+        $this->grouplist = $grouplist; // Keep compatibility with MDL-41465.
         return $grouplist;
     }
 

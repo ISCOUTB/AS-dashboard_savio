@@ -148,7 +148,7 @@ class dataset_manager {
             return false;
         }
         foreach ($data as $line) {
-            fputcsv($fh, $line, escape: '\\');
+            fputcsv($fh, $line);
         }
         fclose($fh);
 
@@ -290,12 +290,12 @@ class dataset_manager {
             $rh = $file->get_content_file_handle();
 
             // Copy the var names as they are, all files should have the same var names.
-            $varnames = fgetcsv($rh, escape: '\\');
+            $varnames = fgetcsv($rh);
 
-            $analysablesvalues[] = fgetcsv($rh, escape: '\\');
+            $analysablesvalues[] = fgetcsv($rh);
 
             // Copy the columns as they are, all files should have the same columns.
-            $columns = fgetcsv($rh, escape: '\\');
+            $columns = fgetcsv($rh);
         }
 
         // Merge analysable values skipping the ones that are the same in all analysables.
@@ -316,9 +316,9 @@ class dataset_manager {
             throw new \moodle_exception('errorcannotwritedataset', 'analytics', '', $tmpfilepath);
         }
 
-        fputcsv($wh, $varnames, escape: '\\');
-        fputcsv($wh, $values, escape: '\\');
-        fputcsv($wh, $columns, escape: '\\');
+        fputcsv($wh, $varnames);
+        fputcsv($wh, $values);
+        fputcsv($wh, $columns);
 
         // Iterate through all files and add them to the tmp one. We don't want file contents in memory.
         foreach ($files as $file) {
@@ -402,11 +402,11 @@ class dataset_manager {
 
         $calculations = array();
 
-        $headers = fgetcsv($rh, escape: '\\');
+        $headers = fgetcsv($rh);
         // Get rid of the sampleid column name.
         array_shift($headers);
 
-        while ($columns = fgetcsv($rh, escape: '\\')) {
+        while ($columns = fgetcsv($rh)) {
             $uniquesampleid = array_shift($columns);
 
             // Unfortunately fgetcsv does not respect line's var types.

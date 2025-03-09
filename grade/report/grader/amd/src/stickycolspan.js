@@ -21,6 +21,7 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+import $ from 'jquery';
 import {SELECTORS as stickyFooterSelectors, eventTypes as stickyFooterEvents} from 'core/sticky-footer';
 
 const SELECTORS = {
@@ -39,11 +40,9 @@ export const init = () => {
     // The sticky positioning attributed to the user column cells affects the stacking context and makes the dropdowns
     // within these cells to be cut off. To solve this problem, whenever one of these action menus (dropdowns) is opened
     // we need to manually bump up the z-index value of the parent container element and revert once closed.
-    document.querySelectorAll(SELECTORS.USERDROPDOWN).forEach((dropdown) => {
-        dropdown.addEventListener('show.bs.dropdown', (e) => {
-            // The closest heading element has sticky positioning which affects the stacking context in this case.
-            e.target.closest(SELECTORS.TABLEHEADER).classList.toggle('actions-menu-active');
-        });
+    $(SELECTORS.USERDROPDOWN).on('show.bs.dropdown hide.bs.dropdown', (e) => {
+        // The closest heading element has sticky positioning which affects the stacking context in this case.
+        e.target.closest(SELECTORS.TABLEHEADER).classList.toggle('actions-menu-active');
     });
 
     defineLastRowIntersectionObserver(true);

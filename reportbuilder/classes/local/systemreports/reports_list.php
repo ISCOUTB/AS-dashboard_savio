@@ -27,9 +27,15 @@ use core_reportbuilder\datasource;
 use core_reportbuilder\manager;
 use core_reportbuilder\system_report;
 use core_reportbuilder\local\entities\user;
-use core_reportbuilder\local\filters\{boolean_select, date, tags, text, select};
-use core_reportbuilder\local\helpers\{audience, format};
-use core_reportbuilder\local\report\{action, column, filter};
+use core_reportbuilder\local\filters\date;
+use core_reportbuilder\local\filters\tags;
+use core_reportbuilder\local\filters\text;
+use core_reportbuilder\local\filters\select;
+use core_reportbuilder\local\helpers\audience;
+use core_reportbuilder\local\helpers\format;
+use core_reportbuilder\local\report\action;
+use core_reportbuilder\local\report\column;
+use core_reportbuilder\local\report\filter;
 use core_reportbuilder\output\report_name_editable;
 use core_reportbuilder\local\models\report;
 use core_reportbuilder\permission;
@@ -161,7 +167,7 @@ class reports_list extends system_report {
         );
 
         // Tags column.
-        $this->add_column_from_entity('tag:namewithbadge')
+        $this->add_column_from_entity('tag:name')
             ->set_title(new lang_string('tags'))
             ->set_aggregation('groupconcat')
             ->set_is_available(core_tag_tag::is_enabled('core_reportbuilder', 'reportbuilder_report') === true);
@@ -226,15 +232,6 @@ class reports_list extends system_report {
             })
         );
 
-        // Schedules filter.
-        $this->add_filter((new filter(
-            boolean_select::class,
-            'schedules',
-            new lang_string('schedules', 'core_reportbuilder'),
-            $this->get_report_entity_name(),
-            "CASE WHEN EXISTS (SELECT 1 FROM {reportbuilder_schedule} WHERE reportid = {$tablealias}.id) THEN 1 ELSE 0 END"
-        )));
-
         // Tags filter.
         $this->add_filter((new filter(
             tags::class,
@@ -261,33 +258,8 @@ class reports_list extends system_report {
             ->set_limited_operators([
                 date::DATE_ANY,
                 date::DATE_RANGE,
-                date::DATE_BEFORE,
-                date::DATE_LAST,
-                date::DATE_CURRENT,
             ])
         );
-
-        // Time modified filter.
-        $this->add_filter((new filter(
-            date::class,
-            'timemodified',
-            new lang_string('timemodified', 'core_reportbuilder'),
-            $this->get_report_entity_name(),
-            "{$tablealias}.timemodified",
-        ))
-            ->set_limited_operators([
-                date::DATE_ANY,
-                date::DATE_RANGE,
-                date::DATE_BEFORE,
-                date::DATE_LAST,
-                date::DATE_CURRENT,
-            ])
-        );
-
-        // User modified filter.
-        $this->add_filter_from_entity('user:userselect')
-            ->set_header(new lang_string('usermodified', 'reportbuilder'))
-            ->set_is_available(has_capability('moodle/user:viewalldetails', $this->get_context()));
     }
 
     /**
@@ -331,24 +303,6 @@ class reports_list extends system_report {
             ->add_callback(function(stdClass $row): bool {
                 // We check this only to give the action to editors, because normal users can just click on the report name.
                 return $this->report_source_valid($row->source) && permission::can_edit_report(new report(0, $row));
-            })
-        );
-
-        // Duplicate action.
-        $this->add_action((new action(
-            new moodle_url('#'),
-            new pix_icon('t/copy', ''),
-            ['data-action' => 'report-duplicate', 'data-report-id' => ':id', 'data-report-name' => ':name'],
-            false,
-            new lang_string('duplicatereport', 'core_reportbuilder')
-        ))
-            ->add_callback(function(stdClass $row): bool {
-
-                // Ensure data name attribute is properly formatted.
-                $report = new report(0, $row);
-                $row->name = $report->get_formatted_name();
-
-                return $this->report_source_valid($row->source) && permission::can_duplicate_report($report);
             })
         );
 

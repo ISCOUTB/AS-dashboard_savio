@@ -24,7 +24,7 @@ namespace mod_wiki\backup;
  *
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class restore_format_test extends \advanced_testcase {
+class restore_format_test extends \advanced_testcase {
 
     /**
      * Data provider for test_duplicating_wiki_removes_unwanted_formats.
@@ -34,19 +34,19 @@ final class restore_format_test extends \advanced_testcase {
     public static function restore_format_test_provider(): array {
         return [
             'creole' => [
-                'format' => 'creole',
+                'data' => 'creole',
                 'expected' => 'creole',
             ],
             'html' => [
-                'format' => 'html',
+                'data' => 'html',
                 'expected' => 'html',
             ],
             'wikimarkup' => [
-                'format' => 'nwiki',
+                'data' => 'nwiki',
                 'expected' => 'nwiki',
             ],
             'wrong format' => [
-                'format' => '../wrongformat123',
+                'data' => '../wrongformat123',
                 'expected' => 'wrongformat',
             ],
         ];

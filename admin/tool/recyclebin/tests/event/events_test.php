@@ -33,7 +33,7 @@ namespace tool_recyclebin\event;
  * @copyright 2016 Mark Nelson <markn@moodle.com>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class events_test extends \advanced_testcase {
+class events_test extends \advanced_testcase {
 
     /**
      * Test set up.

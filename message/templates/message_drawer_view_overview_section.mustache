@@ -42,25 +42,24 @@
     <div id="{{$region}}{{/region}}-toggle" class="card-header rounded-0" data-region="toggle">
         <button
             class="btn btn-link w-100 text-start p-1 p-sm-2 d-flex rounded-0 align-items-center overview-section-toggle {{^expanded}}collapsed{{/expanded}}"
-            data-bs-toggle="collapse"
-            data-bs-target="#{{$region}}{{/region}}-target-{{uniqid}}"
+            data-toggle="collapse"
+            data-target="#{{$region}}{{/region}}-target-{{uniqid}}"
             aria-expanded="{{#expanded}}true{{/expanded}}{{^expanded}}false{{/expanded}}"
             aria-controls="{{$region}}{{/region}}-target-{{uniqid}}"
         >
             <span class="collapsed-icon-container">
-                <span class="dir-rtl-hide">{{#pix}} t/collapsed, core {{/pix}}</span>
-                <span class="dir-ltr-hide">{{#pix}} t/collapsed_rtl, core {{/pix}}</span>
+                {{#pix}} t/collapsedcaret, core {{/pix}}
             </span>
             <span class="expanded-icon-container">
                 {{#pix}} t/expanded, core {{/pix}}
             </span>
-            <span class="fw-bold ms-1">{{$title}}{{/title}}</span>
+            <span class="font-weight-bold">{{$title}}{{/title}}</span>
             <small
                 class="hidden ms-1"
                 data-region="section-total-count-container" aria-labelledby="{{$region}}{{/region}}-total-count-label"
             >
                 (<span aria-hidden="true" data-region="section-total-count">{{count.total}}</span>)
-                <span class="visually-hidden" id="{{$region}}{{/region}}-total-count-label">
+                <span class="sr-only" id="{{$region}}{{/region}}-total-count-label">
                     {{#str}} totalconversations, core_message, {{count.total}} {{/str}}
                 </span>
             </small>
@@ -72,7 +71,7 @@
                 data-region="section-unread-count-container" aria-labelledby="{{$region}}{{/region}}-unread-count-label"
             >
                 <span aria-hidden="true" data-region="section-unread-count">{{count.unread}}</span>
-                <span class="visually-hidden" id="{{$region}}{{/region}}-unread-count-label">
+                <span class="sr-only" id="{{$region}}{{/region}}-unread-count-label">
                     {{#str}} unreadconversations, core_message, {{count.unread}} {{/str}}
                 </span>
             </span>
@@ -83,7 +82,7 @@
         {{$rootattributes}}
             id="{{$region}}{{/region}}-target-{{uniqid}}"
             aria-labelledby="{{$region}}{{/region}}-toggle"
-            data-bs-parent="#message-drawer-view-overview-container-{{uniqid}}"
+            data-parent="#message-drawer-view-overview-container-{{uniqid}}"
         {{/rootattributes}}
     {{/ core_message/message_drawer_lazy_load_list }}
 </div>

@@ -112,7 +112,7 @@ class behat_context_helper {
      * This method will return all contexts which match the specified prefix.
      *
      * For example, to find all editors, you would pass in 'behat_editor', and this might return:
-     * - behat_editor_tiny
+     * - behat_editor_atto
      * - behat_editor_textarea
      *
      * @param string $prefix The prefix to search for
@@ -146,23 +146,6 @@ class behat_context_helper {
         $overrideclassname = "behat_theme_{$suitename}_{$classname}";
         if (self::$environment->hasContextClass($overrideclassname)) {
             return $overrideclassname;
-        }
-
-        try {
-            $themeconfig = theme_config::load($suitename);
-        } catch (Exception $e) {
-            // This theme has no theme config.
-            return null;
-        }
-
-        // The theme will use all core contexts, except the one overridden by theme or its parent.
-        if (isset($themeconfig->parents)) {
-            foreach ($themeconfig->parents as $parent) {
-                $overrideclassname = "behat_theme_{$parent}_{$classname}";
-                if (self::$environment->hasContextClass($overrideclassname)) {
-                    return $overrideclassname;
-                }
-            }
         }
 
         if (self::$environment->hasContextClass($classname)) {

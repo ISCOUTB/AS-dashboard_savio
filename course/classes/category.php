@@ -1666,13 +1666,8 @@ class core_course_category implements renderable, cacheable_object, IteratorAggr
                 $params = array('blockname' => $blockname);
             } else if (!empty($search['modulelist'])) {
                 // Search courses that have module with specified name.
-                if (array_key_exists($search['modulelist'], core_component::get_plugin_list('mod'))) {
-                    // If module plugin exists, use module name as table name.
-                    $where = "c.id IN (SELECT DISTINCT module.course FROM {{$search['modulelist']}} module)";
-                } else {
-                    // Otherwise, return empty list of courses.
-                    $where = '1=0';
-                }
+                $where = "c.id IN (SELECT DISTINCT module.course ".
+                        "FROM {".$search['modulelist']."} module)";
                 $params = array();
             } else if (!empty($search['tagid'])) {
                 // Search courses that are tagged with the specified tag.
@@ -2061,6 +2056,9 @@ class core_course_category implements renderable, cacheable_object, IteratorAggr
         if (!$cb->delete_contents($this->get_context())) {
             throw new moodle_exception('errordeletingcontentfromcategory', 'contentbank', '', $this->get_formatted_name());
         }
+        if (!question_delete_course_category($this, null)) {
+            throw new moodle_exception('cannotdeletecategoryquestions', '', '', $this->get_formatted_name());
+        }
 
         // Delete all events in the category.
         $DB->delete_records('event', array('categoryid' => $this->id));
@@ -2246,6 +2244,12 @@ class core_course_category implements renderable, cacheable_object, IteratorAggr
                         'notifysuccess'
                 );
             }
+        }
+        if (!question_delete_course_category($this, $newparentcat)) {
+            if ($showfeedback) {
+                echo $OUTPUT->notification(get_string('errordeletingquestionsfromcategory', 'question', $catname), 'notifysuccess');
+            }
+            return false;
         }
 
         // Finally delete the category and it's context.

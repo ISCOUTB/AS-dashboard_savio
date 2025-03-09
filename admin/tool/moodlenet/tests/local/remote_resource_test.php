@@ -27,7 +27,7 @@ use tool_moodlenet\local\url;
  * @copyright  2020 Jake Dallimore <jrhdallimore@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class remote_resource_test extends \advanced_testcase {
+class remote_resource_test extends \advanced_testcase {
 
     /**
      * Test getters.
@@ -53,10 +53,10 @@ final class remote_resource_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function remote_resource_data_provider(): array {
+    public function remote_resource_data_provider() {
         return [
             'With filename and extension' => [
-                self::getExternalTestFileUrl('/test.html'),
+                $this->getExternalTestFileUrl('/test.html'),
                 (object) [
                     'name' => 'Test html file',
                     'description' => 'Full description of the html file'
@@ -78,8 +78,8 @@ final class remote_resource_test extends \advanced_testcase {
      * Test confirming the network based operations of a remote_resource.
      */
     public function test_network_features(): void {
-        $url = self::getExternalTestFileUrl('/test.html');
-        $nonexistenturl = self::getExternalTestFileUrl('/test.htmlzz');
+        $url = $this->getExternalTestFileUrl('/test.html');
+        $nonexistenturl = $this->getExternalTestFileUrl('/test.htmlzz');
 
         $remoteres = new remote_resource(
             new \curl(),

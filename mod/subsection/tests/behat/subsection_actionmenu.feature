@@ -5,7 +5,8 @@ Feature: The module menu replaces the delegated section menu
   I need to see the delegated section action menu instead of module menu.
 
   Background:
-    Given the following "users" exist:
+    Given I enable "subsection" "mod" plugin
+    And the following "users" exist:
       | username | firstname | lastname | email                |
       | teacher1 | Teacher   | 1        | teacher1@example.com |
     And the following "courses" exist:

@@ -27,7 +27,6 @@ declare(strict_types=1);
 use core_reportbuilder\permission;
 use core_reportbuilder\system_report_factory;
 use core_reportbuilder\local\systemreports\reports_list;
-use core_reportbuilder\output\report_action;
 
 require_once(__DIR__ . '/../config.php');
 require_once("{$CFG->libdir}/adminlib.php");
@@ -37,16 +36,18 @@ admin_externalpage_setup('customreports');
 $PAGE->requires->js_call_amd('core_reportbuilder/reports_list', 'init');
 
 echo $OUTPUT->header();
+echo html_writer::start_div('d-flex justify-content-between mb-2');
 echo $OUTPUT->heading(get_string('customreports', 'core_reportbuilder'));
 
-$report = system_report_factory::create(reports_list::class, context_system::instance());
 if (permission::can_create_report()) {
-    $report->set_report_action(new report_action(
-        get_string('newreport', 'core_reportbuilder'),
-        ['class' => 'btn btn-primary my-auto', 'data-action' => 'report-create'],
-    ));
+    /** @var \core_reportbuilder\output\renderer $renderer */
+    $renderer = $PAGE->get_renderer('core_reportbuilder');
+    echo $renderer->render_new_report_button();
 }
 
+echo html_writer::end_div();
+
+$report = system_report_factory::create(reports_list::class, context_system::instance());
 echo $report->output();
 
 echo $OUTPUT->footer();

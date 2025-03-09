@@ -26,6 +26,7 @@
         "gradereport": "grade\/report",
         "gradingform": "grade\/grading\/form",
         "mlbackend": "lib\/mlbackend",
+        "mnetservice": "mnet\/service",
         "webservice": "webservice",
         "repository": "repository",
         "portfolio": "portfolio",
@@ -126,9 +127,5 @@
         "userkey": "lib\/userkey",
         "webservice": "webservice",
         "xapi": "lib\/xapi"
-    },
-    "deprecatedplugintypes":
-    {
-        "mnetservice": "mnet\/service"
     }
 }

@@ -30,7 +30,7 @@ use xmldb_table;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \core\persistent
  */
-final class persistent_test extends advanced_testcase {
+class persistent_test extends advanced_testcase {
 
     public function setUp(): void {
         parent::setUp();

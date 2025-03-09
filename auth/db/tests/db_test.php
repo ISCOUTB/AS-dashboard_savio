@@ -25,7 +25,7 @@ namespace auth_db;
  * @copyright  2012 Petr Skoda {@link http://skodak.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class db_test extends \advanced_testcase {
+class db_test extends \advanced_testcase {
     /** @var string Original error log */
     protected $oldlog;
 
@@ -78,6 +78,11 @@ final class db_test extends \advanced_testcase {
                     }
                     set_config('type', 'mysqli://'.rawurlencode($CFG->dbuser).':'.rawurlencode($CFG->dbpass).'@'.rawurlencode($CFG->dbhost).'/'.rawurlencode($CFG->dbname).'?socket='.rawurlencode($dbsocket), 'auth_db');
                 }
+                break;
+
+            case 'oracle':
+                set_config('type', 'oci8po', 'auth_db');
+                set_config('sybasequoting', '1', 'auth_db');
                 break;
 
             case 'postgres':

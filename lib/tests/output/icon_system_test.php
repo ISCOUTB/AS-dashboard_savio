@@ -33,7 +33,7 @@ use coding_exception;
  *
  * @coversDefaultClass \core\output\icon_system
  */
-final class icon_system_test extends advanced_testcase {
+class icon_system_test extends advanced_testcase {
     /**
      * Check whether the supplied classes are valid icon subsystems of the supplied one.
      *
@@ -160,7 +160,7 @@ final class icon_system_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function icon_system_provider(): array {
+    public function icon_system_provider(): array {
         return [
             'icon_system => icon_system_standard' => [
                 icon_system::class,
@@ -211,8 +211,8 @@ final class icon_system_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function is_valid_subsystem_provider(): array {
-        return self::icon_system_provider();
+    public function is_valid_subsystem_provider(): array {
+        return $this->icon_system_provider();
     }
 
     /**
@@ -220,9 +220,9 @@ final class icon_system_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function invalid_instance_provider(): array {
+    public function invalid_instance_provider(): array {
         return array_filter(
-            self::icon_system_provider(),
+            $this->icon_system_provider(),
             function($data) {
                 return !$data[2];
             },
@@ -235,9 +235,9 @@ final class icon_system_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function valid_instance_provider(): array {
+    public function valid_instance_provider(): array {
         return array_filter(
-            self::icon_system_provider(),
+            $this->icon_system_provider(),
             function($data) {
                 return $data[2];
             },

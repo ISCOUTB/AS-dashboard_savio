@@ -23,8 +23,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use core_question\local\bank\filter_condition_manager;
-use core_question\question_reference_manager;
 use mod_quiz\quiz_settings;
 use mod_quiz\question\bank\random_question_view;
 
@@ -33,7 +31,6 @@ require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 require_once($CFG->dirroot . '/mod/quiz/lib.php');
 
 $slotid = required_param('slotid', PARAM_INT);
-$bankcmid = required_param('bankcmid', PARAM_INT);
 $returnurl = optional_param('returnurl', '', PARAM_LOCALURL);
 
 // Get the quiz slot.
@@ -59,19 +56,15 @@ $PAGE->add_body_class('limitedwidth');
 $setreference = $DB->get_record('question_set_references',
     ['itemid' => $slot->id, 'component' => 'mod_quiz', 'questionarea' => 'slot']);
 $filterconditions = json_decode($setreference->filtercondition, true);
-$filterconditions = question_reference_manager::convert_legacy_set_reference_filter_condition($filterconditions);
-$filterconditions = filter_condition_manager::filter_invalid_values($filterconditions);
 
 $params = $filterconditions;
 $params['cmid'] = $cm->id;
 $extraparams['view'] = random_question_view::class;
-$extraparams['requirebankswitch'] = false;
-$extraparams['quizcmid'] = $quizobj->get_cm()->id;
 
 // Build required parameters.
 [$contexts, $thispageurl, $cm, $pagevars, $extraparams] = build_required_parameters_for_custom_view($params, $extraparams);
 
-$thiscontext = context_module::instance($bankcmid);
+$thiscontext = $quizobj->get_context();
 $contexts = new core_question\local\bank\question_edit_contexts($thiscontext);
 
 // Create the editing form.
@@ -137,10 +130,9 @@ if ($mform->is_cancelled()) {
     redirect($returnurl);
 }
 
-$heading = get_string('randomediting', 'mod_quiz');
-$PAGE->set_title($heading);
+$PAGE->set_title('Random question');
 $PAGE->set_heading($COURSE->fullname);
-$PAGE->navbar->add($heading);
+$PAGE->navbar->add('Random question');
 
 // Custom View.
 $questionbank = new random_question_view($contexts, $thispageurl, $course, $cm, $params, $extraparams);
@@ -157,6 +149,7 @@ $PAGE->requires->js_call_amd('mod_quiz/update_random_question_filter_condition',
 
 // Display a heading, question editing form.
 echo $OUTPUT->header();
+$heading = get_string('randomediting', 'mod_quiz');
 echo $OUTPUT->heading_with_help($heading, 'randomquestion', 'mod_quiz');
 echo $updateform;
 echo $OUTPUT->footer();

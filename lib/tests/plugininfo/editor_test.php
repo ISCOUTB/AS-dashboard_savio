@@ -28,7 +28,7 @@ use advanced_testcase;
  * @copyright   2023 Andrew Lyons <andrew@nicols.co.uk>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class editor_test extends advanced_testcase {
+class editor_test extends advanced_testcase {
 
     /**
      * Test that editor::get_enabled_plugins() returns the correct list of enabled plugins.
@@ -101,7 +101,7 @@ final class editor_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function get_sorted_plugins_provider(): array {
+    public function get_sorted_plugins_provider(): array {
         $pluginmanager = \core_plugin_manager::instance();
         $allplugins = array_keys($pluginmanager->get_plugins_of_type('editor'));
 
@@ -167,14 +167,14 @@ final class editor_test extends advanced_testcase {
      * @param string $texteditors
      * @param string $pluginname
      * @param int $direction
-     * @param array $expected
+     * @param array $neworder
      * @param string $newtexteditors
      */
     public function test_change_plugin_order(
         string $texteditors,
         string $pluginname,
         int $direction,
-        array $expected,
+        array $neworder,
         string $newtexteditors,
     ): void {
         global $CFG;
@@ -184,7 +184,7 @@ final class editor_test extends advanced_testcase {
         editor::change_plugin_order($pluginname, $direction);
 
         $this->assertSame(
-            $expected,
+            $neworder,
             array_keys(editor::get_sorted_plugins()),
         );
         $this->assertSame($newtexteditors, $CFG->texteditors);
@@ -195,7 +195,7 @@ final class editor_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function change_plugin_order_provider(): array {
+    public function change_plugin_order_provider(): array {
         $pluginmanager = \core_plugin_manager::instance();
         $allplugins = array_keys($pluginmanager->get_plugins_of_type('editor'));
 
@@ -232,7 +232,7 @@ final class editor_test extends advanced_testcase {
                 'texteditors' => 'textarea,tiny',
                 'pluginname' => 'atto',
                 'direction' => base::MOVE_DOWN,
-                // Atto is not available. No change expected.
+                // Atto is not enabled. No change expected.
                 'expected' => $getorder([
                     'textarea',
                     'tiny',
@@ -264,7 +264,18 @@ final class editor_test extends advanced_testcase {
                 'texteditors' => 'textarea,tiny',
                 'pluginname' => 'atto',
                 'direction' => base::MOVE_UP,
-                // Atto is not available. No change expected.
+                // Atto is not enabled. No change expected.
+                'expected' => $getorder([
+                    'textarea',
+                    'tiny',
+                ]),
+                'newtexteditors' => 'textarea,tiny',
+            ],
+            [
+                'texteditors' => 'textarea,tiny',
+                'pluginname' => 'atto',
+                'direction' => base::MOVE_UP,
+                // Atto is not enabled. No change expected.
                 'expected' => $getorder([
                     'textarea',
                     'tiny',

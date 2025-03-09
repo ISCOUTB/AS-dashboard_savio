@@ -31,7 +31,6 @@ import AIHelper from 'core_ai/helper';
 import DrawerEvents from 'core/drawer_events';
 import {subscribe} from 'core/pubsub';
 import * as MessageDrawerHelper from 'core_message/message_drawer_helper';
-import {getString} from 'core/str';
 
 const AICourseAssist = class {
 
@@ -58,8 +57,6 @@ const AICourseAssist = class {
         this.aiDrawerElement = document.querySelector(Selectors.ELEMENTS.AIDRAWER);
         this.aiDrawerBodyElement = document.querySelector(Selectors.ELEMENTS.AIDRAWER_BODY);
         this.pageElement = document.querySelector(Selectors.ELEMENTS.PAGE);
-        this.lastAction = '';
-        this.responses = new Map();
 
         this.registerEventListeners();
     }
@@ -69,39 +66,18 @@ const AICourseAssist = class {
      */
     registerEventListeners() {
         document.addEventListener('click', async(e) => {
-            // Display summarise.
             const summariseAction = e.target.closest(Selectors.ACTIONS.SUMMARY);
             if (summariseAction) {
                 e.preventDefault();
-                this.openAIDrawer();
-                this.lastAction = 'summarise';
+                this.toggleAIDrawer();
                 const isPolicyAccepted = await this.isPolicyAccepted();
                 if (!isPolicyAccepted) {
                     // Display policy.
                     this.displayPolicy();
                     return;
                 }
-                this.displayAction(this.lastAction);
-            }
-            // Display explain.
-            const explainAction = e.target.closest(Selectors.ACTIONS.EXPLAIN);
-            if (explainAction) {
-                e.preventDefault();
-                this.openAIDrawer();
-                this.lastAction = 'explain';
-                const isPolicyAccepted = await this.isPolicyAccepted();
-                if (!isPolicyAccepted) {
-                    // Display policy.
-                    this.displayPolicy();
-                    return;
-                }
-                this.displayAction(this.lastAction);
-            }
-            // Close AI drawer.
-            const closeAiDrawer = e.target.closest(Selectors.ELEMENTS.AIDRAWER_CLOSE);
-            if (closeAiDrawer) {
-                e.preventDefault();
-                this.closeAIDrawer();
+                // Display summary.
+                this.displaySummary();
             }
         });
 
@@ -119,11 +95,11 @@ const AICourseAssist = class {
     registerPolicyEventListeners() {
         const acceptAction = document.querySelector(Selectors.ACTIONS.ACCEPT);
         const declineAction = document.querySelector(Selectors.ACTIONS.DECLINE);
-        if (acceptAction && this.lastAction.length) {
+        if (acceptAction) {
             acceptAction.addEventListener('click', (e) => {
                 e.preventDefault();
                 this.acceptPolicy().then(() => {
-                    return this.displayAction(this.lastAction);
+                    return this.displaySummary();
                 }).catch(Notification.exception);
             });
         }
@@ -140,34 +116,27 @@ const AICourseAssist = class {
      */
     registerErrorEventListeners() {
         const retryAction = document.querySelector(Selectors.ACTIONS.RETRY);
-        if (retryAction && this.lastAction.length) {
+        if (retryAction) {
             retryAction.addEventListener('click', (e) => {
                 e.preventDefault();
-                this.displayAction(this.lastAction);
+                this.aiDrawerBodyElement.dataset.hasdata = '0';
+                this.displaySummary();
             });
         }
     }
 
     /**
-     * Register event listeners for the responses.
+     * Register event listeners for the response.
      */
     registerResponseEventListeners() {
-        // Get all regenerate action buttons (one per response in the AI drawer).
-        const regenerateActions = document.querySelectorAll(Selectors.ACTIONS.REGENERATE);
-        // Add event listeners for each regenerate action.
-        regenerateActions.forEach(regenerateAction => {
-            const responseElement = regenerateAction.closest(Selectors.ELEMENTS.RESPONSE);
-            if (regenerateAction && responseElement) {
-                // Get the action that this response is associated with.
-                const actionPerformed = responseElement.getAttribute('data-action-performed');
-                regenerateAction.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    // Remove the old response before displaying the new one.
-                    this.removeResponseFromStack(actionPerformed);
-                    this.displayAction(actionPerformed);
-                });
-            }
-        });
+        const regenerateAction = document.querySelector(Selectors.ACTIONS.REGENERATE);
+        if (regenerateAction) {
+            regenerateAction.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.aiDrawerBodyElement.dataset.hasdata = '0';
+                this.displaySummary();
+            });
+        }
     }
 
     registerLoadingEventListeners() {
@@ -177,10 +146,6 @@ const AICourseAssist = class {
                 e.preventDefault();
                 this.setRequestCancelled();
                 this.toggleAIDrawer();
-                this.removeResponseFromStack('loading');
-                // Refresh the response stack to avoid false indication of loading.
-                const responses = this.getResponseStack();
-                this.aiDrawerBodyElement.innerHTML = responses;
             });
         }
     }
@@ -216,6 +181,8 @@ const AICourseAssist = class {
         if (!this.pageElement.classList.contains('show-drawer-right')) {
             this.addPadding();
         }
+        // Disable the summary button.
+        this.disableSummaryButton();
     }
 
     /**
@@ -227,6 +194,8 @@ const AICourseAssist = class {
         if (this.pageElement.classList.contains('show-drawer-right') && this.aiDrawerBodyElement.dataset.removepadding === '1') {
             this.removePadding();
         }
+        // Enable the summary button.
+        this.enableSummaryButton();
     }
 
     /**
@@ -257,26 +226,24 @@ const AICourseAssist = class {
     }
 
     /**
-     * Get important params related to the action.
-     * @param {string} action The action to use.
-     * @returns {object} The params to use for the action.
+     * Disable the summary button.
      */
-    async getParamsForAction(action) {
-        let params = {};
-
-        switch (action) {
-            case 'summarise':
-                params.method = 'aiplacement_courseassist_summarise_text';
-                params.heading = await getString('aisummary', 'aiplacement_courseassist');
-                break;
-
-            case 'explain':
-                params.method = 'aiplacement_courseassist_explain_text';
-                params.heading = await getString('aiexplain', 'aiplacement_courseassist');
-                break;
+    disableSummaryButton() {
+        const summaryButton = document.querySelector(Selectors.ACTIONS.SUMMARY);
+        if (summaryButton) {
+            summaryButton.setAttribute('disabled', 1);
         }
+    }
 
-        return params;
+    /**
+     * Enable the summary button and focus on it.
+     */
+    enableSummaryButton() {
+        const summaryButton = document.querySelector(Selectors.ACTIONS.SUMMARY);
+        if (summaryButton) {
+            summaryButton.removeAttribute('disabled');
+            summaryButton.focus();
+        }
     }
 
     /**
@@ -296,12 +263,11 @@ const AICourseAssist = class {
     }
 
     /**
-     * Check if the AI drawer has already generated content for a particular action.
-     * @param {string} action The action to check.
+     * Check if the AI drawer has generated content or not.
      * @return {boolean} True if the AI drawer has generated content, false otherwise.
      */
-    hasGeneratedContent(action) {
-        return this.responses.has(action);
+    hasGeneratedContent() {
+        return this.aiDrawerBodyElement.dataset.hasdata === '1';
     }
 
     /**
@@ -320,36 +286,23 @@ const AICourseAssist = class {
      */
     displayLoading() {
         Templates.render('aiplacement_courseassist/loading', {}).then((html) => {
-            this.addResponseToStack('loading', html);
-            const responses = this.getResponseStack();
-            this.aiDrawerBodyElement.innerHTML = responses;
+            this.aiDrawerBodyElement.innerHTML = html;
             this.registerLoadingEventListeners();
-            return;
-        }).then(() => {
-            this.removeResponseFromStack('loading');
             return;
         }).catch(Notification.exception);
     }
 
     /**
-     * Display the action result in the AI drawer.
-     * @param {string} action The action to display.
+     * Display the summary.
      */
-    async displayAction(action) {
-        if (this.hasGeneratedContent(action)) {
-            // Scroll to generated content.
-            const existingReponse = document.querySelector('[data-action-performed="' + action + '"]');
-            if (existingReponse) {
-                this.aiDrawerBodyElement.scrollTop = existingReponse.offsetTop;
-            }
-        } else {
+    async displaySummary() {
+        if (!this.hasGeneratedContent()) {
             // Display loading spinner.
             this.displayLoading();
-            // Clear the drawer to prevent including the previously generated response in the new response prompt.
+            // Clear the drawer content to prevent sending some unnecessary content.
             this.aiDrawerBodyElement.innerHTML = '';
-            const params = await this.getParamsForAction(action);
             const request = {
-                methodname: params.method,
+                methodname: 'aiplacement_courseassist_summarise_text',
                 args: {
                     contextid: this.contextId,
                     prompttext: this.getTextContent(),
@@ -362,9 +315,9 @@ const AICourseAssist = class {
                     return;
                 } else {
                     if (!this.isRequestCancelled()) {
-                        // Perform replacements on the generated context to ensure it is formatted correctly.
-                        const generatedContent = AIHelper.formatResponse(responseObj.generatedcontent);
-                        this.displayResponse(generatedContent, action);
+                        // Replace double line breaks with <br> and with </p><p> for paragraphs.
+                        const generatedContent = AIHelper.replaceLineBreaks(responseObj.generatedcontent);
+                        this.displayResponse(generatedContent);
                         return;
                     } else {
                         this.aiDrawerBodyElement.dataset.cancelled = '0';
@@ -378,55 +331,13 @@ const AICourseAssist = class {
     }
 
     /**
-     * Add the HTML response to the response stack.
-     * The stack will be used to display all responses in the AI drawer.
-     * @param {String} action The action key.
-     * @param {String} html The HTML to store.
-     */
-    addResponseToStack(action, html) {
-        this.responses.set(action, html);
-    }
-
-    /**
-     * Remove a stored response, allowing for a regenerated one.
-     * @param {String} action The action key.
-     */
-    removeResponseFromStack(action) {
-        if (this.responses.has(action)) {
-            this.responses.delete(action);
-        }
-    }
-
-    /**
-     * Return a stack of HTML responses.
-     * @return {String} HTML responses.
-     */
-    getResponseStack() {
-        let stack = '';
-        // Reverse to get newest first.
-        const responses = [...this.responses.values()].reverse();
-        for (const response of responses) {
-            stack += response;
-        }
-        return stack;
-    }
-
-    /**
-     * Display the responses.
+     * Display the response.
      * @param {String} content The content to display.
-     * @param {String} action The action used.
      */
-    async displayResponse(content, action) {
-        const params = await this.getParamsForAction(action);
-        const args = {
-            content: content,
-            heading: params.heading,
-            action: action,
-        };
-        Templates.render('aiplacement_courseassist/response', args).then((html) => {
-            this.addResponseToStack(action, html);
-            const responses = this.getResponseStack();
-            this.aiDrawerBodyElement.innerHTML = responses;
+    displayResponse(content) {
+        Templates.render('aiplacement_courseassist/response', {content: content}).then((html) => {
+            this.aiDrawerBodyElement.innerHTML = html;
+            this.aiDrawerBodyElement.dataset.hasdata = '1';
             this.registerResponseEventListeners();
             return;
         }).catch(Notification.exception);
@@ -437,13 +348,8 @@ const AICourseAssist = class {
      */
     displayError() {
         Templates.render('aiplacement_courseassist/error', {}).then((html) => {
-            this.addResponseToStack('error', html);
-            const responses = this.getResponseStack();
-            this.aiDrawerBodyElement.innerHTML = responses;
+            this.aiDrawerBodyElement.innerHTML = html;
             this.registerErrorEventListeners();
-            return;
-        }).then(() => {
-            this.removeResponseFromStack('error');
             return;
         }).catch(Notification.exception);
     }

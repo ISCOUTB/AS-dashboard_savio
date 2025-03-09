@@ -23,7 +23,7 @@ namespace format_weeks;
  * @copyright 2017 Mark Nelson <markn@moodle.com>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class observer_test extends \advanced_testcase {
+class observer_test extends \advanced_testcase {
 
     /**
      * Test setup.

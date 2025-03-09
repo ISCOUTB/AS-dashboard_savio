@@ -34,10 +34,12 @@
         "sensitiveinput": "<input type=\"password\" name=\"password\" id=\"password\">"
     }
 }}
-<div class="toggle-sensitive-wrapper {{#smallscreensonly}}small-screens-only{{/smallscreensonly}} input-group">
+<div class="toggle-sensitive-wrapper {{#smallscreensonly}}small-screens-only{{/smallscreensonly}} input-group mb-3">
     {{{sensitiveinput}}}
-    <button class="toggle-sensitive-btn btn btn-secondary" type="button" {{!
-        !}}aria-label="{{#str}}togglesensitive, form{{/str}}">
-        {{#pix}}t/hide, core{{/pix}}
-    </button>
+    <div class="input-group-append">
+        <button class="toggle-sensitive-btn btn btn-secondary" type="button" {{!
+            !}}aria-label="{{#str}}togglesensitive, form{{/str}}">
+            {{#pix}}t/hide, core{{/pix}}
+        </button>
+    </div>
 </div>

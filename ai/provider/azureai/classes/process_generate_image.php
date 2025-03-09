@@ -37,13 +37,23 @@ class process_generate_image extends abstract_processor {
 
     #[\Override]
     protected function get_endpoint(): UriInterface {
-        $url = rtrim($this->provider->config['endpoint'], '/')
+        $url = rtrim(get_config('aiprovider_azureai', 'endpoint'), '/')
             . '/openai/deployments/'
             . $this->get_deployment_name()
             . '/images/generations?api-version='
             . $this->get_api_version();
 
         return new Uri($url);
+    }
+
+    #[\Override]
+    protected function get_deployment_name(): string {
+        return get_config('aiprovider_azureai', 'action_generate_image_deployment');
+    }
+
+    #[\Override]
+    protected function get_api_version(): string {
+        return get_config('aiprovider_azureai', 'action_generate_image_apiversion');
     }
 
     #[\Override]
@@ -89,9 +99,6 @@ class process_generate_image extends abstract_processor {
         return new Request(
             method: 'POST',
             uri: '',
-            headers: [
-                'Content-Type' => 'application/json',
-            ],
             body: json_encode((object) [
                 'prompt' => $this->action->get_configuration('prompttext'),
                 'n' => $this->numberimages,
@@ -100,6 +107,9 @@ class process_generate_image extends abstract_processor {
                 'style' => $this->action->get_configuration('style'),
                 'user' => $userid,
             ]),
+            headers: [
+                'Content-Type' => 'application/json',
+            ],
         );
     }
 

@@ -251,12 +251,9 @@ class files {
         } else {
             require_login(null, true, $cm, true, true);
         }
-
-        // If the file belongs to a course module, ensure user can join the activity.
-        if ($cm !== null && !has_capability('mod/bigbluebuttonbn:join', $context)) {
+        if (!has_capability('mod/bigbluebuttonbn:join', $context)) {
             return null;
         }
-
         return implode('/', $args);
     }
 

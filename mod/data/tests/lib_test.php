@@ -38,7 +38,7 @@ require_once($CFG->dirroot . '/mod/data/lib.php');
  * @copyright  2013 Adrian Greeve
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class lib_test extends \advanced_testcase {
+class lib_test extends \advanced_testcase {
 
     /**
      * @var moodle_database
@@ -747,7 +747,7 @@ final class lib_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function data_get_config_provider(): array {
+    public function data_get_config_provider() {
         $initialdata = (object) [
             'template_foo' => true,
             'template_bar' => false,
@@ -838,7 +838,7 @@ final class lib_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function data_set_config_provider(): array {
+    public function data_set_config_provider() {
         $basevalue = (object) ['id' => rand(1, 1000)];
         $config = [
             'template_foo'  => true,
@@ -2142,7 +2142,7 @@ final class lib_test extends \advanced_testcase {
      *
      * @return array of scenarios
      */
-    public static function data_append_new_field_to_templates_provider(): array {
+    public function data_append_new_field_to_templates_provider(): array {
         return [
             'Plain template' => [
                 'hasfield' => false,

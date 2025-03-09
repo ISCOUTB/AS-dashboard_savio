@@ -28,7 +28,7 @@ The parameters for the template context are:
         "collapsedcontent": "Hello...",
         "expandedcontent": "Hello<br>Is it me you're looking for? I can see it in your eyes",
         "extraclasses": "rounded p-2 border",
-        "buttonextraclasses": "fw-bold"
+        "buttonextraclasses": "font-weight-bold"
     }
 {{< /mustache >}}
 

@@ -29,6 +29,8 @@ use stdClass;
 /**
  * This filter provides automatic linking to glossary entries, aliases and categories when found inside every Moodle text.
  *
+ * NOTE: multilang glossary entries are not compatible with this filter.
+ *
  * @package    filter_glossary
  * @copyright  2004 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -90,7 +92,7 @@ class text_filter extends \core_filters\text_filter {
         foreach ($allconcepts as $concepts) {
             foreach ($concepts as $concept) {
                 $conceptlist[] = new filter_object(
-                    format_string($concept->concept, true, ['context' => $this->context]),
+                    $concept->concept,
                     null,
                     null,
                     $concept->casesensitive,
@@ -146,9 +148,7 @@ class text_filter extends \core_filters\text_filter {
             $title = get_string(
                 'glossaryconcept',
                 'filter_glossary',
-                ['glossary' => replace_ampersands_not_followed_by_entity(strip_tags(format_string($glossaries[$concept->glossaryid],
-                    true, ['context' => $this->context]))),
-                    'concept' => format_string($concept->concept, true, ['context' => $this->context])]
+                ['glossary' => $glossaries[$concept->glossaryid], 'concept' => $concept->concept]
             );
             // Hardcoding dictionary format in the URL rather than defaulting
             // to the current glossary format which may not work in a popup.

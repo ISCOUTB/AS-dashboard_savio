@@ -33,7 +33,7 @@ use Moodle\H5PDisplayOptionBehaviour;
  * @covers     \core_h5p\framework
  * @runTestsInSeparateProcesses
  */
-final class framework_test extends \advanced_testcase {
+class framework_test extends \advanced_testcase {
 
     /** @var \core_h5p\framework */
     private $framework;
@@ -656,7 +656,7 @@ final class framework_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function isPatchedLibrary_provider(): array {
+    public function isPatchedLibrary_provider(): array {
         return [
             'Unpatched library. No different versioning' => [
                 [
@@ -804,7 +804,7 @@ final class framework_test extends \advanced_testcase {
         $this->getDataGenerator()->enrol_user($user->id, $course->id, 'student');
 
         // Create the .h5p file.
-        $path = self::get_fixture_path(__NAMESPACE__, 'h5ptest.zip');
+        $path = __DIR__ . '/fixtures/h5ptest.zip';
 
         // Admin and manager should have permission to update libraries.
         $file = helper::create_fake_stored_file_from_path($path, $admin->id, $contextsys);
@@ -861,7 +861,7 @@ final class framework_test extends \advanced_testcase {
         $user = $this->getDataGenerator()->create_user();
 
         // The H5P file.
-        $path = self::get_fixture_path(__NAMESPACE__, 'h5ptest.zip');
+        $path = __DIR__ . '/fixtures/h5ptest.zip';
 
         // An error should be raised when it's called before initialitzing it.
         $this->expectException('coding_exception');
@@ -1556,7 +1556,7 @@ final class framework_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function loadLibrarySemantics_provider(): array {
+    public function loadLibrarySemantics_provider(): array {
 
         $semantics = json_encode(
             [
@@ -2347,7 +2347,7 @@ final class framework_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function libraryHasUpgrade_provider(): array {
+    public function libraryHasUpgrade_provider(): array {
         return [
             'Lower major version; Identical lower version' => [
                 [

@@ -179,7 +179,7 @@ class view {
     public $returnurl;
 
     /**
-     * @var bulk_action_base[] $bulkactions bulk actions for the api.
+     * @var array $bulkactions to identify the bulk actions for the api.
      */
     public $bulkactions = [];
 
@@ -235,13 +235,22 @@ class view {
         $this->cm = $cm;
         $this->extraparams = $extraparams;
 
-        if ($cm === null) {
-            debugging('Passing $cm to the view constructor is now required.', DEBUG_DEVELOPER);
-        }
-
         // Default filter condition.
         if (!isset($params['filter']) && isset($params['cat'])) {
-            $params['filter']  = filter_condition_manager::get_default_filter($params['cat']);
+            $params['filter']  = [];
+            [$categoryid, $contextid] = category_condition::validate_category_param($params['cat']);
+            if (!is_null($categoryid)) {
+                $category = category_condition::get_category_record($categoryid, $contextid);
+                $params['filter']['category'] = [
+                    'jointype' => category_condition::JOINTYPE_DEFAULT,
+                    'values' => [$category->id],
+                    'filteroptions' => ['includesubcategories' => false],
+                ];
+            }
+            $params['filter']['hidden'] = [
+                'jointype' => hidden_condition::JOINTYPE_DEFAULT,
+                'values' => [0],
+            ];
             $params['jointype'] = datafilter::JOINTYPE_ALL;
         }
         if (!empty($params['filter'])) {
@@ -255,7 +264,11 @@ class view {
         // Create the url of the new question page to forward to.
         $this->returnurl = $pageurl->out_as_local_url(false);
         $this->editquestionurl = new \moodle_url('/question/bank/editquestion/question.php', ['returnurl' => $this->returnurl]);
-        $this->editquestionurl->param('cmid', $this->cm->id);
+        if ($this->cm !== null) {
+            $this->editquestionurl->param('cmid', $this->cm->id);
+        } else {
+            $this->editquestionurl->param('courseid', $this->course->id);
+        }
 
         $this->lastchangedid = clean_param($pageurl->param('lastchanged'), PARAM_INT);
 
@@ -308,7 +321,7 @@ class view {
      */
     protected function init_bulk_actions(): void {
         foreach ($this->plugins as $componentname => $plugin) {
-            $bulkactions = $plugin->get_bulk_actions($this);
+            $bulkactions = $plugin->get_bulk_actions();
             if (!is_array($bulkactions)) {
                 debugging("The method {$componentname}::get_bulk_actions() must return an " .
                     "array of bulk actions instead of a single bulk action. " .
@@ -318,7 +331,11 @@ class view {
             }
 
             foreach ($bulkactions as $bulkactionobject) {
-                $this->bulkactions[$bulkactionobject->get_key()] = $bulkactionobject;
+                $this->bulkactions[$bulkactionobject->get_key()] = [
+                    'title' => $bulkactionobject->get_bulk_action_title(),
+                    'url' => $bulkactionobject->get_bulk_action_url(),
+                    'capabilities' => $bulkactionobject->get_bulk_action_capabilities()
+                ];
             }
         }
     }
@@ -559,7 +576,7 @@ class view {
     protected function parse_subsort($sort): array {
         // Do the parsing.
         if (strpos($sort, '-') !== false) {
-            [$colname, $subsort] = explode('-', $sort, 2);
+            list($colname, $subsort) = explode('-', $sort, 2);
         } else {
             $colname = $sort;
             $subsort = '';
@@ -597,17 +614,8 @@ class view {
     }
 
     /**
-     * Get the default sort columns for this view of the question bank.
-     *
-     * The array keys in the return value need be the standard keys used
-     * to represent sorts. That is [plugin_frankenstyle]__[class_name] and then
-     * and optional bit like '-name' if the column supports muliple ways of sorting.
-     *
-     * The array values should be one of the constants SORT_ASC or SORT_DESC for the default order.
-     *
-     * Therefore, the default implementation below is a good example.
-     *
-     * @return int[] sort key => SORT_ASC or SORT_DESC.
+     * Default sort for question data.
+     * @return int[]
      */
     protected function default_sort(): array {
         $defaultsort = [];
@@ -737,15 +745,16 @@ class view {
             [$colname, $subsort] = $this->parse_subsort($sortname);
             $sorts[] = $this->requiredcolumns[$colname]->sort_expression($sortorder == SORT_DESC, $subsort);
         }
+
+        // Build the where clause.
+        $latestversion = 'qv.version = (SELECT MAX(v.version)
+                                          FROM {question_versions} v
+                                          JOIN {question_bank_entries} be
+                                            ON be.id = v.questionbankentryid
+                                         WHERE be.id = qbe.id)';
         $this->sqlparams = [];
         $conditions = [];
-        $showhiddenquestion = true;
-        // Build the where clause.
         foreach ($this->searchconditions as $searchcondition) {
-            // This is nasty hack to check if the filter is using "Show hidden question" option.
-            if (array_key_exists('hidden_condition', $searchcondition->params())) {
-                $showhiddenquestion = false;
-            }
             if ($searchcondition->where()) {
                 $conditions[] = '((' . $searchcondition->where() .'))';
             }
@@ -753,18 +762,6 @@ class view {
                 $this->sqlparams = array_merge($this->sqlparams, $searchcondition->params());
             }
         }
-        $extracondition = '';
-        if (!$showhiddenquestion) {
-            // If Show hidden question option is off, then we need get the latest version that is not hidden.
-            $extracondition = ' AND v.status <> :hiddenstatus';
-            $this->sqlparams = array_merge($this->sqlparams, ['hiddenstatus' => question_version_status::QUESTION_STATUS_HIDDEN]);
-        }
-        $latestversion = "qv.version = (SELECT MAX(v.version)
-                                          FROM {question_versions} v
-                                          JOIN {question_bank_entries} be
-                                            ON be.id = v.questionbankentryid
-                                         WHERE be.id = qbe.id $extracondition)";
-
         // Get higher level filter condition.
         $jointype = isset($this->pagevars['jointype']) ? (int)$this->pagevars['jointype'] : condition::JOINTYPE_DEFAULT;
         $nonecondition = ($jointype === datafilter::JOINTYPE_NONE) ? ' NOT ' : '';
@@ -803,13 +800,10 @@ class view {
         global $DB;
         $questions = $DB->get_recordset_sql($this->loadsql, $this->sqlparams,
             (int)$this->pagevars['qpage'] * (int)$this->pagevars['qperpage'], $this->pagevars['qperpage']);
-        if (!$questions->valid()) {
+        if (empty($questions)) {
             $questions->close();
-            // No questions on this page. Reset to the nearest page that contains questions.
-            $this->pagevars['qpage'] = max(0,
-                ceil($this->totalcount / $this->pagevars['qperpage']) - 1);
-            $questions = $DB->get_recordset_sql($this->loadsql, $this->sqlparams,
-                $this->pagevars['qpage'] * (int) $this->pagevars['qperpage'], $this->pagevars['qperpage']);
+            // No questions on this page. Reset to page 0.
+            $questions = $DB->get_recordset_sql($this->loadsql, $this->sqlparams, 0, $this->pagevars['qperpage']);
         }
         return $questions;
     }
@@ -979,7 +973,7 @@ class view {
             DEBUG_DEVELOPER
         );
         global $DB, $OUTPUT;
-        [$categoryid, $contextid] = explode(',', $categoryandcontext);
+        list($categoryid, $contextid) = explode(',', $categoryandcontext);
         if (!$categoryid) {
             $this->print_choose_category_message();
             return false;
@@ -1148,16 +1142,6 @@ class view {
 
         [$categoryid, $contextid] = category_condition::validate_category_param($this->pagevars['cat']);
         $catcontext = \context::instance_by_id($contextid);
-        // Update the question in the list with correct category context when we have selected category filter.
-        if (isset($this->pagevars['filter']['category']['values'])) {
-            $categoryid = $this->pagevars['filter']['category']['values'][0];
-            foreach ($this->contexts->all() as $context) {
-                if ((int) $context->instanceid === (int) $categoryid) {
-                    $catcontext = $context;
-                    break;
-                }
-            }
-        }
 
         echo \html_writer::start_tag(
             'div',
@@ -1171,8 +1155,8 @@ class view {
         echo $this->get_plugin_controls($catcontext, $categoryid);
 
         $this->build_query();
-        $totalquestions = $this->get_question_count();
         $questionsrs = $this->load_page_questions();
+        $totalquestions = $this->get_question_count();
         $questions = [];
         foreach ($questionsrs as $question) {
             if (!empty($question->id)) {
@@ -1185,7 +1169,6 @@ class view {
         echo \html_writer::start_tag('form', ['action' => $this->baseurl, 'method' => 'post', 'id' => 'questionsubmit']);
         echo \html_writer::start_tag('fieldset', ['class' => 'invisiblefieldset', 'style' => "display: block;"]);
         echo \html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()]);
-        echo \html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'addonpage']);
         echo \html_writer::input_hidden_params($this->baseurl);
 
         $filtercondition = json_encode($this->get_pagevars());
@@ -1344,7 +1327,7 @@ class view {
             foreach ($this->bulkactions as $key => $action) {
                 // Check capabilities.
                 $capcount = 0;
-                foreach ($action->get_bulk_action_capabilities() as $capability) {
+                foreach ($action['capabilities'] as $capability) {
                     if (has_capability($capability, $catcontext)) {
                         $capcount ++;
                     }
@@ -1355,9 +1338,9 @@ class view {
                     continue;
                 }
                 $actiondata = new \stdClass();
-                $actiondata->actionname = $action->get_bulk_action_title();
+                $actiondata->actionname = $action['title'];
                 $actiondata->actionkey = $key;
-                $actiondata->actionurl = new \moodle_url($action->get_bulk_action_url(), $params);
+                $actiondata->actionurl = new \moodle_url($action['url'], $params);
                 $bulkactiondata[] = $actiondata;
 
                 $bulkactiondatas ['bulkactionitems'] = $bulkactiondata;
@@ -1366,16 +1349,6 @@ class view {
             if (!empty($bulkactiondatas)) {
                 echo $PAGE->get_renderer('core_question', 'bank')->render_bulk_actions_ui($bulkactiondatas);
             }
-        }
-    }
-
-    /**
-     * Give each bulk action a chance to load its own javascript module.
-     * @return void
-     */
-    public function init_bulk_actions_js(): void {
-        foreach ($this->bulkactions as $action) {
-            $action->initialise_javascript();
         }
     }
 

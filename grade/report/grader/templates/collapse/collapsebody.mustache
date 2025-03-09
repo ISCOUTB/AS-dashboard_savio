@@ -43,15 +43,15 @@
     {{/ core/search_input_auto }}
     <form class="columnsdropdownform flex-column h-100">
         <fieldset>
-            <legend class="visually-hidden">{{#str}} aria:dropdowncolumns, gradereport_grader {{/str}}</legend>
+            <legend class="sr-only">{{#str}} aria:dropdowncolumns, gradereport_grader {{/str}}</legend>
             <ul id="collapse-{{instance}}-listbox" class="searchresultitemscontainer overflow-auto py-2 px-1 list-group mx-0 text-truncate" data-region="search-result-items-container">
                 {{>gradereport_grader/collapse/collapseresults}}
             </ul>
         </fieldset>
         <div class="d-flex mt-2">
-            <div class="ms-1 form-check">
-                <input disabled class="form-check-input" type="checkbox" data-action="selectall" id="check-collapse-all">
-                <label for="check-collapse-all" id="check-all" class="selected-option-info text-truncate form-check-label d-block">
+            <div class="d-flex align-items-center form-check">
+                <label id="check-all" class="selected-option-info text-truncate form-check-label d-block">
+                    <input disabled class="form-check-input" type="checkbox" data-action="selectall">
                     {{#str}}selectall, core{{/str}}
                 </label>
             </div>

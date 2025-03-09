@@ -41,19 +41,18 @@ class utils {
         string $actionclass
     ): bool {
         [$plugintype, $pluginname] = explode('_', \core_component::normalize_componentname('aiplacement_editor'), 2);
-        $pluginmanager = \core_plugin_manager::resolve_plugininfo_class($plugintype);
-        if (!$pluginmanager::is_plugin_enabled($pluginname)) {
-            return false;
+        $manager = \core_plugin_manager::resolve_plugininfo_class($plugintype);
+
+        if ($manager::is_plugin_enabled($pluginname)) {
+            if (
+                has_capability("aiplacement/editor:{$actionname}", $context)
+                && manager::is_action_available($actionclass)
+                && manager::is_action_enabled('aiplacement_editor', $actionclass)
+            ) {
+                return true;
+            }
         }
 
-        $aimanager = \core\di::get(manager::class);
-        if (
-            has_capability("aiplacement/editor:{$actionname}", $context)
-            && $aimanager->is_action_available($actionclass)
-            && $aimanager->is_action_enabled('aiplacement_editor', $actionclass)
-        ) {
-            return true;
-        }
         return false;
     }
 }

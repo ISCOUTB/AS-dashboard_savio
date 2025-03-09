@@ -23,7 +23,7 @@
  * @covers     \core_courseformat\base
  * @coversDefaultClass \core_courseformat\base
  */
-final class base_test extends advanced_testcase {
+class base_test extends advanced_testcase {
 
     /**
      * Setup to ensure that fixtures are loaded.
@@ -281,7 +281,7 @@ final class base_test extends advanced_testcase {
      *
      * @return array the testing scenarios
      */
-    public static function get_output_classname_provider(): array {
+    public function get_output_classname_provider(): array {
         return [
             'overridden class' => [
                 'find' => 'state\\course',
@@ -516,7 +516,7 @@ final class base_test extends advanced_testcase {
      *
      * @return array the testing scenarios
      */
-    public static function delete_format_data_provider(): array {
+    public function delete_format_data_provider(): array {
         return [
             'direct call' => [
                 'usehook' => false
@@ -541,14 +541,13 @@ final class base_test extends advanced_testcase {
         $course = $generator->create_course();
         $format = course_get_format($course);
 
-        $originalsection = $DB->get_record('course_sections', ['course' => $course->id, 'section' => 0], '*', MUST_EXIST);
+        $originalsection = $DB->get_record('course_sections', ['course' => $course->id, 'section' => 1], '*', MUST_EXIST);
         $generator->create_module('page', ['course' => $course, 'section' => $originalsection->section]);
         $generator->create_module('page', ['course' => $course, 'section' => $originalsection->section]);
         $generator->create_module('page', ['course' => $course, 'section' => $originalsection->section]);
-        $generator->create_module('qbank', ['course' => $course, 'section' => $originalsection->section]);
 
         $originalmodcount = $DB->count_records('course_modules', ['course' => $course->id, 'section' => $originalsection->id]);
-        $this->assertEquals(4, $originalmodcount);
+        $this->assertEquals(3, $originalmodcount);
 
         $modinfo = get_fast_modinfo($course);
         $sectioninfo = $modinfo->get_section_info($originalsection->section, MUST_EXIST);
@@ -564,10 +563,7 @@ final class base_test extends advanced_testcase {
         }
 
         $newmodcount = $DB->count_records('course_modules', ['course' => $course->id, 'section' => $newsection->id]);
-        $modinfo = course_modinfo::instance($course);
-        $qbankinstances = $modinfo->get_instances_of('qbank');
-        $this->assertCount(1, $qbankinstances);
-        $this->assertEquals($originalmodcount - 1, $newmodcount);
+        $this->assertEquals($originalmodcount, $newmodcount);
     }
 
     /**
@@ -608,7 +604,7 @@ final class base_test extends advanced_testcase {
      *
      * @return array the testing scenarios
      */
-    public static function get_format_string_provider(): array {
+    public function get_format_string_provider(): array {
         return [
             'Existing in format lang' => [
                 'key' => 'addsection',
@@ -687,7 +683,7 @@ final class base_test extends advanced_testcase {
      *
      * @return array the testing scenarios
      */
-    public static function move_section_after_provider(): array {
+    public function move_section_after_provider(): array {
         return [
             'Move top' => [
                 'movesection' => 'section3',
@@ -790,10 +786,7 @@ final class base_test extends advanced_testcase {
             $this->expectException(\coding_exception::class);
         }
         $result = $format->get_non_ajax_cm_action_url($action, $cminfo);
-        if (!$exception) {
-            $this->assertDebuggingCalled();
-        }
-        $this->assertEquals($assign0->cmid, $result->param('id'));
+        $this->assertEquals($assign0->cmid, $result->param($expectedparam));
     }
 
     /**
@@ -801,7 +794,7 @@ final class base_test extends advanced_testcase {
      *
      * @return array the testing scenarios
      */
-    public static function get_non_ajax_cm_action_url_provider(): array {
+    public function get_non_ajax_cm_action_url_provider(): array {
         return [
             'duplicate' => [
                 'action' => 'cmDuplicate',
@@ -1002,109 +995,6 @@ final class base_test extends advanced_testcase {
         $this->assertTrue($format->is_section_visible($modinfostudent->get_section_info(0)));
         $this->assertFalse($format->is_section_visible($modinfostudent->get_section_info(1)));
         $this->assertFalse($format->is_section_visible($modinfostudent->get_section_info(2)));
-    }
-
-    /**
-     * Test for the get_generic_section_name method.
-     *
-     * @covers ::get_generic_section_name
-     */
-    public function test_get_generic_section_name(): void {
-        $this->resetAfterTest();
-
-        $generator = $this->getDataGenerator();
-        $course1 = $generator->create_course(['format' => 'topics']);
-        $course2 = $generator->create_course(['format' => 'theunittest']);
-
-        $format = course_get_format($course1);
-        $this->assertEquals(
-            get_string('sectionname', 'format_topics'),
-            $format->get_generic_section_name()
-        );
-
-        $format = course_get_format($course2);
-        $this->assertEquals(
-            get_string('section'),
-            $format->get_generic_section_name()
-        );
-    }
-
-    /**
-     * Test can_sections_be_removed_from_navigation().
-     *
-     * @covers ::session_cache
-     * @covers ::session_cache_reset
-     * @covers ::session_cache_reset_all
-     * @covers ::invalidate_all_session_caches_for_course
-     */
-    public function test_session_caches_methods(): void {
-        global $DB;
-
-        $this->resetAfterTest();
-        $generator = $this->getDataGenerator();
-
-        $course1 = $generator->create_course(['format' => 'topics']);
-        $course2 = $generator->create_course(['format' => 'topics']);
-
-        // Force some cacherev to the course.
-        $course1->cacherev = 12345;
-        $course2->cacherev = 67890;
-        $DB->set_field('course', 'cacherev', $course1->cacherev, ['id' => $course1->id]);
-        $DB->set_field('course', 'cacherev', $course2->cacherev, ['id' => $course2->id]);
-
-        $teacher = $generator->create_and_enrol($course1, 'editingteacher');
-        $generator->enrol_user($teacher->id, $course2->id, 'editingteacher');
-        $this->setUser($teacher);
-
-        // The cache key uses time() as hash. To not wait a second between calls we fake an initial value.
-        $statecache = cache::make('core', 'courseeditorstate');
-        $statecache->set($course1->id, $course1->cacherev . '_11111');
-        $statecache->set($course2->id, $course2->cacherev . '_22222');
-
-        $course1cachekey = \core_courseformat\base::session_cache($course1);
-
-        // Validate the method returns the same value when called twice.
-        $course1cachekeyagain = \core_courseformat\base::session_cache($course1);
-        $this->assertEquals($course1cachekey, $course1cachekeyagain);
-
-        // Validate other course has a diferent cache key.
-        $course2cachekey = \core_courseformat\base::session_cache($course2);
-        $this->assertNotEquals($course1cachekey, $course2cachekey);
-
-        // Reset the specific course cache.
-        \core_courseformat\base::session_cache_reset($course1);
-
-        $resetcachekey = \core_courseformat\base::session_cache($course1);
-        $this->assertNotEquals($course1cachekey, $resetcachekey);
-
-        $reset2cachekey = \core_courseformat\base::session_cache($course2);
-        $this->assertEquals($course2cachekey, $reset2cachekey);
-
-        // Return to the initial value.
-        $statecache->set($course1->id, $course1->cacherev . '_11111');
-        $statecache->set($course2->id, $course2->cacherev . '_22222');
-
-        // Reset all user course caches.
-        \core_courseformat\base::session_cache_reset_all();
-
-        $resetallcachekey = \core_courseformat\base::session_cache($course1);
-        $this->assertNotEquals($course1cachekey, $resetallcachekey);
-
-        $resetall2cachekey = \core_courseformat\base::session_cache($course2);
-        $this->assertNotEquals($course2cachekey, $resetall2cachekey);
-
-        // Return to the initial value.
-        $statecache->set($course1->id, $course1->cacherev . '_11111');
-        $statecache->set($course2->id, $course2->cacherev . '_22222');
-
-        // Invalidate cache on course 1.
-        \core_courseformat\base::invalidate_all_session_caches_for_course($course1);
-
-        $invalidatecachekey = \core_courseformat\base::session_cache($course1);
-        $this->assertNotEquals($course1cachekey, $invalidatecachekey);
-
-        $invalidate2cachekey = \core_courseformat\base::session_cache($course2);
-        $this->assertEquals($course2cachekey, $invalidate2cachekey);
     }
 }
 

@@ -29,7 +29,7 @@ require_once(__DIR__ . '/../configonlylib.php');
  * @copyright  2012 Petr Skoda {@link http://skodak.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class configonlylib_test extends \advanced_testcase {
+class configonlylib_test extends \advanced_testcase {
 
     /**
      * Test cleaning of invalid utf-8 entities.
@@ -186,7 +186,7 @@ final class configonlylib_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function min_is_revision_valid_and_current_provider(): array {
+    public function min_is_revision_valid_and_current_provider(): array {
         return [
             'Negative value' => [-1, false],
             'Empty value' => [0, false],

@@ -530,6 +530,24 @@
           <MODIFIERID>0</MODIFIERID>
         </CAPABILITY>
         <CAPABILITY>
+          <NAME>mod/survey:readresponses</NAME>
+          <PERMISSION>1</PERMISSION>
+          <TIMEMODIFIED>1311692181</TIMEMODIFIED>
+          <MODIFIERID>0</MODIFIERID>
+        </CAPABILITY>
+        <CAPABILITY>
+          <NAME>mod/survey:participate</NAME>
+          <PERMISSION>1</PERMISSION>
+          <TIMEMODIFIED>1311692181</TIMEMODIFIED>
+          <MODIFIERID>0</MODIFIERID>
+        </CAPABILITY>
+        <CAPABILITY>
+          <NAME>mod/survey:download</NAME>
+          <PERMISSION>1</PERMISSION>
+          <TIMEMODIFIED>1311692181</TIMEMODIFIED>
+          <MODIFIERID>0</MODIFIERID>
+        </CAPABILITY>
+        <CAPABILITY>
           <NAME>mod/scorm:viewscores</NAME>
           <PERMISSION>1</PERMISSION>
           <TIMEMODIFIED>1311692177</TIMEMODIFIED>
@@ -848,6 +866,18 @@
           <MODIFIERID>0</MODIFIERID>
         </CAPABILITY>
         <CAPABILITY>
+          <NAME>mod/data:managecomments</NAME>
+          <PERMISSION>1</PERMISSION>
+          <TIMEMODIFIED>1311692131</TIMEMODIFIED>
+          <MODIFIERID>0</MODIFIERID>
+        </CAPABILITY>
+        <CAPABILITY>
+          <NAME>mod/data:comment</NAME>
+          <PERMISSION>1</PERMISSION>
+          <TIMEMODIFIED>1311692131</TIMEMODIFIED>
+          <MODIFIERID>0</MODIFIERID>
+        </CAPABILITY>
+        <CAPABILITY>
           <NAME>mod/data:approve</NAME>
           <PERMISSION>1</PERMISSION>
           <TIMEMODIFIED>1311692131</TIMEMODIFIED>
@@ -875,6 +905,24 @@
           <NAME>mod/choice:choose</NAME>
           <PERMISSION>1</PERMISSION>
           <TIMEMODIFIED>1311692127</TIMEMODIFIED>
+          <MODIFIERID>0</MODIFIERID>
+        </CAPABILITY>
+        <CAPABILITY>
+          <NAME>mod/chat:readlog</NAME>
+          <PERMISSION>1</PERMISSION>
+          <TIMEMODIFIED>1311692125</TIMEMODIFIED>
+          <MODIFIERID>0</MODIFIERID>
+        </CAPABILITY>
+        <CAPABILITY>
+          <NAME>mod/chat:deletelog</NAME>
+          <PERMISSION>1</PERMISSION>
+          <TIMEMODIFIED>1311692125</TIMEMODIFIED>
+          <MODIFIERID>0</MODIFIERID>
+        </CAPABILITY>
+        <CAPABILITY>
+          <NAME>mod/chat:chat</NAME>
+          <PERMISSION>1</PERMISSION>
+          <TIMEMODIFIED>1311692125</TIMEMODIFIED>
           <MODIFIERID>0</MODIFIERID>
         </CAPABILITY>
         <CAPABILITY>
@@ -1119,6 +1167,12 @@
           <MODIFIERID>0</MODIFIERID>
         </CAPABILITY>
         <CAPABILITY>
+          <NAME>mod/survey:participate</NAME>
+          <PERMISSION>1</PERMISSION>
+          <TIMEMODIFIED>1311692181</TIMEMODIFIED>
+          <MODIFIERID>0</MODIFIERID>
+        </CAPABILITY>
+        <CAPABILITY>
           <NAME>mod/scorm:viewscores</NAME>
           <PERMISSION>1</PERMISSION>
           <TIMEMODIFIED>1311692176</TIMEMODIFIED>
@@ -1233,9 +1287,27 @@
           <MODIFIERID>0</MODIFIERID>
         </CAPABILITY>
         <CAPABILITY>
+          <NAME>mod/data:comment</NAME>
+          <PERMISSION>1</PERMISSION>
+          <TIMEMODIFIED>1311692130</TIMEMODIFIED>
+          <MODIFIERID>0</MODIFIERID>
+        </CAPABILITY>
+        <CAPABILITY>
           <NAME>mod/choice:choose</NAME>
           <PERMISSION>1</PERMISSION>
           <TIMEMODIFIED>1311692127</TIMEMODIFIED>
+          <MODIFIERID>0</MODIFIERID>
+        </CAPABILITY>
+        <CAPABILITY>
+          <NAME>mod/chat:readlog</NAME>
+          <PERMISSION>1</PERMISSION>
+          <TIMEMODIFIED>1311692125</TIMEMODIFIED>
+          <MODIFIERID>0</MODIFIERID>
+        </CAPABILITY>
+        <CAPABILITY>
+          <NAME>mod/chat:chat</NAME>
+          <PERMISSION>1</PERMISSION>
+          <TIMEMODIFIED>1311692125</TIMEMODIFIED>
           <MODIFIERID>0</MODIFIERID>
         </CAPABILITY>
         <CAPABILITY>

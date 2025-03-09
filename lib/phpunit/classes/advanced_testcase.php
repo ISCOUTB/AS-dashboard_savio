@@ -20,8 +20,6 @@ use core\http_client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
-use PHPUnit\Framework\Attributes\After;
-use PHPUnit\Framework\Attributes\Before;
 
 /**
  * Advanced PHPUnit test case customised for Moodle.
@@ -48,16 +46,21 @@ abstract class advanced_testcase extends base_testcase {
      * Note: use setUp() or setUpBeforeClass() in your test cases.
      *
      * @param string $name
+     * @param array  $data
+     * @param string $dataName
      */
-    final public function __construct(string $name) {
-        parent::__construct($name);
+    final public function __construct($name = null, array $data = [], $dataname = '') {
+        parent::__construct($name, $data, $dataname);
 
         $this->setBackupGlobals(false);
+        $this->setBackupStaticAttributes(false);
         $this->setPreserveGlobalState(false);
     }
 
-    #[Before]
-    final public function setup_test_environment(): void {
+    /**
+     * Runs the bare test sequence.
+     */
+    final public function runBare(): void {
         global $CFG, $DB;
 
         if (phpunit_util::$lastdbwrites != $DB->perf_get_writes()) {
@@ -68,18 +71,28 @@ abstract class advanced_testcase extends base_testcase {
             $this->testdbtransaction = $DB->start_delegated_transaction();
         }
 
-        $this->setCurrentTimeStart();
-    }
+        try {
+            $this->setCurrentTimeStart();
+            parent::runBare();
+        } catch (Exception $ex) {
+            $e = $ex;
+        } catch (Throwable $ex) {
+            // Engine errors in PHP7 throw exceptions of type Throwable (this "catch" will be ignored in PHP5).
+            $e = $ex;
+        } finally {
+            // Reset global state after test and test failure.
+            $CFG = phpunit_util::get_global_backup('CFG');
+            $DB = phpunit_util::get_global_backup('DB');
 
-    #[After]
-    final public function teardown_test_environment(): void {
-        global $CFG, $DB;
-        // Reset global state after test and test failure.
-        $CFG = phpunit_util::get_global_backup('CFG');
-        $DB = phpunit_util::get_global_backup('DB');
+            // We need to reset the autoloader.
+            \core_component::reset();
+        }
 
-        // We need to reset the autoloader.
-        \core_component::reset();
+        if (isset($e)) {
+            // Cleanup after failed expectation.
+            self::resetAllData();
+            throw $e;
+        }
 
         // Deal with any debugging messages.
         $debugerror = phpunit_util::display_debugging_messages(true);
@@ -178,7 +191,7 @@ abstract class advanced_testcase extends base_testcase {
      * @param array $files full paths to CSV or XML files to load.
      * @return phpunit_dataset
      */
-    protected static function dataset_from_files(array $files) {
+    protected function dataset_from_files(array $files) {
         // We ignore $delimiter, $enclosure and $escape, use the default ones in your fixtures.
         $dataset = new phpunit_dataset();
         $dataset->from_files($files);
@@ -195,7 +208,7 @@ abstract class advanced_testcase extends base_testcase {
      * @param string $table name of the table which the file belongs to (only for CSV files).
      * @return phpunit_dataset
      */
-    protected static function dataset_from_string(string $content, string $type, ?string $table = null) {
+    protected function dataset_from_string(string $content, string $type, ?string $table = null) {
         $dataset = new phpunit_dataset();
         $dataset->from_string($content, $type, $table);
         return $dataset;
@@ -209,7 +222,7 @@ abstract class advanced_testcase extends base_testcase {
      * @param array $data array of tables, see {@see phpunit_dataset::from_array()} for supported formats.
      * @return phpunit_dataset
      */
-    protected static function dataset_from_array(array $data) {
+    protected function dataset_from_array(array $data) {
         $dataset = new phpunit_dataset();
         $dataset->from_array($data);
         return $dataset;
@@ -594,31 +607,28 @@ abstract class advanced_testcase extends base_testcase {
      * @param bool $https true if https required
      * @return string url
      */
-    public static function getExternalTestFileUrl(
-        string $path,
-        bool $https = false,
-    ): string {
+    public function getExternalTestFileUrl($path, $https = false) {
         $path = ltrim($path, '/');
         if ($path) {
-            $path = "/{$path}";
+            $path = '/' . $path;
         }
         if ($https) {
             if (defined('TEST_EXTERNAL_FILES_HTTPS_URL')) {
                 if (!TEST_EXTERNAL_FILES_HTTPS_URL) {
-                    self::markTestSkipped('Tests using external https test files are disabled');
+                    $this->markTestSkipped('Tests using external https test files are disabled');
                 }
                 return TEST_EXTERNAL_FILES_HTTPS_URL . $path;
             }
-            return "https://download.moodle.org/unittest{$path}";
+            return 'https://download.moodle.org/unittest' . $path;
         }
 
         if (defined('TEST_EXTERNAL_FILES_HTTP_URL')) {
             if (!TEST_EXTERNAL_FILES_HTTP_URL) {
-                self::markTestSkipped('Tests using external http test files are disabled');
+                $this->markTestSkipped('Tests using external http test files are disabled');
             }
             return TEST_EXTERNAL_FILES_HTTP_URL . $path;
         }
-        return "http://download.moodle.org/unittest{$path}";
+        return 'http://download.moodle.org/unittest' . $path;
     }
 
     /**
@@ -685,8 +695,8 @@ abstract class advanced_testcase extends base_testcase {
             $params['userid'] = $matchuserid;
         }
 
-        $lock = $this->createStub(\core\lock\lock::class);
-        $cronlock = $this->createStub(\core\lock\lock::class);
+        $lock = $this->createMock(\core\lock\lock::class);
+        $cronlock = $this->createMock(\core\lock\lock::class);
 
         $tasks = $DB->get_recordset('task_adhoc', $params);
         foreach ($tasks as $record) {
@@ -772,25 +782,22 @@ abstract class advanced_testcase extends base_testcase {
      *
      * @param string $plugintype The name of the plugintype
      * @param string $path The path to the plugintype's root
-     * @param bool $deprecated whether to add the plugintype as a deprecated plugin type.
      */
     protected function add_mocked_plugintype(
         string $plugintype,
         string $path,
-        bool $deprecated = false,
     ): void {
         require_phpunit_isolation();
 
         $mockedcomponent = new \ReflectionClass(\core_component::class);
-        $propertyname = $deprecated ? 'deprecatedplugintypes' : 'plugintypes';
-        $plugintypes = $mockedcomponent->getStaticPropertyValue($propertyname);
+        $plugintypes = $mockedcomponent->getStaticPropertyValue('plugintypes');
 
         if (array_key_exists($plugintype, $plugintypes)) {
             throw new \coding_exception("The plugintype '{$plugintype}' already exists.");
         }
 
         $plugintypes[$plugintype] = $path;
-        $mockedcomponent->setStaticPropertyValue($propertyname, $plugintypes);
+        $mockedcomponent->setStaticPropertyValue('plugintypes', $plugintypes);
 
         $this->resetDebugging();
     }
@@ -838,11 +845,17 @@ abstract class advanced_testcase extends base_testcase {
         string $component,
         string $path,
     ): string {
-        return sprintf(
+        $fullpath = sprintf(
             "%s/tests/fixtures/%s",
             \core_component::get_component_directory($component),
             $path,
         );
+
+        if (!file_exists($fullpath)) {
+            throw new \coding_exception("Fixture file not found: $fullpath");
+        }
+
+        return $fullpath;
     }
 
     /**
@@ -867,13 +880,7 @@ abstract class advanced_testcase extends base_testcase {
         global $COURSE;
         global $SITE;
 
-        $fullpath = static::get_fixture_path($component, $path);
-
-        if (!file_exists($fullpath)) {
-            throw new \coding_exception("Fixture file not found: $fullpath");
-        }
-
-        require_once($fullpath);
+        require_once(static::get_fixture_path($component, $path));
     }
 
     /**
@@ -901,19 +908,5 @@ abstract class advanced_testcase extends base_testcase {
             'mock' => $mock,
             'handlerstack' => $handlerstack,
         ];
-    }
-
-    /**
-     * Get a copy of the mocked string manager.
-     *
-     * @return \core\tests\mocking_string_manager
-     */
-    protected function get_mocked_string_manager(): \core\tests\mocking_string_manager {
-        global $CFG;
-
-        $this->resetAfterTest();
-        $CFG->config_php_settings['customstringmanager'] = \core\tests\mocking_string_manager::class;
-
-        return get_string_manager(true);
     }
 }

@@ -43,7 +43,7 @@ require_once($CFG->libdir . "/phpunit/classes/restore_date_testcase.php");
  * @covers \backup_bigbluebuttonbn_activity_task
  * @covers \restore_bigbluebuttonbn_activity_task
  */
-final class backup_restore_test extends restore_date_testcase {
+class backup_restore_test extends restore_date_testcase {
     use testcase_helper_trait;
 
     /**
@@ -223,7 +223,7 @@ final class backup_restore_test extends restore_date_testcase {
      * Return an array of BigBlueButton types
      * @return array[]
      */
-    public static function bbb_type_provider(): array {
+    public function bbb_type_provider() {
         return [
             'All' => [instance::TYPE_ALL],
             'Recording Only' => [instance::TYPE_RECORDING_ONLY],

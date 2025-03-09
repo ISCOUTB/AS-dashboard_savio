@@ -35,6 +35,7 @@ class PhoneNumberMatch implements \Stringable
 
     /**
      * Returns the phone number matched by the receiver.
+     * @return PhoneNumber
      */
     public function number(): PhoneNumber
     {
@@ -43,6 +44,7 @@ class PhoneNumberMatch implements \Stringable
 
     /**
      * Returns the start index of the matched phone number within the searched text.
+     * @return int
      */
     public function start(): int
     {
@@ -51,6 +53,7 @@ class PhoneNumberMatch implements \Stringable
 
     /**
      * Returns the exclusive end index of the matched phone number within the searched text.
+     * @return int
      */
     public function end(): int
     {
@@ -59,6 +62,7 @@ class PhoneNumberMatch implements \Stringable
 
     /**
      * Returns the raw string matched as a phone number in the searched text.
+     * @return string
      */
     public function rawString(): string
     {

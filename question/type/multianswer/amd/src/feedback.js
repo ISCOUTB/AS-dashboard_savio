@@ -22,11 +22,11 @@
  */
 
 import 'theme_boost/popover';
-import Popover from 'theme_boost/bootstrap/popover';
+import $ from 'jquery';
 
 /** @property {object} Contains the list of selectors for this module. */
 const SELECTORS = {
-    FEEDBACK_TRIGGER: '.feedbacktrigger[data-bs-toggle="popover"]',
+    FEEDBACK_TRIGGER: '.feedbacktrigger[data-toggle="popover"]',
 };
 
 /** @property {boolean} Flag to indicate whether the feedback popovers have been already initialised. */
@@ -37,8 +37,7 @@ let feedbackInitialised = false;
  */
 const initPopovers = () => {
     if (!feedbackInitialised) {
-        const popoverTriggers = document.querySelectorAll(SELECTORS.FEEDBACK_TRIGGER);
-        [...popoverTriggers].map((trigger) => new Popover(trigger));
+        $(SELECTORS.FEEDBACK_TRIGGER).popover();
 
         document.addEventListener('click', (e) => {
             if (e.target.closest(SELECTORS.FEEDBACK_TRIGGER)) {

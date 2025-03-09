@@ -17,7 +17,9 @@ class RegexBasedMatcher implements MatcherAPIInterface
     }
 
     // Keep PHPStan happy (Unsafe usage of new static())
-    final public function __construct() {}
+    final public function __construct()
+    {
+    }
 
     /**
      * Returns whether the given national number (a string containing only decimal digits) matches

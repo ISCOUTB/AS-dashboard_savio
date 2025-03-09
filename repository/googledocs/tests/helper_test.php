@@ -29,7 +29,7 @@ require_once($CFG->dirroot . '/repository/googledocs/lib.php');
  * @copyright  2021 Mihail Geshoski <mihail@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class helper_test extends \repository_googledocs_testcase {
+class helper_test extends \repository_googledocs_testcase {
 
     /**
      * Test build_node_path().
@@ -50,7 +50,7 @@ final class helper_test extends \repository_googledocs_testcase {
      *
      * @return array
      */
-    public static function build_node_path_provider(): array {
+    public function build_node_path_provider(): array {
 
         $rootid = \repository_googledocs::REPOSITORY_ROOT_ID;
         $mydriveid = \repository_googledocs::MY_DRIVE_ROOT_ID;
@@ -105,7 +105,7 @@ final class helper_test extends \repository_googledocs_testcase {
      *
      * @return array
      */
-    public static function explode_node_path_provider(): array {
+    public function explode_node_path_provider(): array {
 
         $rootid = \repository_googledocs::REPOSITORY_ROOT_ID;
 
@@ -155,7 +155,7 @@ final class helper_test extends \repository_googledocs_testcase {
      *
      * @return array
      */
-    public static function get_browser_provider(): array {
+    public function get_browser_provider(): array {
 
         $rootid = \repository_googledocs::REPOSITORY_ROOT_ID;
         $mydriveid = \repository_googledocs::MY_DRIVE_ROOT_ID;
@@ -208,16 +208,17 @@ final class helper_test extends \repository_googledocs_testcase {
      *
      * @return array
      */
-    public static function get_node_provider(): array {
+    public function get_node_provider(): array {
+
         return [
             'The content object represents a Google Drive folder.' =>
                 [
-                    self::create_google_drive_folder_object('e3b0c44298fc1c149', 'Folder', ''),
+                    $this->create_google_drive_folder_object('e3b0c44298fc1c149', 'Folder', ''),
                     \repository_googledocs\local\node\folder_node::class,
                 ],
             'The content object represents a Google Drive file.' =>
                 [
-                    self::create_google_drive_file_object('de04d58dc5ccc', 'File.pdf',
+                    $this->create_google_drive_file_object('de04d58dc5ccc', 'File.pdf',
                         'application/pdf'),
                     \repository_googledocs\local\node\file_node::class,
                 ],
@@ -252,7 +253,7 @@ final class helper_test extends \repository_googledocs_testcase {
      *
      * @return array
      */
-    public static function request_exception_provider(): array {
+    public function request_exception_provider(): array {
 
         return [
             'The API call throws exception (status: 403; message: Access Not Configured).' =>

@@ -65,7 +65,7 @@
     {{#responsename}}
         <div class="ablock" id="{{ablockid}}">
             <div class="answer ordering">
-                <div aria-live="polite" class="visually-hidden" id="{{sortableid}}-announcement"></div>
+                <div aria-live="polite" class="sr-only" id="{{sortableid}}-announcement"></div>
                 <ul class="sortablelist {{layoutclass}} {{#numberingstyle}}numbering{{numberingstyle}}{{/numberingstyle}} {{#active}}active{{/active}}{{^active}}notactive{{/active}}" id="{{sortableid}}">
                     {{#answers}}
                         <li class="p-2 {{^readonly}}sortableitem{{/readonly}} {{scoreclass}}" id="{{id}}">
@@ -83,7 +83,7 @@
                                         {{#horizontallayout}}
                                             <button
                                                 type="button"
-                                                class="dir-rtl-hide btn btn-icon"
+                                                class="dir-rtl-hide btn btn-icon icon-no-margin"
                                                 data-action="move-backward"
                                                 aria-label="{{#cleanstr}}moveleft, qtype_ordering{{/cleanstr}}"
                                                 aria-describedby="{{id}}-text"
@@ -92,7 +92,7 @@
                                             </button>
                                             <button
                                                 type="button"
-                                                class="dir-rtl-hide btn btn-icon"
+                                                class="dir-rtl-hide btn btn-icon icon-no-margin"
                                                 data-action="move-forward"
                                                 aria-label="{{#cleanstr}}moveright, qtype_ordering{{/cleanstr}}"
                                                 aria-describedby="{{id}}-text"
@@ -101,7 +101,7 @@
                                             </button>
                                             <button
                                                 type="button"
-                                                class="dir-ltr-hide btn btn-icon"
+                                                class="dir-ltr-hide btn btn-icon icon-no-margin"
                                                 data-action="move-backward"
                                                 aria-label="{{#cleanstr}}moveright, qtype_ordering{{/cleanstr}}"
                                                 aria-describedby="{{id}}-text"
@@ -110,7 +110,7 @@
                                             </button>
                                             <button
                                                 type="button"
-                                                class="dir-ltr-hide btn btn-icon"
+                                                class="dir-ltr-hide btn btn-icon icon-no-margin"
                                                 data-action="move-forward"
                                                 aria-label="{{#cleanstr}}moveleft, qtype_ordering{{/cleanstr}}"
                                                 aria-describedby="{{id}}-text"
@@ -121,7 +121,7 @@
                                         {{^horizontallayout}}
                                             <button
                                                 type="button"
-                                                class="btn btn-icon"
+                                                class="btn btn-icon icon-no-margin"
                                                 data-action="move-backward"
                                                 aria-label="{{#cleanstr}}moveup{{/cleanstr}}"
                                                 aria-describedby="{{id}}-text"
@@ -130,7 +130,7 @@
                                             </button>
                                             <button
                                                 type="button"
-                                                class="btn btn-icon"
+                                                class="btn btn-icon icon-no-margin"
                                                 data-action="move-forward" aria-label="{{#cleanstr}}movedown{{/cleanstr}}"
                                                 aria-describedby="{{id}}-text"
                                             >

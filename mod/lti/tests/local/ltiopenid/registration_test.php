@@ -42,7 +42,7 @@ namespace mod_lti\local\ltiopenid;
  * @author     Claude Vervoort
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class registration_test extends \advanced_testcase {
+class registration_test extends \advanced_testcase {
 
     /**
      * @var string A has-it-all client registration.
@@ -407,7 +407,7 @@ EOD;
         $toolproxy['secret'] = 'peM7YDx420bo';
 
         $reghelper = $this->getMockBuilder(registration_helper::class)
-            ->onlyMethods(['get_tool_proxy'])
+            ->setMethods(['get_tool_proxy'])
             ->getMock();
         $map = [[$toolproxy['id'], $toolproxy]];
         $reghelper->method('get_tool_proxy')

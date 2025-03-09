@@ -1,5 +1,4 @@
 <?php
-
 /**
  * libphonenumber-for-php-lite data file
  * This file has been @generated from libphonenumber data
@@ -7,80 +6,109 @@
  * @internal
  */
 
-return [
-    'id' => '001',
-    'countryCode' => 878,
-    'generalDesc' => [
-        'pattern' => '10\\d{10}',
-        'posLength' => [
-            12,
-        ],
+return  [
+  'generalDesc' =>
+   [
+    'NationalNumberPattern' => '10\\d{10}',
+    'PossibleLength' =>
+     [
+      0 => 12,
     ],
-    'fixedLine' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'fixedLine' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'mobile' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'mobile' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'tollFree' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'tollFree' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'premiumRate' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'premiumRate' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'sharedCost' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'sharedCost' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'personalNumber' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'personalNumber' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'voip' => [
-        'pattern' => '10\\d{10}',
-        'example' => '101234567890',
+  ],
+  'voip' =>
+   [
+    'NationalNumberPattern' => '10\\d{10}',
+    'ExampleNumber' => '101234567890',
+  ],
+  'pager' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'pager' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'uan' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'uan' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'voicemail' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'voicemail' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'noInternationalDialling' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'noInternationalDialling' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'id' => '001',
+  'countryCode' => 878,
+  'internationalPrefix' => '',
+  'sameMobileAndFixedLinePattern' => true,
+  'numberFormat' =>
+   [
+    0 =>
+     [
+      'pattern' => '(\\d{2})(\\d{5})(\\d{5})',
+      'format' => '$1 $2 $3',
+      'leadingDigitsPatterns' =>
+       [
+        0 => '1',
+      ],
+      'nationalPrefixFormattingRule' => '',
+      'domesticCarrierCodeFormattingRule' => '',
+      'nationalPrefixOptionalWhenFormatting' => false,
     ],
-    'internationalPrefix' => '',
-    'sameMobileAndFixedLinePattern' => true,
-    'numberFormat' => [
-        [
-            'pattern' => '(\\d{2})(\\d{5})(\\d{5})',
-            'format' => '$1 $2 $3',
-            'leadingDigitsPatterns' => [
-                '1',
-            ],
-            'nationalPrefixFormattingRule' => '',
-            'domesticCarrierCodeFormattingRule' => '',
-        ],
-    ],
+  ],
+  'mainCountryForCode' => false,
+  'mobileNumberPortableRegion' => false,
 ];

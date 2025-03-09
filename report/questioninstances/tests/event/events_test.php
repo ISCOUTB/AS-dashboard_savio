@@ -31,7 +31,7 @@ namespace report_questioninstances\event;
  * @copyright  2014 Petr Skoda
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
-final class events_test extends \advanced_testcase {
+class events_test extends \advanced_testcase {
 
     /**
      * Setup testcase.

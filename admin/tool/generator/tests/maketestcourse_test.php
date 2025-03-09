@@ -26,7 +26,7 @@ use tool_generator_course_backend;
  * @copyright 2013 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class maketestcourse_test extends \advanced_testcase {
+class maketestcourse_test extends \advanced_testcase {
     /**
      * Creates a small test course and checks all the components have been put in place.
      */
@@ -158,7 +158,7 @@ final class maketestcourse_test extends \advanced_testcase {
 
         // Users that started discussions are the same.
         $forums = $modinfo->get_instances_of('forum');
-        $discussions = forum_get_discussions(reset($forums), 'd.timemodified ASC, d.id ASC');
+        $discussions = forum_get_discussions(reset($forums), 'd.timemodified ASC');
         $lastusernumber = 0;
         $discussionstarters = array();
         foreach ($discussions as $discussion) {

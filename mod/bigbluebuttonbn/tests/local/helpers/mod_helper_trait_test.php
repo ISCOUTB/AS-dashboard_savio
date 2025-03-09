@@ -38,7 +38,7 @@ use mod_bigbluebuttonbn\test\testcase_helper_trait;
  * @covers \mod_bigbluebuttonbn\local\helpers\mod_helper
  * @coversDefaultClass \mod_bigbluebuttonbn\local\helpers\mod_helper
  */
-final class mod_helper_trait_test extends \advanced_testcase {
+class mod_helper_trait_test extends \advanced_testcase {
     use testcase_helper_trait;
 
     /**

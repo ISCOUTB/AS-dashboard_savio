@@ -85,9 +85,9 @@ if ($options['replace']) {
     $results = $urlfinder->http_link_stats();
     asort($results);
     $fp = fopen('php://stdout', 'w');
-    fputcsv($fp, ['clientsite', 'httpdomain', 'urlcount'], escape: '\\');
+    fputcsv($fp, ['clientsite', 'httpdomain', 'urlcount']);
     foreach ($results as $domain => $count) {
-        fputcsv($fp, [$SITE->shortname, $domain, $count], escape: '\\');
+        fputcsv($fp, [$SITE->shortname, $domain, $count]);
     }
     fclose($fp);
 }

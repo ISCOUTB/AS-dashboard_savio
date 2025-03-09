@@ -33,7 +33,7 @@ require_once($CFG->dirroot . '/backup/moodle2/backup_plan_builder.class.php');
  * @copyright 2017 Dmitrii Metelkin (dmitriim@catalyst-au.net)
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class backup_xml_transformer_test extends \advanced_testcase {
+class backup_xml_transformer_test extends \advanced_testcase {
 
     /**
      * Initial set up.
@@ -49,7 +49,7 @@ final class backup_xml_transformer_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function filephp_links_replace_data_provider(): array {
+    public function filephp_links_replace_data_provider() {
         return array(
             array('http://test.test/', 'http://test.test/'),
             array('http://test.test/file.php/1', 'http://test.test/file.php/1'),

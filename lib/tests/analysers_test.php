@@ -33,7 +33,7 @@ require_once(__DIR__ . '/../../lib/enrollib.php');
  * @copyright 2017 David Monllaó {@link http://www.davidmonllao.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class analysers_test extends \advanced_testcase {
+class analysers_test extends \advanced_testcase {
 
     /**
      * test_courses_analyser

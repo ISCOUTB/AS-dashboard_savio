@@ -16,7 +16,7 @@
 
 namespace aiprovider_openai;
 
-use aiprovider_openai\test\testcase_helper_trait;
+use aiprovider_openai\process_generate_text;
 use core_ai\aiactions\base;
 use core_ai\provider;
 use GuzzleHttp\Psr7\Response;
@@ -32,14 +32,8 @@ use GuzzleHttp\Psr7\Response;
  * @covers     \aiprovider_openai\abstract_processor
  */
 final class process_generate_text_test extends \advanced_testcase {
-
-    use testcase_helper_trait;
-
     /** @var string A successful response in JSON format. */
     protected string $responsebodyjson;
-
-    /** @var \core_ai\manager */
-    private $manager;
 
     /** @var provider The provider that will process the action. */
     protected provider $provider;
@@ -52,17 +46,17 @@ final class process_generate_text_test extends \advanced_testcase {
      */
     protected function setUp(): void {
         parent::setUp();
-        $this->resetAfterTest();
         // Load a response body from a file.
         $this->responsebodyjson = file_get_contents(self::get_fixture_path('aiprovider_openai', 'text_request_success.json'));
-        $this->manager = \core\di::get(\core_ai\manager::class);
-        $this->provider = $this->create_provider(
-            actionclass: \core_ai\aiactions\generate_text::class,
-            actionconfig: [
-                'systeminstruction' => get_string('action_generate_text_instruction', 'core_ai'),
-            ],
-        );
+        $this->create_provider();
         $this->create_action();
+    }
+
+    /**
+     * Create the provider object.
+     */
+    private function create_provider(): void {
+        $this->provider = new \aiprovider_openai\provider();
     }
 
     /**
@@ -91,51 +85,6 @@ final class process_generate_text_test extends \advanced_testcase {
 
         $this->assertEquals('This is a test prompt', $body->messages[1]->content);
         $this->assertEquals('user', $body->messages[1]->role);
-    }
-
-    /**
-     * Test create_request_object with extra model settings.
-     */
-    public function test_create_request_object_with_model_settings(): void {
-        $this->provider = $this->create_provider(
-            actionclass: \core_ai\aiactions\generate_text::class,
-            actionconfig: [
-                'systeminstruction' => get_string('action_generate_text_instruction', 'core_ai'),
-                'temperature' => '0.5',
-                'max_tokens' => '100',
-            ],
-        );
-        $processor = new process_generate_text($this->provider, $this->action);
-
-        // We're working with a private method here, so we need to use reflection.
-        $method = new \ReflectionMethod($processor, 'create_request_object');
-        $request = $method->invoke($processor, 1);
-
-        $body = (object) json_decode($request->getBody()->getContents());
-
-        $this->assertEquals('gpt-4o', $body->model);
-        $this->assertEquals('0.5', $body->temperature);
-        $this->assertEquals('100', $body->max_tokens);
-
-        $this->provider = $this->create_provider(
-            actionclass: \core_ai\aiactions\generate_text::class,
-            actionconfig: [
-                'model' => 'my-custom-gpt',
-                'systeminstruction' => get_string('action_generate_text_instruction', 'core_ai'),
-                'modelextraparams' => '{"temperature": 0.5,"max_tokens": 100}',
-            ],
-        );
-        $processor = new process_generate_text($this->provider, $this->action);
-
-        // We're working with a private method here, so we need to use reflection.
-        $method = new \ReflectionMethod($processor, 'create_request_object');
-        $request = $method->invoke($processor, 1);
-
-        $body = (object) json_decode($request->getBody()->getContents());
-
-        $this->assertEquals('my-custom-gpt', $body->model);
-        $this->assertEquals('0.5', $body->temperature);
-        $this->assertEquals('100', $body->max_tokens);
     }
 
     /**
@@ -201,7 +150,7 @@ final class process_generate_text_test extends \advanced_testcase {
         $this->assertEquals('stop', $result['finishreason']);
         $this->assertEquals('11', $result['prompttokens']);
         $this->assertEquals('568', $result['completiontokens']);
-        $this->assertEquals('gpt-4o-2024-05-13', $result['model']);
+
     }
 
     /**
@@ -229,7 +178,6 @@ final class process_generate_text_test extends \advanced_testcase {
         $this->assertEquals('stop', $result['finishreason']);
         $this->assertEquals('11', $result['prompttokens']);
         $this->assertEquals('568', $result['completiontokens']);
-        $this->assertEquals('gpt-4o-2024-05-13', $result['model']);
     }
 
     /**
@@ -249,7 +197,6 @@ final class process_generate_text_test extends \advanced_testcase {
             'finishreason' => 'stop',
             'prompttokens' => '11',
             'completiontokens' => '568',
-            'model' => 'gpt-4o',
         ];
 
         $result = $method->invoke($processor, $response);
@@ -259,7 +206,6 @@ final class process_generate_text_test extends \advanced_testcase {
         $this->assertEquals('generate_text', $result->get_actionname());
         $this->assertEquals($response['success'], $result->get_success());
         $this->assertEquals($response['generatedcontent'], $result->get_response_data()['generatedcontent']);
-        $this->assertEquals($response['model'], $result->get_response_data()['model']);
     }
 
     /**
@@ -290,6 +236,7 @@ final class process_generate_text_test extends \advanced_testcase {
      * Test process method.
      */
     public function test_process(): void {
+        $this->resetAfterTest();
         // Log in user.
         $this->setUser($this->getDataGenerator()->create_user());
 
@@ -315,6 +262,7 @@ final class process_generate_text_test extends \advanced_testcase {
      * Test process method with error.
      */
     public function test_process_error(): void {
+        $this->resetAfterTest();
         // Log in user.
         $this->setUser($this->getDataGenerator()->create_user());
 
@@ -342,6 +290,7 @@ final class process_generate_text_test extends \advanced_testcase {
      * Test process method with user rate limiter.
      */
     public function test_process_with_user_rate_limiter(): void {
+        $this->resetAfterTest();
         // Create users.
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
@@ -351,30 +300,14 @@ final class process_generate_text_test extends \advanced_testcase {
         $clock = $this->mock_clock_with_frozen();
 
         // Set the user rate limiter.
-        $config = [
-            'apikey' => '123',
-            'enableuserratelimit' => true,
-            'userratelimit' => 1,
-        ];
-        $provider = $this->manager->create_provider_instance(
-            classname: '\aiprovider_openai\provider',
-            name: 'dummy',
-            config: $config,
-            actionconfig: [
-                \core_ai\aiactions\generate_text::class => [
-                    'settings' => [
-                        'model' => 'gpt-4o',
-                        'endpoint' => "https://api.openai.com/v1/chat/completions",
-                        'systeminstruction' => get_string('action_generate_text_instruction', 'core_ai'),
-                    ],
-                ],
-            ],
-        );
+        set_config('enableuserratelimit', 1, 'aiprovider_openai');
+        set_config('userratelimit', 1, 'aiprovider_openai');
 
         // Mock the http client to return a successful response.
         ['mock' => $mock] = $this->get_mocked_http_client();
 
         // Case 1: User rate limit has not been reached.
+        $this->create_provider();
         $this->create_action($user1->id);
         // The response from OpenAI.
         $mock->append(new Response(
@@ -394,8 +327,9 @@ final class process_generate_text_test extends \advanced_testcase {
             ['Content-Type' => 'application/json'],
             $this->responsebodyjson,
         ));
+        $this->create_provider();
         $this->create_action($user1->id);
-        $processor = new process_generate_text($provider, $this->action);
+        $processor = new process_generate_text($this->provider, $this->action);
         $result = $processor->process();
         $this->assertEquals(429, $result->get_errorcode());
         $this->assertEquals('User rate limit exceeded', $result->get_errormessage());
@@ -404,6 +338,7 @@ final class process_generate_text_test extends \advanced_testcase {
         // Case 3: User rate limit has not been reached for a different user.
         // Log in user2.
         $this->setUser($user2);
+        $this->create_provider();
         $this->create_action($user2->id);
         // The response from OpenAI.
         $mock->append(new Response(
@@ -411,7 +346,7 @@ final class process_generate_text_test extends \advanced_testcase {
             ['Content-Type' => 'application/json'],
             $this->responsebodyjson,
         ));
-        $processor = new process_generate_text($provider, $this->action);
+        $processor = new process_generate_text($this->provider, $this->action);
         $result = $processor->process();
         $this->assertTrue($result->get_success());
 
@@ -425,9 +360,9 @@ final class process_generate_text_test extends \advanced_testcase {
             ['Content-Type' => 'application/json'],
             $this->responsebodyjson,
         ));
-        $this->provider = $this->create_provider(\core_ai\aiactions\generate_text::class);
+        $this->create_provider();
         $this->create_action($user1->id);
-        $processor = new process_generate_text($provider, $this->action);
+        $processor = new process_generate_text($this->provider, $this->action);
         $result = $processor->process();
         $this->assertTrue($result->get_success());
     }
@@ -436,6 +371,7 @@ final class process_generate_text_test extends \advanced_testcase {
      * Test process method with global rate limiter.
      */
     public function test_process_with_global_rate_limiter(): void {
+        $this->resetAfterTest();
         // Create users.
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
@@ -445,30 +381,14 @@ final class process_generate_text_test extends \advanced_testcase {
         $clock = $this->mock_clock_with_frozen();
 
         // Set the global rate limiter.
-        $config = [
-            'apikey' => '123',
-            'enableglobalratelimit' => true,
-            'globalratelimit' => 1,
-        ];
-        $provider = $this->manager->create_provider_instance(
-            classname: '\aiprovider_openai\provider',
-            name: 'dummy',
-            config: $config,
-            actionconfig: [
-                \core_ai\aiactions\generate_text::class => [
-                    'settings' => [
-                        'model' => 'gpt-4o',
-                        'endpoint' => "https://api.openai.com/v1/chat/completions",
-                        'systeminstruction' => get_string('action_generate_text_instruction', 'core_ai'),
-                    ],
-                ],
-            ],
-        );
+        set_config('enableglobalratelimit', 1, 'aiprovider_openai');
+        set_config('globalratelimit', 1, 'aiprovider_openai');
 
         // Mock the http client to return a successful response.
         ['mock' => $mock] = $this->get_mocked_http_client();
 
         // Case 1: Global rate limit has not been reached.
+        $this->create_provider();
         $this->create_action($user1->id);
         // The response from OpenAI.
         $mock->append(new Response(
@@ -476,7 +396,7 @@ final class process_generate_text_test extends \advanced_testcase {
             ['Content-Type' => 'application/json'],
             $this->responsebodyjson,
         ));
-        $processor = new process_generate_text($provider, $this->action);
+        $processor = new process_generate_text($this->provider, $this->action);
         $result = $processor->process();
         $this->assertTrue($result->get_success());
 
@@ -488,8 +408,9 @@ final class process_generate_text_test extends \advanced_testcase {
             ['Content-Type' => 'application/json'],
             $this->responsebodyjson,
         ));
+        $this->create_provider();
         $this->create_action($user1->id);
-        $processor = new process_generate_text($provider, $this->action);
+        $processor = new process_generate_text($this->provider, $this->action);
         $result = $processor->process();
         $this->assertEquals(429, $result->get_errorcode());
         $this->assertEquals('Global rate limit exceeded', $result->get_errormessage());
@@ -498,6 +419,7 @@ final class process_generate_text_test extends \advanced_testcase {
         // Case 3: Global rate limit has been reached for a different user too.
         // Log in user2.
         $this->setUser($user2);
+        $this->create_provider();
         $this->create_action($user2->id);
         // The response from OpenAI.
         $mock->append(new Response(
@@ -505,7 +427,7 @@ final class process_generate_text_test extends \advanced_testcase {
             ['Content-Type' => 'application/json'],
             $this->responsebodyjson,
         ));
-        $processor = new process_generate_text($provider, $this->action);
+        $processor = new process_generate_text($this->provider, $this->action);
         $result = $processor->process();
         $this->assertFalse($result->get_success());
 
@@ -519,9 +441,9 @@ final class process_generate_text_test extends \advanced_testcase {
             ['Content-Type' => 'application/json'],
             $this->responsebodyjson,
         ));
-        $this->provider = $this->create_provider(\core_ai\aiactions\generate_text::class);
+        $this->create_provider();
         $this->create_action($user1->id);
-        $processor = new process_generate_text($provider, $this->action);
+        $processor = new process_generate_text($this->provider, $this->action);
         $result = $processor->process();
         $this->assertTrue($result->get_success());
     }

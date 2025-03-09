@@ -345,11 +345,10 @@ class HandlerManager {
         let hasDefault = false;
         fileHandlers.forEach((handler, index) => {
             const isDefault = (defaultModule == handler.module);
-            const optionNumber = index + 1;
             data.handlers.push({
                 ...handler,
                 selected: isDefault,
-                labelid: `fileuploader_${data.uploadid}_${optionNumber}`,
+                labelid: `fileuploader_${data.uploadid}`,
                 value: index,
             });
             hasDefault = hasDefault || isDefault;

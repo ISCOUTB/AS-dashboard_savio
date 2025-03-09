@@ -4,24 +4,24 @@
     color: $table-color;
     background-color: $table-bg; // Reset for nesting within parents with `background-color`.
 
-    $table-cell-padding: .75rem !default;
-    $table-cell-padding-sm: .3rem !default;
-
     th,
     td {
         padding: $table-cell-padding;
         vertical-align: top;
         border-top: $table-border-width solid $table-border-color;
+        .form-check {
+            padding: 0;
+        }
     }
 
     thead th,
     thead td {
         vertical-align: bottom;
-        border-bottom: calc(2 * #{$table-border-width}) solid $table-border-color;
+        border-bottom: (2 * $table-border-width) solid $table-border-color;
     }
 
     tbody + tbody {
-        border-top: calc(2 * #{$table-border-width}) solid $table-border-color;
+        border-top: (2 * $table-border-width) solid $table-border-color;
     }
 
     tbody tr:nth-of-type(#{$table-striped-order}) {
@@ -53,11 +53,6 @@
                 background-color: $table-hover-bg;
             }
         }
-    }
-    // Allow table cells to inherit text color and background color from table rows.
-    tbody td {
-        color: inherit;
-        background-color: inherit;
     }
 }
 

@@ -203,11 +203,10 @@ class user extends base {
         ))
             ->add_joins($this->get_joins())
             ->add_fields($fullnameselect)
-            ->set_is_sortable(true, $fullnamesort)
-            ->add_callback(static function($value, stdClass $row) use ($viewfullnames): string {
-
-                // Ensure we have at least one field present.
-                if (count(array_filter((array) $row, fn($field) => $field !== null)) === 0) {
+            ->set_type(column::TYPE_TEXT)
+            ->set_is_sortable($this->is_sortable('fullname'), $fullnamesort)
+            ->add_callback(static function(?string $value, stdClass $row) use ($viewfullnames): string {
+                if ($value === null) {
                     return '';
                 }
 
@@ -235,12 +234,12 @@ class user extends base {
                 ->add_joins($this->get_joins())
                 ->add_fields($fullnameselect)
                 ->add_field("{$usertablealias}.id")
-                ->set_is_sortable(true, $fullnamesort)
-                ->add_callback(static function($value, stdClass $row) use ($fullnamefield, $viewfullnames): string {
+                ->set_type(column::TYPE_TEXT)
+                ->set_is_sortable($this->is_sortable($fullnamefield), $fullnamesort)
+                ->add_callback(static function(?string $value, stdClass $row) use ($fullnamefield, $viewfullnames): string {
                     global $OUTPUT;
 
-                    // Ensure we have at least one field present.
-                    if (count(array_filter((array) $row, fn($field) => $field !== null)) === 0) {
+                    if ($value === null) {
                         return '';
                     }
 
@@ -264,7 +263,7 @@ class user extends base {
                             fullname($row, $viewfullnames));
                     }
 
-                    return (string) $value;
+                    return $value;
                 });
 
             // Picture fields need some more data.
@@ -278,11 +277,12 @@ class user extends base {
         // Picture column.
         $columns[] = (new column(
             'picture',
-            new lang_string('picture'),
+            new lang_string('userpicture', 'core_reportbuilder'),
             $this->get_entity_name()
         ))
             ->add_joins($this->get_joins())
             ->add_fields($userpictureselect)
+            ->set_is_sortable($this->is_sortable('picture'))
             ->add_callback(static function($value, stdClass $row): string {
                 global $OUTPUT;
 
@@ -294,6 +294,11 @@ class user extends base {
         foreach ($userfields as $userfield => $userfieldlang) {
             $columntype = $this->get_user_field_type($userfield);
 
+            $columnfieldsql = "{$usertablealias}.{$userfield}";
+            if ($columntype === column::TYPE_LONGTEXT && $DB->get_dbfamily() === 'oracle') {
+                $columnfieldsql = $DB->sql_order_by_text($columnfieldsql, 1024);
+            }
+
             $column = (new column(
                 $userfield,
                 $userfieldlang,
@@ -301,8 +306,8 @@ class user extends base {
             ))
                 ->add_joins($this->get_joins())
                 ->set_type($columntype)
-                ->add_field("{$usertablealias}.{$userfield}")
-                ->set_is_sortable(true)
+                ->add_field($columnfieldsql, $userfield)
+                ->set_is_sortable($this->is_sortable($userfield))
                 ->add_callback([$this, 'format'], $userfield);
 
             // Join on the context table so that we can use it for formatting these columns later.
@@ -319,6 +324,22 @@ class user extends base {
         }
 
         return $columns;
+    }
+
+    /**
+     * Check if this field is sortable
+     *
+     * @param string $fieldname
+     * @return bool
+     */
+    protected function is_sortable(string $fieldname): bool {
+        // Some columns can't be sorted, like longtext or images.
+        $nonsortable = [
+            'description',
+            'picture',
+        ];
+
+        return !in_array($fieldname, $nonsortable);
     }
 
     /**
@@ -342,7 +363,7 @@ class user extends base {
 
         // If the column has corresponding filter, determine the value from its options.
         $options = $this->get_options_for($fieldname);
-        if ($options !== null && $value !== null && array_key_exists($value, $options)) {
+        if ($options !== null && array_key_exists($value, $options)) {
             return $options[$value];
         }
 
@@ -466,6 +487,9 @@ class user extends base {
      * @return filter[]
      */
     protected function get_all_filters(): array {
+        global $DB;
+
+        $filters = [];
         $tablealias = $this->get_table_alias('user');
 
         // Fullname filter.
@@ -481,19 +505,14 @@ class user extends base {
         ))
             ->add_joins($this->get_joins());
 
-        // Picture filter.
-        $filters[] = (new filter(
-            boolean_select::class,
-            'picture',
-            new lang_string('picture'),
-            $this->get_entity_name(),
-            "CASE WHEN {$tablealias}.picture > 0 THEN 1 ELSE 0 END",
-        ))
-            ->add_joins($this->get_joins());
-
         // User fields filters.
         $fields = $this->get_user_fields();
         foreach ($fields as $field => $name) {
+            $filterfieldsql = "{$tablealias}.{$field}";
+            if ($this->get_user_field_type($field) === column::TYPE_LONGTEXT) {
+                $filterfieldsql = $DB->sql_cast_to_char($filterfieldsql);
+            }
+
             $optionscallback = [static::class, 'get_options_for_' . $field];
             if (is_callable($optionscallback)) {
                 $classname = select::class;
@@ -510,7 +529,7 @@ class user extends base {
                 $field,
                 $name,
                 $this->get_entity_name(),
-                "{$tablealias}.{$field}"
+                $filterfieldsql
             ))
                 ->add_joins($this->get_joins());
 

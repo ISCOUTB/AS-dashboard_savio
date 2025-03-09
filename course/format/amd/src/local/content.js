@@ -23,8 +23,7 @@
  */
 
 import {BaseComponent} from 'core/reactive';
-import Collapse from 'theme_boost/bootstrap/collapse';
-import {throttle, debounce} from 'core/utils';
+import {debounce} from 'core/utils';
 import {getCurrentCourseEditor} from 'core_courseformat/courseeditor';
 import Config from 'core/config';
 import inplaceeditable from 'core/inplace_editable';
@@ -34,8 +33,9 @@ import Fragment from 'core/fragment';
 import Templates from 'core/templates';
 import DispatchActions from 'core_courseformat/local/content/actions';
 import * as CourseEvents from 'core_course/events';
+// The jQuery module is only used for interacting with Boostrap 4. It can we removed when MDL-71979 is integrated.
+import jQuery from 'jquery';
 import Pending from 'core/pending';
-import log from "core/log";
 
 export default class Component extends BaseComponent {
 
@@ -55,7 +55,7 @@ export default class Component extends BaseComponent {
             COURSE_SECTIONLIST: `[data-for='course_sectionlist']`,
             CM: `[data-for='cmitem']`,
             TOGGLER: `[data-action="togglecoursecontentsection"]`,
-            COLLAPSE: `[data-bs-toggle="collapse"]`,
+            COLLAPSE: `[data-toggle="collapse"]`,
             TOGGLEALL: `[data-toggle="toggleall"]`,
             // Formats can override the activity tag but a default one is needed to create new elements.
             ACTIVITYTAG: 'li',
@@ -93,14 +93,8 @@ export default class Component extends BaseComponent {
      * @return {Component}
      */
     static init(target, selectors, sectionReturn) {
-        let element = document.querySelector(target);
-        // TODO Remove this if condition as part of MDL-83851.
-        if (!element) {
-            log.debug('Init component with id is deprecated, use a query selector instead.');
-            element = document.getElementById(target);
-        }
         return new Component({
-            element,
+            element: document.getElementById(target),
             reactive: getCurrentCourseEditor(),
             selectors,
             sectionReturn,
@@ -157,7 +151,7 @@ export default class Component extends BaseComponent {
         this.addEventListener(
             document,
             "scroll",
-            throttle(this._scrollHandler.bind(this), 50)
+            this._scrollHandler
         );
     }
 
@@ -180,11 +174,7 @@ export default class Component extends BaseComponent {
 
             const section = event.target.closest(this.selectors.SECTION);
             const toggler = section.querySelector(this.selectors.COLLAPSE);
-            let isCollapsed = toggler?.classList.contains(this.classes.COLLAPSED) ?? false;
-            // If the click was on the chevron, Bootstrap already toggled the section before this event.
-            if (isChevron) {
-                isCollapsed = !isCollapsed;
-            }
+            const isCollapsed = toggler?.classList.contains(this.classes.COLLAPSED) ?? false;
 
             const sectionId = section.getAttribute('data-id');
             this.reactive.dispatch(
@@ -273,9 +263,9 @@ export default class Component extends BaseComponent {
     }
 
     /**
-     * Update section collapsed state via bootstrap if necessary.
+     * Update section collapsed state via bootstrap 4 if necessary.
      *
-     * Formats that do not use bootstrap must override this method in order to keep the section
+     * Formats that do not use bootstrap 4 must override this method in order to keep the section
      * toggling working.
      *
      * @param {object} args
@@ -301,11 +291,11 @@ export default class Component extends BaseComponent {
             if (!collapsible) {
                 return;
             }
-            if (element.contentcollapsed) {
-                Collapse.getOrCreateInstance(collapsible, {toggle: false}).hide();
-            } else {
-                Collapse.getOrCreateInstance(collapsible, {toggle: false}).show();
-            }
+
+            // Course index is based on Bootstrap 4 collapsibles. To collapse them we need jQuery to
+            // interact with collapsibles methods. Hopefully, this will change in Bootstrap 5 because
+            // it does not require jQuery anymore (when MDL-71979 is integrated).
+            jQuery(collapsible).collapse(element.contentcollapsed ? 'hide' : 'show');
         }
 
         this._refreshAllSectionsToggler(state);

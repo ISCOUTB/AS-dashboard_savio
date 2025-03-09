@@ -886,7 +886,6 @@ class user {
      */
     public static function reset_caches() {
         self::$propertiescache = null;
-        self::$preferencescache = null;
     }
 
     /**

@@ -25,7 +25,7 @@ require_once(__DIR__ . '/fixtures/testable_antivirus.php');
  * @copyright  2016 Ruslan Kabalin, Lancaster University.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class antivirus_test extends advanced_testcase {
+class antivirus_test extends advanced_testcase {
 
     /**
      * @var string Path to the tempfile created for use with AV scanner tests

@@ -14,7 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * A check result class
+ *
+ * @package    core
+ * @category   check
+ * @copyright  2020 Brendan Heywood <brendan@catalyst-au.net>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 namespace core\check;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * A check object returns a result object
@@ -23,8 +33,6 @@ namespace core\check;
  * 'details' which is computationally expensive then extend this and overide
  * the get_details() method so that it is only called when it will be needed.
  *
- * @package    core
- * @category   check
  * @copyright  2020 Brendan Heywood <brendan@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -100,6 +108,20 @@ class result implements \renderable {
      * different states and actions to address them.
      */
     protected $details = '';
+
+    /**
+     * Get the check reference label
+     *
+     * @return string must be globally unique
+     */
+    public function get_ref(): string {
+        $ref = $this->get_component();
+        if (!empty($ref)) {
+            $ref .= '_';
+        }
+        $ref .= $this->get_id();
+        return $ref;
+    }
 
     /**
      * Constructor

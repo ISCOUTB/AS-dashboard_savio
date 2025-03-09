@@ -23,7 +23,7 @@ namespace core_competency;
  * @copyright  2015 Frédéric Massart - FMCorz.net
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class plan_test extends \advanced_testcase {
+class plan_test extends \advanced_testcase {
 
     public function test_can_manage_user(): void {
         $this->resetAfterTest(true);

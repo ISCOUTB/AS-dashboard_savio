@@ -24,7 +24,7 @@ namespace core\hub;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers \core\hub\registration
  */
-final class registration_test extends \advanced_testcase {
+class registration_test extends \advanced_testcase {
 
     /**
      * Test getting site registration information.
@@ -94,9 +94,6 @@ final class registration_test extends \advanced_testcase {
         $this->resetAfterTest();
         $clock = $this->mock_clock_with_frozen();
 
-        $gpt4omodel = 'gpt-4o';
-        $dalle3model = 'dall-e-3';
-
         // Record some generated text.
         $record = new \stdClass();
         $record->provider = 'openai';
@@ -107,17 +104,15 @@ final class registration_test extends \advanced_testcase {
         $record->success = true;
         $record->timecreated = $clock->time() - 5;
         $record->timecompleted = $clock->time();
-        $record->model = $gpt4omodel;
         $DB->insert_record('ai_action_register', $record);
 
         // Record a generated image.
         $record->actionname = 'generate_image';
-        $record->actionid = 111;
+        $record->actionid = 2;
         $record->timecreated = $clock->time() - 20;
-        $record->model = $dalle3model;
         $DB->insert_record('ai_action_register', $record);
         // Record another image.
-        $record->actionid = 222;
+        $record->actionid = 3;
         $record->timecreated = $clock->time() - 10;
         $DB->insert_record('ai_action_register', $record);
 
@@ -126,7 +121,6 @@ final class registration_test extends \advanced_testcase {
         $record->actionid = 4;
         $record->success = false;
         $record->errorcode = 403;
-        $record->model = null;
         $DB->insert_record('ai_action_register', $record);
         $record->actionid = 5;
         $record->errorcode = 403;
@@ -149,9 +143,5 @@ final class registration_test extends \advanced_testcase {
         // Check time range is set correctly.
         $this->assertEquals($clock->time() - WEEKSECS, $aisuage->time_range->timefrom);
         $this->assertEquals($clock->time(), $aisuage->time_range->timeto);
-        // Check model counts.
-        $this->assertEquals(1, $aisuage->openai->generate_text->models->{$gpt4omodel}->count);
-        $this->assertEquals(2, $aisuage->openai->generate_image->models->{$dalle3model}->count);
-        $this->assertEquals(3, $aisuage->openai->generate_image->models->unknown->count);
     }
 }

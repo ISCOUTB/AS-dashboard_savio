@@ -29,7 +29,7 @@ use mod_data\local\importer\preset_existing_importer;
 use mod_data\manager;
 use mod_data\preset;
 
-final class events_test extends \advanced_testcase {
+class events_test extends \advanced_testcase {
 
     /**
      * Test set up.
@@ -342,7 +342,7 @@ final class events_test extends \advanced_testcase {
      *
      * @return array[]
      */
-    public static function preset_importer_provider(): array {
+    public function preset_importer_provider(): array {
         // Image gallery preset is: ['title' => 'text', 'description' => 'textarea', 'image' => 'picture'];
 
         $titlefield = new \stdClass();

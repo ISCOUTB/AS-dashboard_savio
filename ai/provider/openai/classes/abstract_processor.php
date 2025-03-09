@@ -17,9 +17,9 @@
 namespace aiprovider_openai;
 
 use core\http_client;
+use core_ai\aiactions\responses\response_base;
 use core_ai\process_base;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -38,44 +38,14 @@ abstract class abstract_processor extends process_base {
      *
      * @return UriInterface
      */
-    protected function get_endpoint(): UriInterface {
-        return new Uri($this->provider->actionconfig[$this->action::class]['settings']['endpoint']);
-    }
+    abstract protected function get_endpoint(): UriInterface;
 
     /**
      * Get the name of the model to use.
      *
      * @return string
      */
-    protected function get_model(): string {
-        return $this->provider->actionconfig[$this->action::class]['settings']['model'];
-    }
-
-    /**
-     * Get the model settings.
-     *
-     * @return array
-     */
-    protected function get_model_settings(): array {
-        $settings = $this->provider->actionconfig[$this->action::class]['settings'];
-        if (!empty($settings['modelextraparams'])) {
-            // Custom model settings.
-            $params = json_decode($settings['modelextraparams'], true);
-            foreach ($params as $key => $param) {
-                $settings[$key] = $param;
-            }
-        }
-
-        // Unset unnecessary settings.
-        unset(
-            $settings['model'],
-            $settings['endpoint'],
-            $settings['systeminstruction'],
-            $settings['providerid'],
-            $settings['modelextraparams'],
-        );
-        return $settings;
-    }
+    abstract protected function get_model(): string;
 
     /**
      * Get the system instructions.

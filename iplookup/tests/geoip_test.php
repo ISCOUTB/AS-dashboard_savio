@@ -16,6 +16,14 @@
 
 namespace core;
 
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+
+require_once("{$CFG->libdir}/filelib.php");
+require_once("{$CFG->dirroot}/iplookup/lib.php");
+
+
 /**
  * GeoIp data file parsing test.
  *
@@ -24,21 +32,16 @@ namespace core;
  * @copyright  2012 Petr Skoda {@link http://skodak.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class geoip_test extends \advanced_testcase {
-    #[\Override]
-    public static function setUpBeforeClass(): void {
-        global $CFG;
-
-        parent::setUpBeforeClass();
-
-        require_once("{$CFG->libdir}/filelib.php");
-        require_once("{$CFG->dirroot}/iplookup/lib.php");
+class geoip_test extends \advanced_testcase {
+    public function setUp(): void {
+        parent::setUp();
+        $this->resetAfterTest();
     }
 
     /**
      * Setup the GeoIP2File system.
      */
-    public function setup_geoip2file(): void {
+    public function setup_geoip2file() {
         global $CFG;
         $CFG->geoip2file = "$CFG->dirroot/iplookup/tests/fixtures/GeoIP2-City-Test.mmdb";
     }
@@ -50,8 +53,6 @@ final class geoip_test extends \advanced_testcase {
      * @param   string  $ip The IP to test
      */
     public function test_ip($ip): void {
-        $this->resetAfterTest();
-
         $this->setup_geoip2file();
 
         // Note: The results we get from the iplookup tests are beyond our control.
@@ -76,7 +77,7 @@ final class geoip_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function ip_provider(): array {
+    public function ip_provider() {
         return [
             'IPv4: IPV4 test' => ['81.2.69.142'],
             'IPv6: IPV6 test' => ['2001:252:1::1:1:1'],

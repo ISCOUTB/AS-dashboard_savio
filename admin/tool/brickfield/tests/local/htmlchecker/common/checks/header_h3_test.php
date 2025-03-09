@@ -31,7 +31,7 @@ require_once('all_checks.php');
 /**
  * Class header_h3_testcase
  */
-final class header_h3_test extends all_checks {
+class header_h3_test extends all_checks {
     /** @var string Check type */
     protected $checktype = 'header_h3';
 

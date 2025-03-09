@@ -623,6 +623,12 @@ class completion_info {
             return;
         }
 
+        // The activity completion alters the course state cache for this particular user.
+        $course = get_course($cm->course);
+        if ($course) {
+            course_format::session_cache_reset($course);
+        }
+
         // For auto tracking, if the status is overridden to 'COMPLETION_COMPLETE', then disallow further changes,
         // unless processing another override.
         // Basically, we want those activities which have been overridden to COMPLETE to hold state, and those which have been
@@ -653,19 +659,6 @@ class completion_info {
             $current->timemodified    = time();
             $current->overrideby      = $override ? $USER->id : null;
             $this->internal_set_data($cm, $current, $isbulkupdate);
-
-            // Dispatch the hook for course content update.
-            // The activity completion alters the course state cache for this particular user.
-            $course = get_course($cm->course);
-            if ($course) {
-                $modinfo = get_fast_modinfo($course);
-                $cminfo = $modinfo->get_cm($cm->id);
-                $hook = new \core_completion\hook\after_cm_completion_updated(
-                    cm: $cminfo,
-                    data: $current,
-                );
-                \core\di::get(\core\hook\manager::class)->dispatch($hook);
-            }
         }
     }
 
@@ -1647,27 +1640,6 @@ class completion_info {
         }
 
         return (array)$data;
-    }
-
-    /**
-     * Return the number of modules completed by a user in one specific course.
-     *
-     * @param int $userid The User ID.
-     * @return int Total number of modules completed by a user
-     */
-    public function count_modules_completed(int $userid): int {
-        global $DB;
-
-        $sql = "SELECT COUNT(1)
-                  FROM {course_modules} cm
-                  JOIN {course_modules_completion} cmc ON cm.id = cmc.coursemoduleid
-                 WHERE cm.course = :courseid
-                       AND cmc.userid = :userid
-                       AND (cmc.completionstate = " . COMPLETION_COMPLETE . "
-                        OR cmc.completionstate = " . COMPLETION_COMPLETE_PASS . ")";
-        $params = ['courseid' => $this->course_id, 'userid' => $userid];
-
-        return $DB->count_records_sql($sql, $params);
     }
 }
 

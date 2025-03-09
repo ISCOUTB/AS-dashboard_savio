@@ -114,7 +114,6 @@ class qtype_ddtoimage_renderer_base extends qtype_with_combined_feedback_rendere
             $output .= $html;
             $placeinfo = (object) (array) $place;
             $placeinfo->fieldname = $fieldname;
-            $placeinfo->text = format_string($placeinfo->text);
             $placeinfoforjsandmobileapp[$placeno] = $placeinfo;
         }
 

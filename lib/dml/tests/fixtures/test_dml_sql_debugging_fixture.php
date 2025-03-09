@@ -34,14 +34,16 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class test_dml_sql_debugging_fixture {
+    /** @var db handle */
+    private $db;
+
     /**
-     * Constructor
-     * @param \moodle_database $db The database handle to use for this fixture
+     * constructor
+     * @param testcase $testcase test object
      */
-    public function __construct(
-        /** @var \moodle_database The database handle to use for this fixture */
-        private \moodle_database $db,
-    ) {
+    public function __construct($testcase) {
+        $this->db = $testcase->getMockBuilder(\moodle_database::class)
+            ->getMockForAbstractClass();
     }
 
     /**

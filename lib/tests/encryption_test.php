@@ -26,7 +26,7 @@ use advanced_testcase;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers  \core\encryption
  */
-final class encryption_test extends advanced_testcase {
+class encryption_test extends advanced_testcase {
 
     /**
      * Clear junk created by tests.
@@ -58,7 +58,7 @@ final class encryption_test extends advanced_testcase {
      *
      * @return array[] Array of method options for test
      */
-    public static function encryption_method_provider(): array {
+    public function encryption_method_provider(): array {
         return [
             'Sodium' => [encryption::METHOD_SODIUM],
         ];

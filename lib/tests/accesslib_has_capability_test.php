@@ -30,7 +30,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers ::has_capability
  */
-final class accesslib_has_capability_test extends \advanced_testcase {
+class accesslib_has_capability_test extends \advanced_testcase {
 
     /**
      * Unit tests to check the operation of locked contexts.
@@ -364,35 +364,35 @@ final class accesslib_has_capability_test extends \advanced_testcase {
      *
      * @return  array
      */
-    public static function locked_context_provider(): array {
+    public function locked_context_provider() {
         return [
             'All unlocked' => [
-                'lockedcontexts' => [
+                'locked' => [
                 ],
-                'blocked' => [
+                'blockedwrites' => [
                 ],
             ],
             'User is locked (yes, this is weird)' => [
-                'lockedcontexts' => [
+                'locked' => [
                     'adminuser' => true,
                 ],
-                'blocked' => [
+                'blockedwrites' => [
                     'adminuser',
                 ],
             ],
             'Cat1/Block locked' => [
-                'lockedcontexts' => [
+                'locked' => [
                     'cat1block' => true,
                 ],
-                'blocked' => [
+                'blockedwrites' => [
                     'cat1block',
                 ],
             ],
             'Cat1' => [
-                'lockedcontexts' => [
+                'locked' => [
                     'cat1' => true,
                 ],
-                'blocked' => [
+                'blockedwrites' => [
                     'cat1',
                     'cat1block',
                     'cat1a',
@@ -414,11 +414,11 @@ final class accesslib_has_capability_test extends \advanced_testcase {
                 ],
             ],
             'Cat1 locked and a child explicitly unlocked' => [
-                'lockedcontexts' => [
+                'locked' => [
                     'cat1' => true,
                     'cat1a' => false,
                 ],
-                'blocked' => [
+                'blockedwrites' => [
                     'cat1',
                     'cat1block',
                     'cat1a',
@@ -447,7 +447,7 @@ final class accesslib_has_capability_test extends \advanced_testcase {
      *
      * @return  array
      */
-    public static function login_as_provider(): array {
+    public function login_as_provider(): array {
         return [
             [
                 'system',

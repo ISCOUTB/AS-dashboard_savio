@@ -26,7 +26,7 @@ use mod_forum\local\entities\post as post_entity;
  * @copyright  2019 Ryan Wyllie <ryan@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class entities_discussion_test extends \advanced_testcase {
+class entities_discussion_test extends \advanced_testcase {
     /**
      * Test the entity returns expected values.
      */
@@ -159,7 +159,7 @@ final class entities_discussion_test extends \advanced_testcase {
      *
      * @return array start/end time offsets and the expected results.
      */
-    public static function diplay_period_options_provider(): array {
+    public function diplay_period_options_provider() {
         return array(
             ["No dates set", 0, 0, true, false, true],
             ["Only started date in the future", 100, 0, false, false, false],

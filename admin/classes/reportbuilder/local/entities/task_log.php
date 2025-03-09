@@ -105,9 +105,10 @@ class task_log extends base {
         ))
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_TEXT)
-            ->add_field("{$tablealias}.classname")
+            ->add_fields("{$tablealias}.classname, {$tablealias}.id")
             ->set_is_sortable(true)
-            ->add_callback(static function(string $classname): string {
+            ->add_callback(static function($value, stdClass $row): string {
+                $classname = $row->classname;
                 $output = '';
                 if (class_exists($classname)) {
                     $task = new $classname;
@@ -118,6 +119,7 @@ class task_log extends base {
                 $output .= \html_writer::tag('div', "\\{$classname}", [
                     'class' => 'small text-muted',
                 ]);
+                $output = \html_writer::link(new \moodle_url('/admin/tasklogs.php', ['logid' => $row->id]), $output);
                 return $output;
             });
 
@@ -271,6 +273,8 @@ class task_log extends base {
      * @return filter[]
      */
     protected function get_all_filters(): array {
+        global $DB;
+
         $tablealias = $this->get_table_alias('task_log');
 
         // Name filter (Filter by classname).
@@ -328,7 +332,7 @@ class task_log extends base {
             'output',
             new lang_string('task_logoutput', 'admin'),
             $this->get_entity_name(),
-            "{$tablealias}.output"
+            $DB->sql_cast_to_char("{$tablealias}.output")
         ))
             ->add_joins($this->get_joins());
 

@@ -67,12 +67,7 @@ class matrix_user_manager {
             $username = self::MATRIX_USER_PREFIX . $username;
         }
 
-        $homeserver = get_config('communication_matrix', 'matrixhomeservername');
-
-        // Fall back to homeserver URL if name not set.
-        if (empty($homeserver)) {
-            $homeserver = self::get_formatted_matrix_home_server();
-        }
+        $homeserver = self::get_formatted_matrix_home_server();
 
         return "@{$username}:{$homeserver}";
     }

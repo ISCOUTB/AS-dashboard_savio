@@ -28,7 +28,7 @@ require_once(__DIR__ . '/../fixtures/task_fixtures.php');
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers \core\task\scheduled_task
  */
-final class scheduled_task_test extends \advanced_testcase {
+class scheduled_task_test extends \advanced_testcase {
 
     /**
      * Data provider for {@see test_eval_cron_field}
@@ -709,7 +709,7 @@ final class scheduled_task_test extends \advanced_testcase {
     public static function provider_schedule_overrides(): array {
         return array(
             array(
-                'overrides' => array(
+                'scheduled_tasks' => array(
                     '\core\task\scheduled_test_task' => array(
                         'schedule' => '10 13 1 2 4',
                         'disabled' => 0,
@@ -719,7 +719,7 @@ final class scheduled_task_test extends \advanced_testcase {
                         'disabled' => 1,
                     ),
                 ),
-                'tasks' => array(
+                'task_full_classnames' => array(
                     '\core\task\scheduled_test_task',
                     '\core\task\scheduled_test2_task',
                 ),
@@ -743,13 +743,13 @@ final class scheduled_task_test extends \advanced_testcase {
                 )
             ),
             array(
-                'overrides' => array(
+                'scheduled_tasks' => array(
                     '\core\task\*' => array(
                         'schedule' => '1 2 3 4 5',
                         'disabled' => 0,
                     )
                 ),
-                'tasks' => array(
+                'task_full_classnames' => array(
                     '\core\task\scheduled_test_task',
                     '\core\task\scheduled_test2_task',
                 ),
@@ -944,9 +944,9 @@ final class scheduled_task_test extends \advanced_testcase {
      *
      * @return array[]
      */
-    public static function is_component_enabled_provider(): array {
+    public function is_component_enabled_provider(): array {
         return [
-            'Enabled component' => ['auth_email', true],
+            'Enabled component' => ['auth_cas', true],
             'Disabled component' => ['auth_ldap', false],
             'Invalid component' => ['auth_invalid', false],
         ];
@@ -964,7 +964,7 @@ final class scheduled_task_test extends \advanced_testcase {
         $this->resetAfterTest();
 
         // Set cas as the only enabled auth component.
-        set_config('auth', 'email');
+        set_config('auth', 'cas');
 
         $task = new scheduled_test_task();
         $task->set_component($component);

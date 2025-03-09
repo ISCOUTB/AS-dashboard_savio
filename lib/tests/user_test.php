@@ -24,7 +24,7 @@ namespace core;
  * @copyright  2013 Rajesh Taneja <rajesh@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class user_test extends \advanced_testcase {
+class user_test extends \advanced_testcase {
 
     /**
      * Setup test data.
@@ -977,33 +977,33 @@ final class user_test extends \advanced_testcase {
     public static function user_name_provider(): array {
         return [
             'simple user' => [
-                'userdata' => ['firstname' => 'first', 'lastname' => 'last'],
-                'fullnameconfig' => 'language',
+                'user' => ['firstname' => 'first', 'lastname' => 'last'],
+                'fullnamedisplay' => 'language',
                 'expected' => 'fl',
             ],
             'simple user with lastname firstname in language settings' => [
-                'userdata' => ['firstname' => 'first', 'lastname' => 'last'],
-                'fullnameconfig' => 'lastname firstname',
+                'user' => ['firstname' => 'first', 'lastname' => 'last'],
+                'fullnamedisplay' => 'lastname firstname',
                 'expected' => 'lf',
             ],
             'simple user with no surname' => [
-                'userdata' => ['firstname' => '', 'lastname' => 'L'],
-                'fullnameconfig' => 'language',
+                'user' => ['firstname' => '', 'lastname' => 'L'],
+                'fullnamedisplay' => 'language',
                 'expected' => 'L',
             ],
             'simple user with a middle name' => [
-                'userdata' => ['firstname' => 'f', 'lastname' => 'l', 'middlename' => 'm'],
-                'fullnameconfig' => 'middlename lastname',
+                'user' => ['firstname' => 'f', 'lastname' => 'l', 'middlename' => 'm'],
+                'fullnamedisplay' => 'middlename lastname',
                 'expected' => 'ml',
             ],
             'user with a middle name & fullnamedisplay contains 3 names' => [
-                'userdata' => ['firstname' => 'first', 'lastname' => 'last', 'middlename' => 'middle'],
-                'fullnameconfig' => 'firstname middlename lastname',
+                'user' => ['firstname' => 'first', 'lastname' => 'last', 'middlename' => 'middle'],
+                'fullnamedisplay' => 'firstname middlename lastname',
                 'expected' => 'fl',
             ],
             'simple user with a namefield consisting of one element' => [
-                'userdata' => ['firstname' => 'first', 'lastname' => 'last'],
-                'fullnameconfig' => 'lastname',
+                'user' => ['firstname' => 'first', 'lastname' => 'last'],
+                'fullnamedisplay' => 'lastname',
                 'expected' => 'l',
             ],
         ];

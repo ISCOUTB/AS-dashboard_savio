@@ -32,7 +32,7 @@ global $CFG;
 // Used to create a wiki page to tag.
 require_once($CFG->dirroot . '/mod/wiki/locallib.php');
 
-final class events_test extends \advanced_testcase {
+class events_test extends \advanced_testcase {
 
     /**
      * Test set up.
@@ -100,9 +100,7 @@ final class events_test extends \advanced_testcase {
         global $DB;
 
         // Create a course to tag.
-        $course = self::getDataGenerator()->create_course();
-        $qbank = self::getDataGenerator()->create_module('qbank', ['course' => $course->id]);
-        $qbankcontext = \context_module::instance($qbank->cmid);
+        $course = $this->getDataGenerator()->create_course();
 
         // Trigger and capture the event for tagging a course.
         $sink = $this->redirectEvents();
@@ -117,7 +115,7 @@ final class events_test extends \advanced_testcase {
 
         // Create a question to tag.
         $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
-        $cat = $questiongenerator->create_question_category(['contextid' => $qbankcontext->id]);
+        $cat = $questiongenerator->create_question_category();
         $question = $questiongenerator->create_question('shortanswer', null, array('category' => $cat->id));
 
         // Trigger and capture the event for tagging a question.
@@ -131,7 +129,7 @@ final class events_test extends \advanced_testcase {
         // Check that the tag was added to the question and the event data is valid.
         $this->assertEquals(1, $DB->count_records('tag_instance', array('component' => 'core')));
         $this->assertInstanceOf('\core\event\tag_added', $event);
-        $this->assertEquals($qbankcontext, $event->get_context());
+        $this->assertEquals(\context_system::instance(), $event->get_context());
     }
 
     /**

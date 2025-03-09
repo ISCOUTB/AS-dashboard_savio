@@ -38,7 +38,7 @@ require_once($CFG->libdir . '/webdavlib.php');
  * @copyright  2017 Project seminar (Learnweb, University of Münster)
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class lib_test extends \advanced_testcase {
+class lib_test extends \advanced_testcase {
 
     /** @var null|\repository_nextcloud the repository_nextcloud object, which the tests are run on. */
     private $repo = null;
@@ -853,7 +853,7 @@ XML;
      *
      * @return array[]
      */
-    public static function sync_reference_provider(): array {
+    public function sync_reference_provider(): array {
         return [
             'referecncelastsync done recently' => [
                 [
@@ -948,17 +948,17 @@ XML;
      *
      * @dataProvider sync_reference_provider
      * @param array $storedfileargs
-     * @param array $mockfunctions
+     * @param array $storedfilemethodsmock
      * @param bool $expectedresult
      * @return void
      */
-    public function test_sync_reference(array $storedfileargs, $mockfunctions, bool $expectedresult): void {
+    public function test_sync_reference(array $storedfileargs, $storedfilemethodsmock, bool $expectedresult): void {
         $this->resetAfterTest(true);
 
-        if (isset($mockfunctions[0])) {
+        if (isset($storedfilemethodsmock[0])) {
             $storedfile = $this->createMock(\stored_file::class);
 
-            if ($mockfunctions[0] === 'get_referencelastsync') {
+            if ($storedfilemethodsmock[0] === 'get_referencelastsync') {
                 if (!$expectedresult) {
                     $storedfile->method('get_referencelastsync')->willReturn(DAYSECS + time());
                 }

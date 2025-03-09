@@ -129,61 +129,18 @@ class format_social extends core_courseformat\base {
         return $this->get_format_options();
     }
 
-    #[\Override]
+    /**
+     * Returns the information about the ajax support in the given source format.
+     *
+     * The returned object's property (boolean)capable indicates that
+     * the course format supports Moodle course ajax features.
+     *
+     * @return stdClass
+     */
     public function supports_ajax() {
-        // All home page is rendered in the backend, we only need an ajax editor components in edit mode.
-        // This will also prevent redirectng to the login page when a guest tries to access the site,
-        // and will make the home page loading faster.
         $ajaxsupport = new stdClass();
-        $ajaxsupport->capable = $this->show_editor();
+        $ajaxsupport->capable = true;
         return $ajaxsupport;
     }
 
-    #[\Override]
-    public function supports_components() {
-        return true;
-    }
-
-    #[\Override]
-    public function uses_sections() {
-        return true;
-    }
-
-    #[\Override]
-    public function get_section_name($section) {
-        return get_string('socialactivities', 'format_social');
-    }
-
-    /**
-     * Social format uses only section 0.
-     *
-     * @return int
-     */
-    #[\Override]
-    public function get_sectionnum(): int {
-        return 0;
-    }
-
-
-    #[\Override]
-    public function get_max_sections() {
-        // Social ony uses one section.
-        return 1;
-    }
-
-    /**
-     * Returns if a specific section is visible to the current user.
-     *
-     * Formats can override this method to implement any special section logic.
-     * Social format does not use any other sections than section 0 and
-     * used this method to hide all other sections from the Move section activity.
-     *
-     * @param section_info $section the section modinfo
-     * @return bool;
-     */
-    #[\Override]
-    public function is_section_visible(section_info $section): bool {
-        $visible = parent::is_section_visible($section);
-        return $visible && $section->section == 0;
-    }
 }

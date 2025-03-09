@@ -1678,7 +1678,7 @@ EOF;
      *    // Note: phpDoc beforeStep attribution not shown.
      *    public function before_step(StepScope $scope) {
      *        $callback = function (string $tag): bool {
-     *            return $tag === 'editor_tiny' || substr($tag, 0, 5) === 'tiny_';
+     *            return $tag === 'editor_atto' || substr($tag, 0, 5) === 'atto_';
      *        };
      *
      *        if (!self::scope_tags_match($scope, $callback)) {
@@ -1743,20 +1743,5 @@ EOF;
         ]);
 
         return $result ?: null;
-    }
-
-    /**
-     * Prepare an xpath for insertion into Selenium JavaScript.
-     *
-     * @param string $xpath
-     * @return string
-     */
-    protected function prepare_xpath_for_javascript(string $xpath): string {
-        $newlines = [
-            "\r\n",
-            "\r",
-            "\n",
-        ];
-        return str_replace($newlines, ' ', $xpath);
     }
 }

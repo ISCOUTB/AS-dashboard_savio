@@ -37,7 +37,7 @@ use stdClass;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \qbank_managecategories\question_category_object
  */
-final class question_category_object_test extends \advanced_testcase {
+class question_category_object_test extends \advanced_testcase {
 
     /**
      * @var question_category_object used in the tests.
@@ -88,30 +88,26 @@ final class question_category_object_test extends \advanced_testcase {
         parent::setUp();
         self::setAdminUser();
         $this->resetAfterTest();
-
-        // Set up tests in a quiz context.
-        $this->course = $this->getDataGenerator()->create_course();
-        $qbank = self::getDataGenerator()->create_module('qbank', ['course' => $this->course->id]);
-        $qbankcontext = context_module::instance($qbank->cmid);
-        $this->quiz = $this->getDataGenerator()->create_module('quiz', ['course' => $this->course->id]);
-        $this->qcontexts = new question_edit_contexts(context_module::instance($this->quiz->cmid));
-
-        $contexts = new question_edit_contexts($qbankcontext);
-        $this->topcat = question_get_top_category($qbankcontext->id, true);
+        $this->context = context_course::instance(SITEID);
+        $contexts = new question_edit_contexts($this->context);
+        $this->topcat = question_get_top_category($this->context->id, true);
         $this->resetDebugging();
         $this->qcobject = new question_category_object(null,
-            new moodle_url('/question/bank/managecategories/category.php', ['cmid' => $qbank->cmid]),
+            new moodle_url('/question/bank/managecategories/category.php', ['courseid' => SITEID]),
             $contexts->having_one_edit_tab_cap('categories'), 0, null, 0,
-            $contexts->having_cap('moodle/question:add')
-        );
+            $contexts->having_cap('moodle/question:add'));
         $this->assertDebuggingCalled(
             'Deprecation: qbank_managecategories\question_category_object::__construct has been deprecated since 4.5. ' .
                 'API properly divided between qbank_managecategories and core_question. ' .
                 'Use \qbank_managecategories\question_categories or \core_question\category_manager instead. ' .
                 'See MDL-72397 for more information.',
         );
+        // Set up tests in a quiz context.
+        $this->course = $this->getDataGenerator()->create_course();
+        $this->quiz = $this->getDataGenerator()->create_module('quiz', ['course' => $this->course->id]);
+        $this->qcontexts = new question_edit_contexts(context_module::instance($this->quiz->cmid));
 
-        $this->defaultcategoryobj = question_get_default_category($this->qcontexts->lowest()->id, true);
+        $this->defaultcategoryobj = question_make_default_categories([$this->qcontexts->lowest()]);
         $this->defaultcategory = $this->defaultcategoryobj->id . ',' . $this->defaultcategoryobj->contextid;
 
         $this->resetDebugging();

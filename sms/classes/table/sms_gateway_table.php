@@ -243,7 +243,7 @@ class sms_gateway_table extends flexible_table implements dynamic_table {
             ],
             'title' => $labelstr,
             'label' => $labelstr,
-            'labelclasses' => 'visually-hidden',
+            'labelclasses' => 'sr-only',
         ];
 
         return $OUTPUT->render_from_template('core_admin/setting_configtoggle', $params);

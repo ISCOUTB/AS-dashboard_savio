@@ -15,6 +15,7 @@
 
 import ajax from 'core/ajax';
 import {getString} from "core/str";
+import log from 'core/log';
 import SRLogger from "core/local/reactive/srlogger";
 
 /**
@@ -333,6 +334,28 @@ export default class {
     }
 
     /**
+     * Move course modules to specific course location.
+     *
+     * @deprecated since Moodle 4.4 MDL-77038.
+     * @todo MDL-80116 This will be deleted in Moodle 4.8.
+     * @param {StateManager} stateManager the current state manager
+     * @param {array} sectionIds the list of section ids to move
+     * @param {number} targetSectionId the target section id
+     */
+    async sectionMove(stateManager, sectionIds, targetSectionId) {
+        log.debug('sectionMove() is deprecated. Use sectionMoveAfter() instead');
+        if (!targetSectionId) {
+            throw new Error(`Mutation sectionMove requires targetSectionId`);
+        }
+        const course = stateManager.get('course');
+        this.sectionLock(stateManager, sectionIds, true);
+        const updates = await this._callEditWebservice('section_move', course.id, sectionIds, targetSectionId);
+        this.bulkReset(stateManager);
+        stateManager.processUpdates(updates);
+        this.sectionLock(stateManager, sectionIds, false);
+    }
+
+    /**
      * Move course modules after a specific course location.
      *
      * @param {StateManager} stateManager the current state manager
@@ -448,16 +471,8 @@ export default class {
      * @param {bool} complete the new completion value
      */
     cmCompletion(stateManager, cmIds, complete) {
-        const newState = (complete) ? 1 : 0;
-        stateManager.setReadOnly(false);
-        cmIds.forEach((id) => {
-            const element = stateManager.get('cm', id);
-            if (element) {
-                element.isoverallcomplete = complete;
-                element.completionstate = newState;
-            }
-        });
-        stateManager.setReadOnly(true);
+        const newValue = (complete) ? 1 : 0;
+        this._setElementsValue(stateManager, 'cm', cmIds, 'completionstate', newValue);
     }
 
     /**
@@ -564,12 +579,9 @@ export default class {
                 return;
             }
         }
-        const course = stateManager.get('course');
-        if (course.pageItem && course.pageItem.type === type && course.pageItem.id === id) {
-            return;
-        }
         stateManager.setReadOnly(false);
         // Remove the current page item.
+        const course = stateManager.get('course');
         course.pageItem = null;
         // Save the new page item.
         if (newPageItem) {

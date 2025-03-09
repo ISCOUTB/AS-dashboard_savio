@@ -491,6 +491,14 @@
                                     min-height: 30px;
                                     align-items: center;
 
+                                    .form-check {
+                                        padding: 0;
+
+                                        .itemselect {
+                                            margin-right: 5px;
+                                        }
+                                    }
+
                                     a {
                                         &.toggle-category {
                                             height: 24px;

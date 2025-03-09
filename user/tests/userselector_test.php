@@ -32,7 +32,7 @@ require_once($CFG->dirroot.'/user/tests/fixtures/testable_user_selector.php');
  * @copyright 2018 David Mudrák <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class userselector_test extends \advanced_testcase {
+class userselector_test extends \advanced_testcase {
 
     /**
      * Setup the environment for the tests.

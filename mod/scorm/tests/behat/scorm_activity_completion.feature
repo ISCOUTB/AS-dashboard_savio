@@ -33,7 +33,7 @@ Feature: View activity completion in the SCORM activity
       | completionusegrade       | 1                                                             |
 
   @javascript
-  Scenario: A teacher can view a SCORM activity automatic completion conditions
+  Scenario: View automatic completion items as a teacher
     Given I am on the "Music history" "scorm activity" page logged in as teacher1
     Then "Music history" should have the "View" completion condition
     And "Music history" should have the "Receive a score of 3 or more" completion condition
@@ -51,7 +51,7 @@ Feature: View activity completion in the SCORM activity
     And I should not see "Passing grade"
 
   @javascript
-  Scenario: A student can complete a SCORM activity by achieving a passing grade
+  Scenario: View automatic completion items as a student
     Given I am on the "Music history" "scorm activity" page logged in as student1
     # We need a little taller window because Firefox is, apparently, unable to auto-scroll within
     # an iframe, so we need to ensure that the "Save changes" button is visible in the viewport.
@@ -102,7 +102,7 @@ Feature: View activity completion in the SCORM activity
     And I wait until "Score: 33" "text" exists
     And I switch to the main frame
     # We need to get some time till the last item is marked as done (or it won't be ready in slow databases).
-    # This could be a pause of a few seconds, but re-visiting
+    # This could be a pause of a few seconds (working ok in super-slow oracle docker database), but re-visiting
     # any of the pages seems to  be doing the work too under that very same slow environment.
     And I click on "Par?" "list_item"
     And I switch to "scorm_object" iframe
@@ -117,7 +117,7 @@ Feature: View activity completion in the SCORM activity
     And the "Complete or pass the activity" completion condition of "Music history" is displayed as "done"
 
   @javascript
-  Scenario: A student can manually mark the scorm activity as done but a teacher cannot
+  Scenario: Use manual completion
     Given I am on the "Music history" "scorm activity" page logged in as teacher1
     And I navigate to "Settings" in current page administration
     And I expand all fieldsets

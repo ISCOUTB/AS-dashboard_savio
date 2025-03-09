@@ -95,6 +95,8 @@ class grouping extends base {
      * @return column[]
      */
     protected function get_all_columns(): array {
+        global $DB;
+
         $contextalias = $this->get_table_alias('context');
         $groupingsalias = $this->get_table_alias('groupings');
 
@@ -132,6 +134,10 @@ class grouping extends base {
             ->set_is_sortable(true);
 
         // Description column.
+        $descriptionfieldsql = "{$groupingsalias}.description";
+        if ($DB->get_dbfamily() === 'oracle') {
+            $descriptionfieldsql = $DB->sql_order_by_text($descriptionfieldsql, 1024);
+        }
         $columns[] = (new column(
             'description',
             new lang_string('description'),
@@ -139,10 +145,10 @@ class grouping extends base {
         ))
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_LONGTEXT)
-            ->add_field("{$groupingsalias}.description")
+            ->add_field($descriptionfieldsql, 'description')
             ->add_fields("{$groupingsalias}.descriptionformat, {$groupingsalias}.id, {$groupingsalias}.courseid")
             ->add_fields(context_helper::get_preload_record_columns_sql($contextalias))
-            ->set_is_sortable(true)
+            ->set_is_sortable(false)
             ->set_callback(static function(?string $description, stdClass $grouping): string {
                 global $CFG;
 

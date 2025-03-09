@@ -26,7 +26,7 @@ use enrol_lti\local\ltiadvantage\repository\legacy_consumer_repository;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \enrol_lti\local\ltiadvantage\entity\migration_claim
  */
-final class migration_claim_test extends \advanced_testcase {
+class migration_claim_test extends \advanced_testcase {
     /**
      * Setup run for each test case.
      */
@@ -49,61 +49,33 @@ final class migration_claim_test extends \advanced_testcase {
      * Test instantiation and getters of the migration_claim.
      *
      * @dataProvider migration_claim_provider
-     * @param array $lti1p1migrationclaim the lti1p1 migration claim.
+     * @param array $migrationclaimdata the lti1p1 migration claim.
      * @param string $deploymentid string id of the tool deployment.
      * @param string $platform string url of the issuer.
      * @param string $clientid string id of the client.
      * @param string $exp expiry time.
      * @param string $nonce nonce.
-     * @param bool $stublegacyconsumerrepo Whether the legacy consumer repo is a stub
+     * @param legacy_consumer_repository $legacyconsumerrepo legacy consumer repo instance.
      * @param array $expected array containing expectation data.
      * @covers ::__construct
      */
-    public function test_migration_claim(
-        array $lti1p1migrationclaim,
-        string $deploymentid,
-        string $platform,
-        string $clientid,
-        string $exp,
-        string $nonce,
-        bool $stublegacyconsumerrepo,
-        array $expected,
-    ): void {
-        if ($stublegacyconsumerrepo) {
-            $legacyconsumerrepo = $this->get_stub_legacy_consumer_repo();
-        } else {
-            $legacyconsumerrepo = new legacy_consumer_repository();
-        }
+    public function test_migration_claim(array $migrationclaimdata, string $deploymentid, string $platform,
+            string $clientid, string $exp, string $nonce, legacy_consumer_repository $legacyconsumerrepo,
+            array $expected): void {
 
         if (!empty($expected['exception'])) {
             $this->expectException($expected['exception']);
             $this->expectExceptionMessage($expected['exceptionmessage']);
-            new migration_claim(
-                $lti1p1migrationclaim,
-                $deploymentid,
-                $platform,
-                $clientid,
-                $exp,
-                $nonce,
-                $legacyconsumerrepo,
-            );
+            new migration_claim($migrationclaimdata, $deploymentid, $platform, $clientid, $exp, $nonce,
+                $legacyconsumerrepo);
         } else {
-            $migrationclaim = new migration_claim(
-                $lti1p1migrationclaim,
-                $deploymentid,
-                $platform,
-                $clientid,
-                $exp,
-                $nonce,
-                $legacyconsumerrepo,
-            );
+            $migrationclaim = new migration_claim($migrationclaimdata, $deploymentid, $platform, $clientid, $exp,
+                $nonce, $legacyconsumerrepo);
             $this->assertInstanceOf(migration_claim::class, $migrationclaim);
             $this->assertEquals($expected['user_id'], $migrationclaim->get_user_id());
             $this->assertEquals($expected['context_id'], $migrationclaim->get_context_id());
-            $this->assertEquals(
-                $expected['tool_consumer_instance_guid'],
-                $migrationclaim->get_tool_consumer_instance_guid(),
-            );
+            $this->assertEquals($expected['tool_consumer_instance_guid'],
+                $migrationclaim->get_tool_consumer_instance_guid());
             $this->assertEquals($expected['resource_link_id'], $migrationclaim->get_resource_link_id());
         }
     }
@@ -113,7 +85,7 @@ final class migration_claim_test extends \advanced_testcase {
      *
      * @return array[] the test case data.
      */
-    public static function migration_claim_provider(): array {
+    public function migration_claim_provider(): array {
         // Note: See https://www.imsglobal.org/spec/lti/v1p3/migr#lti-1-1-migration-claim for details regarding the
         // correct generation of oauth_consumer_key_sign signature.
         return [
@@ -127,7 +99,7 @@ final class migration_claim_test extends \advanced_testcase {
                 'clientid' => 'a1b2c3d4',
                 'exp' => '1622612930',
                 'nonce' => 'j45j2j5nnjn24544',
-                'stublegacyconsumerrepo' => false,
+                new legacy_consumer_repository(),
                 'expected' => [
                     'exception' => \coding_exception::class,
                     'exceptionmessage' => "Missing 'oauth_consumer_key' property in lti1p1 migration claim."
@@ -143,7 +115,7 @@ final class migration_claim_test extends \advanced_testcase {
                 'clientid' => 'a1b2c3d4',
                 'exp' => '1622612930',
                 'nonce' => 'j45j2j5nnjn24544',
-                'stublegacyconsumerrepo' => false,
+                new legacy_consumer_repository(),
                 'expected' => [
                     'exception' => \coding_exception::class,
                     'exceptionmessage' => "Missing 'oauth_consumer_key_sign' property in lti1p1 migration claim."
@@ -159,7 +131,7 @@ final class migration_claim_test extends \advanced_testcase {
                 'clientid' => 'a1b2c3d4',
                 'exp' => '1622612930',
                 'nonce' => 'j45j2j5nnjn24544',
-                'stublegacyconsumerrepo' => false,
+                new legacy_consumer_repository(),
                 'expected' => [
                     'exception' => \coding_exception::class,
                     'exceptionmessage' => "Invalid 'oauth_consumer_key_sign' signature in lti1p1 claim."
@@ -181,7 +153,7 @@ final class migration_claim_test extends \advanced_testcase {
                 'clientid' => 'a1b2c3d4',
                 'exp' => '1622612930',
                 'nonce' => 'j45j2j5nnjn24544',
-                'stublegacyconsumerrepo' => true,
+                $this->get_stub_legacy_consumer_repo(),
                 'expected' => [
                     'user_id' => null,
                     'context_id' => null,
@@ -209,7 +181,7 @@ final class migration_claim_test extends \advanced_testcase {
                 'clientid' => 'a1b2c3d4',
                 'exp' => '1622612930',
                 'nonce' => 'j45j2j5nnjn24544',
-                'stublegacyconsumerrepo' => true,
+                $this->get_stub_legacy_consumer_repo(),
                 'expected' => [
                     'user_id' => '24',
                     'context_id' => 'd345b',

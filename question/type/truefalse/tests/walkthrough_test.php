@@ -32,7 +32,7 @@ require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \qtype_truefalse_question
  */
-final class walkthrough_test extends \qbehaviour_walkthrough_test_base {
+class walkthrough_test extends \qbehaviour_walkthrough_test_base {
     public function test_false_right_does_not_show_feedback_when_not_answered(): void {
 
         // Create a true-false question with correct answer false.
@@ -156,7 +156,7 @@ final class walkthrough_test extends \qbehaviour_walkthrough_test_base {
 
         // Check for 'Show standard instruction'.
         $standardinstruction = \html_writer::tag('legend', get_string('answer'), [
-            'class' => 'prompt h6 fw-normal visually-hidden',
+            'class' => 'prompt h6 font-weight-normal sr-only'
         ]);
         $this->assertStringContainsString($standardinstruction, $this->currentoutput);
     }

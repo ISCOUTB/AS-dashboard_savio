@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * Note: execution may take many minutes especially on slower servers.
  */
-final class accesslib_test extends advanced_testcase {
+class accesslib_test extends advanced_testcase {
 
     /**
      * Setup.
@@ -1998,7 +1998,6 @@ final class accesslib_test extends advanced_testcase {
 
         // For now we have deprecated fake/access:fakecapability.
         $capinfo = get_deprecated_capability_info('fake/access:fakecapability');
-        $this->assertNotNull(get_capability_info('fake/access:existingcapability'));
         $this->assertNotEmpty($capinfo);
         $this->assertEquals("The capability 'fake/access:fakecapability' is"
             . " deprecated.This capability should not be used anymore.", $capinfo['fullmessage']);
@@ -2071,7 +2070,7 @@ final class accesslib_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function deprecated_capabilities_use_cases(): array {
+    public function deprecated_capabilities_use_cases() {
         return [
             'capability missing' => [
                 'fake/access:missingcapability',
@@ -2113,38 +2112,6 @@ final class accesslib_test extends advanced_testcase {
                 false // As the capability is applied to managers, we should not have this capability for this simple user.
             ],
         ];
-    }
-
-    /**
-     * Test get_deprecated_capability_info() with an invalid component.
-     *
-     * @covers get_deprecated_capability_info
-     */
-    public function test_get_deprecated_capability_info_invalid_component(): void {
-        global $DB;
-
-        $this->resetAfterTest();
-
-        // Set up a fake plugin.
-        $this->setup_fake_plugin('access');
-
-        // Add a plugin for an unrelated fake component.
-        $DB->insert_record('capabilities', [
-            'name' => 'mod/fake:addinstance',
-            'captype' => 'write',
-            'contextlevel' => CONTEXT_COURSE,
-            'component' => 'mod_fake',
-            'riskbitmask' => 4,
-        ]);
-
-        // Purge the cache.
-        cache::make('core', 'capabilities')->purge();
-
-        // For now we have deprecated fake/access:fakecapability.
-        $this->assertNotEmpty($DB->get_record('capabilities', ['component' => 'mod_fake']));
-        $info = get_deprecated_capability_info('fake/access:fakecapability');
-        $this->assertIsArray($info);
-        $this->assertDebuggingNotCalled();
     }
 
     /**
@@ -3077,7 +3044,7 @@ final class accesslib_test extends advanced_testcase {
         $this->assertEquals(1, count_enrolled_users($coursecontext, '', $groupids));
     }
 
-    public static function get_enrolled_sql_provider(): array {
+    public function get_enrolled_sql_provider() {
         return array(
             array(
                 // Two users who are enrolled.
@@ -4108,7 +4075,7 @@ final class accesslib_test extends advanced_testcase {
 
         // Just test a few representative capabilities.
         $expectedcapabilities = ['moodle/site:accessallgroups', 'moodle/site:viewfullnames',
-                'repository/upload:view', 'tiny/recordrtc:recordaudio'];
+                'repository/upload:view', 'atto/recordrtc:recordaudio'];
 
         $this->assert_capability_list_contains($expectedcapabilities, $actual);
     }
@@ -4127,7 +4094,7 @@ final class accesslib_test extends advanced_testcase {
 
         // Just test a few representative capabilities.
         $expectedcapabilities = ['moodle/site:accessallgroups', 'moodle/site:viewfullnames',
-                'repository/upload:view', 'tiny/recordrtc:recordaudio'];
+                'repository/upload:view', 'atto/recordrtc:recordaudio'];
 
         $this->assert_capability_list_contains($expectedcapabilities, $actual);
     }
@@ -4147,7 +4114,7 @@ final class accesslib_test extends advanced_testcase {
 
         // Just test a few representative capabilities.
         $expectedcapabilities = ['moodle/site:accessallgroups', 'moodle/site:viewfullnames',
-                'repository/upload:view', 'tiny/recordrtc:recordaudio'];
+                'repository/upload:view', 'atto/recordrtc:recordaudio'];
 
         $this->assert_capability_list_contains($expectedcapabilities, $actual);
     }
@@ -4168,7 +4135,7 @@ final class accesslib_test extends advanced_testcase {
 
         // Just test a few representative capabilities.
         $expectedcapabilities = ['moodle/site:accessallgroups', 'moodle/site:viewfullnames',
-                'repository/upload:view', 'tiny/recordrtc:recordaudio'];
+                'repository/upload:view', 'atto/recordrtc:recordaudio'];
 
         $this->assert_capability_list_contains($expectedcapabilities, $actual);
     }
@@ -4620,7 +4587,7 @@ final class accesslib_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function get_get_with_capability_join_override_cases(): array {
+    public function get_get_with_capability_join_override_cases() {
         return [
                 'no overrides' => [true, []],
                 'one override' => [true, ['moodle/course:viewscales']],
@@ -4822,7 +4789,7 @@ final class accesslib_test extends advanced_testcase {
      *
      * @return  array
      */
-    public static function is_parent_of_provider(): array {
+    public function is_parent_of_provider(): array {
         $provideboth = function(string $desc, string $contextpath, string $testpath, bool $expected): array {
             return [
                 "includeself: true; {$desc}" => [
@@ -4923,7 +4890,7 @@ final class accesslib_test extends advanced_testcase {
      *
      * @return  array
      */
-    public static function is_child_of_provider(): array {
+    public function is_child_of_provider(): array {
         $provideboth = function(string $desc, string $contextpath, string $testpath, bool $expected): array {
             return [
                 "includeself: true; {$desc}" => [
@@ -5291,30 +5258,6 @@ final class accesslib_test extends advanced_testcase {
         $this->assertInstanceOf('\context_system', $filtercontext);
         $filtercontext = context_helper::get_navigation_filter_context($coursecontext);
         $this->assertInstanceOf('\context_system', $filtercontext);
-    }
-
-    /**
-     * Test access APIs when dealing with deprecated plugin types.
-     *
-     * Note: this injects a mocked plugin type into core_component and is a slow test that must be run in isolation.
-     *
-     * @covers ::has_capability
-     * @runInSeparateProcess
-     */
-    public function test_capabilities_deprecated_plugintype(): void {
-        $this->resetAfterTest();
-
-        global $CFG;
-        $this->add_mocked_plugintype('fake', "{$CFG->dirroot}/lib/tests/fixtures/fakeplugins/fake", true);
-        $this->add_mocked_plugin('fake', 'fullfeatured', "{$CFG->dirroot}/lib/tests/fixtures/fakeplugins/fake/fullfeatured");
-        update_capabilities('fake_fullfeatured');
-
-        $this->assertTrue(\core_component::is_deprecated_plugin_type('fake'));
-
-        $user = $this->getDataGenerator()->create_user();
-        $this->assertNotEmpty(get_capability_info('fake/fullfeatured:fakecapability'));
-        $this->assertTrue(has_capability('fake/fullfeatured:fakecapability', \core\context\system::instance(), $user));
-        $this->assertEquals('Fullfeatured capability description', get_capability_string('fake/fullfeatured:fakecapability'));
     }
 }
 

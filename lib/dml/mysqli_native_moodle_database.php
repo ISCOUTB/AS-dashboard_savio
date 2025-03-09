@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__.'/moodle_database.php');
-require_once(__DIR__.'/moodle_read_replica_trait.php');
+require_once(__DIR__.'/moodle_read_slave_trait.php');
 require_once(__DIR__.'/mysqli_native_moodle_recordset.php');
 require_once(__DIR__.'/mysqli_native_moodle_temptables.php');
 
@@ -37,8 +37,8 @@ require_once(__DIR__.'/mysqli_native_moodle_temptables.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mysqli_native_moodle_database extends moodle_database {
-    use moodle_read_replica_trait {
-        can_use_readonly as read_replica_can_use_readonly;
+    use moodle_read_slave_trait {
+        can_use_readonly as read_slave_can_use_readonly;
     }
 
     /** @var array $sslmodes */
@@ -135,7 +135,7 @@ class mysqli_native_moodle_database extends moodle_database {
     /**
      * Returns database family type - describes SQL dialect
      * Note: can be used before connect()
-     * @return string db family name (mysql, postgres, mssql, etc.)
+     * @return string db family name (mysql, postgres, mssql, oracle, etc.)
      */
     public function get_dbfamily() {
         return 'mysql';
@@ -144,7 +144,7 @@ class mysqli_native_moodle_database extends moodle_database {
     /**
      * Returns more specific database driver type
      * Note: can be used before connect()
-     * @return string db type mysqli, pgsql, mssql, sqlsrv
+     * @return string db type mysqli, pgsql, oci, mssql, sqlsrv
      */
     protected function get_dbtype() {
         return 'mysqli';
@@ -652,12 +652,12 @@ class mysqli_native_moodle_database extends moodle_database {
      * @return bool
      */
     protected function can_use_readonly(int $type, string $sql): bool {
-        // ... *_LOCK queries always go to primary.
+        // ... *_LOCK queries always go to master.
         if (preg_match('/\b(GET|RELEASE)_LOCK/i', $sql)) {
             return false;
         }
 
-        return $this->read_replica_can_use_readonly($type, $sql);
+        return $this->read_slave_can_use_readonly($type, $sql);
     }
 
     /**

@@ -320,14 +320,7 @@ class api {
             $settings->tool_mobile_customlangstrings = get_config('tool_mobile', 'customlangstrings');
             $settings->tool_mobile_disabledfeatures = get_config('tool_mobile', 'disabledfeatures');
             $settings->tool_mobile_filetypeexclusionlist = get_config('tool_mobile', 'filetypeexclusionlist');
-            $custommenuitems = get_config('tool_mobile', 'custommenuitems');
-            // If filtering of the primary custom menu is enabled, apply only the string filters.
-            if (!empty($CFG->navfilter && !empty($CFG->stringfilters))) {
-                // Apply filters that are enabled for Content and Headings.
-                $filtermanager = \filter_manager::instance();
-                $custommenuitems = $filtermanager->filter_string($custommenuitems, \context_system::instance());
-            }
-            $settings->tool_mobile_custommenuitems = $custommenuitems;
+            $settings->tool_mobile_custommenuitems = get_config('tool_mobile', 'custommenuitems');
             $settings->tool_mobile_apppolicy = get_config('tool_mobile', 'apppolicy');
             // This setting could be not set in some edge cases such as bad upgrade.
             $mintimereq = get_config('tool_mobile', 'autologinmintimebetweenreq');
@@ -503,8 +496,8 @@ class api {
         $availablemods = core_plugin_manager::instance()->get_plugins_of_type('mod');
         $coursemodules = array();
         $appsupportedmodules = array(
-            'assign', 'bigbluebuttonbn', 'book', 'choice', 'data', 'feedback', 'folder', 'forum', 'glossary', 'h5pactivity',
-            'imscp', 'label', 'lesson', 'lti', 'page', 'quiz', 'resource', 'scorm', 'url', 'wiki', 'workshop');
+            'assign', 'bigbluebuttonbn', 'book', 'chat', 'choice', 'data', 'feedback', 'folder', 'forum', 'glossary', 'h5pactivity',
+            'imscp', 'label', 'lesson', 'lti', 'page', 'quiz', 'resource', 'scorm', 'survey', 'url', 'wiki', 'workshop');
 
         foreach ($availablemods as $mod) {
             if (in_array($mod->name, $appsupportedmodules)) {

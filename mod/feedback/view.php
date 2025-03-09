@@ -141,11 +141,7 @@ if ($feedbackcompletion->can_complete()) {
         echo $OUTPUT->continue_button(course_get_url($courseid ?: $course->id));
     } else if (!$feedbackcompletion->can_submit()) {
         // Feedback was already submitted.
-        echo $OUTPUT->notification(
-            get_string('this_feedback_is_already_submitted', 'feedback'),
-            \core\output\notification::NOTIFY_INFO,
-            closebutton: false,
-        );
+        echo $OUTPUT->notification(get_string('this_feedback_is_already_submitted', 'feedback'));
         $OUTPUT->continue_button(course_get_url($courseid ?: $course->id));
     }
     echo $OUTPUT->box_end();

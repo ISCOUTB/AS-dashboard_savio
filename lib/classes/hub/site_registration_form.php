@@ -27,8 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 
 use context_course;
 use stdClass;
-use html_writer;
-use moodle_url;
 
 global $CFG;
 require_once($CFG->libdir . '/formslib.php');
@@ -141,14 +139,11 @@ class site_registration_form extends \moodleform {
 
         $this->add_checkbox_with_email('emailalert', 'siteregistrationemail', false, get_string('registrationyes'));
 
-        $privacyurl = new moodle_url('https://moodle.com/privacy-notice/');
-        $experttipsandinsightsdesc = html_writer::span(get_string('experttipsandinsightsdesc', 'hub', $privacyurl->out()));
         $this->add_checkbox_with_email(
-            elementname: 'commnews',
-            stridentifier: 'experttipsandinsights',
-            highlight: in_array('commnews', $highlightfields),
-            checkboxtext: $experttipsandinsightsdesc,
-            showhelp: false,
+            'commnews',
+            'sitecommnews',
+            in_array('commnews', $highlightfields),
+            get_string('sitecommnewsyes', 'hub')
         );
 
         // TODO site logo.
@@ -196,16 +191,44 @@ class site_registration_form extends \moodleform {
     }
 
     /**
+     * Add yes/no select with additional checkbox allowing to specify another email
+     *
      * @deprecated since Moodle 3.11 - MDL-71460 The form elements using this have been converted to checkboxes
+     * @todo MDL-71472 - Will be deleted in 4.3
+     * @see \core\hub\site_registration_form::add_checkbox_with_email()
+     * @param string $elementname
+     * @param string $stridentifier
+     * @param array|null $options options for the select element
+     * @param bool $highlight highlight as a new field
      */
-    #[\core\attribute\deprecated(
-        '\core\hub\site_registration_form::add_checkbox_with_email()',
-        since: '3.11',
-        mdl: 'MDL-71460',
-        final: true,
-    )]
-    protected function add_select_with_email() {
-        \core\deprecation::emit_deprecation_if_present([self::class, __FUNCTION__]);
+    protected function add_select_with_email($elementname, $stridentifier, $options = null, $highlight = false) {
+        debugging('add_select_with_email() is deprecated. Please use add_checkbox_with_email() instead.', DEBUG_DEVELOPER);
+
+        $mform = $this->_form;
+
+        if ($options === null) {
+            $options = [0 => get_string('no'), 1 => get_string('yes')];
+        }
+
+        $group = [
+            $mform->createElement('select', $elementname, get_string($stridentifier, 'hub'), $options),
+            $mform->createElement('static', $elementname . 'sep', '', '<br/>'),
+            $mform->createElement('advcheckbox', $elementname . 'newemail', '', get_string('usedifferentemail', 'hub'),
+                ['onchange' => "this.form.elements['{$elementname}email'].focus();"]),
+            $mform->createElement('text', $elementname . 'email', get_string('email'))
+        ];
+
+        $element = $mform->addElement('group', $elementname . 'group', get_string($stridentifier, 'hub'), $group, '', false);
+        if ($highlight) {
+            $element->setAttributes(['class' => $element->getAttribute('class') . ' needsconfirmation mark']);
+        }
+        $mform->hideIf($elementname . 'email', $elementname, 'eq', 0);
+        $mform->hideIf($elementname . 'newemail', $elementname, 'eq', 0);
+        $mform->hideIf($elementname . 'email', $elementname . 'newemail', 'notchecked');
+        $mform->setType($elementname, PARAM_INT);
+        $mform->setType($elementname . 'email', PARAM_RAW_TRIMMED); // E-mail will be validated in validation().
+        $mform->addHelpButton($elementname . 'group', $stridentifier, 'hub');
+
     }
 
     /**
@@ -215,15 +238,8 @@ class site_registration_form extends \moodleform {
      * @param string $stridentifier
      * @param bool $highlight highlight as a new field
      * @param string $checkboxtext The text to show after the text.
-     * @param bool $showhelp Show the help icon.
      */
-    protected function add_checkbox_with_email(
-        string $elementname,
-        string $stridentifier,
-        bool $highlight = false,
-        string $checkboxtext = '',
-        bool $showhelp = true,
-    ): void {
+    protected function add_checkbox_with_email($elementname, $stridentifier, $highlight = false, string $checkboxtext = '') {
         $mform = $this->_form;
 
         $group = [
@@ -243,9 +259,7 @@ class site_registration_form extends \moodleform {
         $mform->hideif($elementname . 'email', $elementname . 'newemail', 'notchecked');
         $mform->setType($elementname, PARAM_INT);
         $mform->setType($elementname . 'email', PARAM_RAW_TRIMMED); // E-mail will be validated in validation().
-        if ($showhelp) {
-            $mform->addHelpButton($elementname . 'group', $stridentifier, 'hub');
-        }
+        $mform->addHelpButton($elementname . 'group', $stridentifier, 'hub');
 
     }
 

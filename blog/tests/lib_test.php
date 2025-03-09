@@ -35,7 +35,7 @@ require_once($CFG->dirroot . '/blog/lib.php');
 /**
  * Test functions that rely on the DB tables
  */
-final class lib_test extends \advanced_testcase {
+class lib_test extends \advanced_testcase {
 
     private $courseid;
     private $cmid;

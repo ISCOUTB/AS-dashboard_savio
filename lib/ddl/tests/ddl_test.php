@@ -33,7 +33,7 @@ use xmldb_table;
  * @copyright  2008 Nicolas Connault
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class ddl_test extends \database_driver_testcase {
+class ddl_test extends \database_driver_testcase {
     /** @var xmldb_table[] keys are table name. Created in setUp. */
     private $tables = array();
     /** @var array table name => array of stdClass test records loaded into that table. Created in setUp. */
@@ -2131,6 +2131,7 @@ final class ddl_test extends \database_driver_testcase {
         $rec = $DB->get_record($tablename, array('id'=>$id));
         $this->assertSame($maxstr, $rec->name);
 
+        // Following test is supposed to fail in oracle.
         $maxstr = '';
         for ($i=0; $i<xmldb_field::CHAR_MAX_LENGTH; $i++) {
             $maxstr .= '言'; // Random long string that should fix exactly the limit for one char column.
@@ -2146,7 +2147,11 @@ final class ddl_test extends \database_driver_testcase {
             $rec = $DB->get_record($tablename, array('id'=>$id));
             $this->assertSame($maxstr, $rec->name);
         } catch (dml_exception $e) {
-            throw $e;
+            if ($DB->get_dbfamily() === 'oracle') {
+                $this->fail('Oracle does not support text fields larger than 4000 bytes, this is not a big problem for mostly ascii based languages');
+            } else {
+                throw $e;
+            }
         }
 
         $table = new xmldb_table('testtable');
@@ -2259,7 +2264,7 @@ final class ddl_test extends \database_driver_testcase {
      *
      * @return array The type-value pair fixture.
      */
-    public static function get_enc_quoted_provider(): array {
+    public function get_enc_quoted_provider() {
         return array(
             // Reserved: some examples from SQL-92.
             [true, 'from'],
@@ -2293,7 +2298,9 @@ final class ddl_test extends \database_driver_testcase {
                     $this->assertSame("`$columnname`", $gen->getEncQuoted($columnname));
                     break;
                 case 'mssql': // The Moodle connection runs under 'QUOTED_IDENTIFIER ON'.
+                case 'oracle':
                 case 'postgres':
+                case 'sqlite':
                 default:
                     $this->assertSame('"' . $columnname . '"', $gen->getEncQuoted($columnname));
                     break;
@@ -2306,7 +2313,7 @@ final class ddl_test extends \database_driver_testcase {
      *
      * @return array The type-old-new tuple fixture.
      */
-    public static function sql_generator_get_rename_field_sql_provider(): array {
+    public function sql_generator_get_rename_field_sql_provider() {
         return array(
             // Reserved: an example from SQL-92.
             // Both names should be reserved.
@@ -2343,12 +2350,17 @@ final class ddl_test extends \database_driver_testcase {
                         $gen->getRenameFieldSQL($table, $field, $newcolumnname)
                     );
                     break;
+                case 'sqlite':
+                    // Skip it, since the DB is not supported yet.
+                    // BTW renaming a column name is already covered by the integration test 'testRenameField'.
+                    break;
                 case 'mssql': // The Moodle connection runs under 'QUOTED_IDENTIFIER ON'.
                     $this->assertSame(
                         [ "sp_rename '{$prefix}$tablename.[$oldcolumnname]', '$newcolumnname', 'COLUMN'" ],
                         $gen->getRenameFieldSQL($table, $field, $newcolumnname)
                     );
                     break;
+                case 'oracle':
                 case 'postgres':
                 default:
                     $this->assertSame(
@@ -2366,12 +2378,17 @@ final class ddl_test extends \database_driver_testcase {
                         $gen->getRenameFieldSQL($table, $field, $newcolumnname)
                     );
                     break;
+                case 'sqlite':
+                    // Skip it, since the DB is not supported yet.
+                    // BTW renaming a column name is already covered by the integration test 'testRenameField'.
+                break;
                 case 'mssql': // The Moodle connection runs under 'QUOTED_IDENTIFIER ON'.
                     $this->assertSame(
                         [ "sp_rename '{$prefix}$tablename.[$oldcolumnname]', '$newcolumnname', 'COLUMN'" ],
                         $gen->getRenameFieldSQL($table, $field, $newcolumnname)
                     );
                     break;
+                case 'oracle':
                 case 'postgres':
                 default:
                     $this->assertSame(

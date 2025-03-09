@@ -31,7 +31,7 @@ require_once('all_checks.php');
 /**
  * Class img_alt_is_different_testcase
  */
-final class img_alt_is_different_test extends all_checks {
+class img_alt_is_different_test extends all_checks {
     /** @var string Check type */
     protected $checktype = 'img_alt_is_different';
 

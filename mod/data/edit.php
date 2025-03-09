@@ -121,7 +121,7 @@ if ($rid) {
     $PAGE->navbar->add(get_string('editentry', 'data'));
 }
 
-$PAGE->add_body_class('limitedwidth');
+$PAGE->add_body_class('mediumwidth');
 if ($rid) {
     $pagename = get_string('editentry', 'data');
 } else {

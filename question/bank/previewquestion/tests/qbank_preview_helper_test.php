@@ -32,7 +32,7 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \qbank_previewquestion\helper
  */
-final class qbank_preview_helper_test extends \advanced_testcase {
+class qbank_preview_helper_test extends \advanced_testcase {
 
     /**
      * @var bool|\context|\context_course $context
@@ -73,12 +73,10 @@ final class qbank_preview_helper_test extends \advanced_testcase {
         $questiongenerator = $generator->get_plugin_generator('core_question');
         // Create a course.
         $course = $generator->create_course();
-        $qbank = $generator->create_module('qbank', ['course' => $course->id]);
-        $qbankcontext = \context_module::instance($qbank->cmid);
-        $this->context = $qbankcontext;
+        $this->context = context_course::instance($course->id);
         // Create a question in the default category.
-        $contexts = new \core_question\local\bank\question_edit_contexts($qbankcontext);
-        $cat = question_get_default_category($contexts->lowest()->id, true);
+        $contexts = new \core_question\local\bank\question_edit_contexts($this->context);
+        $cat = question_make_default_categories($contexts->all());
         $this->questiondata = $questiongenerator->create_question('numerical', null,
                 ['name' => 'Example question', 'category' => $cat->id]);
         $this->quba = question_engine::make_questions_usage_by_activity('core_question_preview',
@@ -101,7 +99,7 @@ final class qbank_preview_helper_test extends \advanced_testcase {
            'id' => $this->questiondata->id,
            'previewid' => $this->quba->get_id(),
            'returnurl' => $this->returnurl,
-           'cmid' => $this->context->instanceid,
+           'courseid' => $this->context->instanceid,
            'restartversion' => question_preview_options::ALWAYS_LATEST,
         ];
         $params = array_merge($params, $this->options->get_url_params());
@@ -121,7 +119,7 @@ final class qbank_preview_helper_test extends \advanced_testcase {
             'id' => $this->questiondata->id,
             'previewid' => $this->quba->get_id(),
             'returnurl' => $this->returnurl,
-            'cmid' => $this->context->instanceid,
+            'courseid' => $this->context->instanceid
         ];
         $params = array_merge($params, $this->options->get_url_params());
         $expectedurl = new moodle_url('/question/bank/previewquestion/preview.php', $params);
@@ -140,7 +138,7 @@ final class qbank_preview_helper_test extends \advanced_testcase {
             'id' => $this->questiondata->id,
             'previewid' => $this->quba->get_id(),
             'returnurl' => $this->returnurl,
-            'cmid' => $this->context->instanceid,
+            'courseid' => $this->context->instanceid
         ];
         $expectedurl = new moodle_url('/question/bank/previewquestion/preview.php', $params);
         $this->assertEquals($expectedurl, $formurl);
@@ -158,7 +156,7 @@ final class qbank_preview_helper_test extends \advanced_testcase {
             'id' => $this->questiondata->id,
             'behaviour' => $this->options->behaviour,
             'maxmark' => $this->options->maxmark,
-            'cmid' => $this->context->instanceid,
+            'courseid' => $this->context->instanceid,
             'restartversion' => question_preview_options::ALWAYS_LATEST,
         ];
         // Extra params for options.
@@ -186,7 +184,7 @@ final class qbank_preview_helper_test extends \advanced_testcase {
             'id' => $this->questiondata->id,
             'behaviour' => $this->options->behaviour,
             'maxmark' => $this->options->maxmark,
-            'cmid' => $this->context->instanceid,
+            'courseid' => $this->context->instanceid,
         ];
         // Extra params for options.
         $params['correctness']     = $this->options->correctness;

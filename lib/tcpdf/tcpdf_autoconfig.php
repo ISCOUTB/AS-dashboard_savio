@@ -240,11 +240,6 @@ if (!defined('K_TIMEZONE')) {
 	define('K_TIMEZONE', @date_default_timezone_get());
 }
 
-// Custom cURL options for curl_setopt_array.
-if (!defined('K_CURLOPTS')) {
-	define('K_CURLOPTS', array());
-}
-
 //============================================================+
 // END OF FILE
 //============================================================+

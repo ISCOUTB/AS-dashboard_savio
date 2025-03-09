@@ -116,7 +116,7 @@ class qtype_numerical_renderer extends qtype_renderer {
 
         if ($placeholder) {
             $inputinplace = html_writer::tag('label', $options->add_question_identifier_to_label(get_string('answer')),
-                    ['for' => $inputattributes['id'], 'class' => 'visually-hidden']);
+                    array('for' => $inputattributes['id'], 'class' => 'sr-only'));
             $inputinplace .= $input;
             $questiontext = substr_replace($questiontext, $inputinplace,
                     strpos($questiontext, $placeholder), strlen($placeholder));

@@ -23,7 +23,7 @@ namespace core_calendar;
  * @copyright  2017 Mark Nelson <markn@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class lib_test extends \advanced_testcase {
+class lib_test extends \advanced_testcase {
 
     /**
      * Load required test libraries
@@ -1228,7 +1228,7 @@ final class lib_test extends \advanced_testcase {
      *
      * @return array[]
      */
-    public static function calendar_format_event_location_provider(): array {
+    public function calendar_format_event_location_provider(): array {
         return [
             'Empty' => ['', ''],
             'Text' => ['Barcelona', 'Barcelona'],

@@ -48,22 +48,11 @@ class completion extends base {
      */
     protected function get_default_tables(): array {
         return [
+            'course_completion',
             'course',
-            'course_completions',
             'grade_grades' ,
             'grade_items',
             'user',
-        ];
-    }
-
-    /**
-     * Database tables that this entity no longer uses
-     *
-     * @return string[]
-     */
-    protected function get_deprecated_tables(): array {
-        return [
-            'course_completions' => 'course_completion',
         ];
     }
 
@@ -103,8 +92,8 @@ class completion extends base {
      */
     protected function get_all_columns(): array {
         [
+            'course_completion' => $coursecompletion,
             'course' => $course,
-            'course_completions' => $coursecompletion,
             'grade_grades' => $grade,
             'grade_items' => $gradeitem,
             'user' => $user,
@@ -306,7 +295,7 @@ class completion extends base {
      * @return filter[]
      */
     protected function get_all_filters(): array {
-        $coursecompletion = $this->get_table_alias('course_completions');
+        $coursecompletion = $this->get_table_alias('course_completion');
 
         // Completed status filter.
         $filters[] = (new filter(

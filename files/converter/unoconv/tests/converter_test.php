@@ -23,7 +23,7 @@ namespace fileconverter_unoconv;
  * @copyright  2016 Damyon Wiese
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class converter_test extends \advanced_testcase {
+class converter_test extends \advanced_testcase {
 
     /**
      * Helper to skip tests which _require_ unoconv.
@@ -114,7 +114,7 @@ final class converter_test extends \advanced_testcase {
      *
      * @return  array
      */
-    public static function provider_test_unoconv_path(): array {
+    public function provider_test_unoconv_path() {
         return [
             'Empty path' => [
                 'path' => null,

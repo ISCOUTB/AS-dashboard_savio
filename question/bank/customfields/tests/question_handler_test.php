@@ -24,7 +24,7 @@ namespace qbank_customfields;
  * @author      Matt Porritt <mattp@catalyst-au.net>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class question_handler_test extends \advanced_testcase {
+class question_handler_test extends \advanced_testcase {
 
     /**
      * Question setup helper method.
@@ -33,10 +33,9 @@ final class question_handler_test extends \advanced_testcase {
      * @throws coding_exception
      */
     protected function setup_question(): int {
-        $course = self::getDataGenerator()->create_course();
-        $qbank = self::getDataGenerator()->create_module('qbank', ['course' => $course->id]);
+        $category = $this->getDataGenerator()->create_category();
         $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
-        $context = \context_module::instance($qbank->cmid);
+        $context = \context_coursecat::instance($category->id);
         $questioncategory = $questiongenerator->create_question_category(['contextid' => $context->id]);
         $questiondata = ['category' => $questioncategory->id, 'idnumber' => 'q1'];
         $question = $questiongenerator->create_question('shortanswer', null, $questiondata);

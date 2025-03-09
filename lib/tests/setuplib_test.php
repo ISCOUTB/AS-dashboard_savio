@@ -24,7 +24,7 @@ namespace core;
  * @copyright 2012 The Open University
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class setuplib_test extends \advanced_testcase {
+class setuplib_test extends \advanced_testcase {
 
     /**
      * Test get_docs_url_standard in the normal case when we should link to Moodle docs.
@@ -426,7 +426,7 @@ final class setuplib_test extends \advanced_testcase {
      *
      * @return array An array of arrays contain test data
      */
-    public static function data_for_test_get_real_size(): array {
+    public function data_for_test_get_real_size() {
         return array(
             array('8KB',    8192),
             array('8Kb',    8192),

@@ -36,7 +36,7 @@ require_once($CFG->dirroot . '/mod/scorm/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since      Moodle 3.0
  */
-final class externallib_test extends externallib_advanced_testcase {
+class externallib_test extends externallib_advanced_testcase {
 
     /** @var \stdClass course record. */
     protected \stdClass $course;

@@ -44,9 +44,4 @@ class version_number_column extends column_base {
         return ['pe-3'];
     }
 
-    #[\Override]
-    public function is_sortable() {
-        return 'qv.version';
-    }
-
 }

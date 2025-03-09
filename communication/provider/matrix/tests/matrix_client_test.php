@@ -20,7 +20,10 @@ use communication_matrix\local\command;
 use communication_matrix\local\spec\v1p7;
 use communication_matrix\local\spec\features;
 use communication_matrix\tests\fixtures\mocked_matrix_client;
+use core\http_client;
 use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
 use moodle_exception;
 
@@ -37,7 +40,7 @@ require_once(__DIR__ . '/matrix_client_test_trait.php');
  * @covers \communication_matrix\matrix_client
  * @coversDefaultClass \communication_matrix\matrix_client
  */
-final class matrix_client_test extends \advanced_testcase {
+class matrix_client_test extends \advanced_testcase {
     use matrix_client_test_trait;
 
     /**
@@ -86,13 +89,16 @@ final class matrix_client_test extends \advanced_testcase {
         ?array $versions,
         string $expectedversion,
     ): void {
+        // Create a mock and queue two responses.
+
+        $mock = new MockHandler([
+            $this->get_mocked_version_response($versions),
+        ]);
+        $handlerstack = HandlerStack::create($mock);
         $container = [];
-        ['client' => $client, 'mock' => $mock] = $this->get_mocked_http_client(
-            history: $container,
-        );
-
-        $mock->append($this->get_mocked_version_response($versions));
-
+        $history = Middleware::history($container);
+        $handlerstack->push($history);
+        $client = new http_client(['handler' => $handlerstack]);
         mocked_matrix_client::set_client($client);
 
         $instance = mocked_matrix_client::instance(
@@ -115,15 +121,15 @@ final class matrix_client_test extends \advanced_testcase {
      * Test that the instance method returns a valid instance for the given versions.
      */
     public function test_instance_cached(): void {
+        $mock = new MockHandler([
+            $this->get_mocked_version_response(),
+            $this->get_mocked_version_response(),
+        ]);
+        $handlerstack = HandlerStack::create($mock);
         $container = [];
-        ['client' => $client, 'mock' => $mock] = $this->get_mocked_http_client(
-            history: $container,
-        );
-
-        // Queue two responses.
-        $mock->append($this->get_mocked_version_response());
-        $mock->append($this->get_mocked_version_response());
-
+        $history = Middleware::history($container);
+        $handlerstack->push($history);
+        $client = new http_client(['handler' => $handlerstack]);
         mocked_matrix_client::set_client($client);
 
         $instance = mocked_matrix_client::instance('https://example.com', 'testtoken');
@@ -147,10 +153,16 @@ final class matrix_client_test extends \advanced_testcase {
      * Test that the instance method throws an appropriate exception if no support is found.
      */
     public function test_instance_no_support(): void {
-        ['client' => $client, 'mock' => $mock] = $this->get_mocked_http_client();
+        // Create a mock and queue two responses.
 
-        $mock->append($this->get_mocked_version_response(['v99.9']));
-
+        $mock = new MockHandler([
+            $this->get_mocked_version_response(['v99.9']),
+        ]);
+        $handlerstack = HandlerStack::create($mock);
+        $container = [];
+        $history = Middleware::history($container);
+        $handlerstack->push($history);
+        $client = new http_client(['handler' => $handlerstack]);
         mocked_matrix_client::set_client($client);
 
         $this->expectException(moodle_exception::class);

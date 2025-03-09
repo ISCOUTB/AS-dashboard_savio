@@ -33,7 +33,7 @@ require_once($CFG->libdir . '/filestorage/file_progress.php');
  * @copyright 2012 Petr Skoda
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class zip_packer_test extends \advanced_testcase implements file_progress {
+class zip_packer_test extends \advanced_testcase implements file_progress {
     protected $testfile;
     protected $files;
 
@@ -523,7 +523,8 @@ final class zip_packer_test extends \advanced_testcase implements file_progress 
         unlink($archive);
 
         // Create archive and close if forcing error.
-        // (returns false with warnings).
+        // (returns true for old PHP versions and
+        // false with warnings for new PHP versions). MDL-51863.
         $zip_archive = new zip_archive();
         $result = $zip_archive->open($archive, file_archive::CREATE);
         $this->assertTrue($result);
@@ -535,14 +536,24 @@ final class zip_packer_test extends \advanced_testcase implements file_progress 
         unlink($textfile);
         // Behavior is different between old PHP versions and new ones. Let's detect it.
         $result = false;
-
-        set_error_handler(function ($errno, $errstr) use (&$result) {
-            $result = $errstr;
-            $this->assertStringContainsString('ZipArchive::close', $errstr);
-        }, E_WARNING);
-        $this->assertFalse($zip_archive->close());
+        try {
+            // Old PHP versions were not printing any warning.
+            $result = $zip_archive->close();
+        } catch (\Exception $e) {
+            // New PHP versions print PHP Warning.
+            $this->assertInstanceOf('PHPUnit\Framework\Error\Warning', $e);
+            $this->assertStringContainsString('ZipArchive::close', $e->getMessage());
+        }
+        // This is crazy, but it shows how some PHP versions do return true.
+        try {
+            // And some PHP versions do return correctly false (5.4.25, 5.6.14...)
+            $this->assertFalse($result);
+        } catch (\Exception $e) {
+            // But others do insist into returning true (5.6.13...). Only can accept them.
+            $this->assertInstanceOf('PHPUnit\Framework\ExpectationFailedException', $e);
+            $this->assertTrue($result);
+        }
         $this->assertFileDoesNotExist($archive);
-        restore_error_handler();
     }
 
     /**

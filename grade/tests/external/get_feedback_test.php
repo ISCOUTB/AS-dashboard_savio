@@ -32,7 +32,7 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  * @since      Moodle 4.2
  * @covers \core_grades\external\get_feedback
  */
-final class get_feedback_test extends \externallib_advanced_testcase {
+class get_feedback_test extends \externallib_advanced_testcase {
 
     /**
      * Test get_feedback.
@@ -77,7 +77,7 @@ final class get_feedback_test extends \externallib_advanced_testcase {
      *
      * @return array
      */
-    public static function get_feedback_provider(): array {
+    public function get_feedback_provider(): array {
         return [
             'Return when feedback is set.' => [
                 'Test feedback',
@@ -153,7 +153,7 @@ final class get_feedback_test extends \externallib_advanced_testcase {
      *
      * @return array
      */
-    public static function get_feedback_invalid_request_provider(): array {
+    public function get_feedback_invalid_request_provider(): array {
         return [
             'Logged user does not have permissions to view feedback.' => [
                 'user',

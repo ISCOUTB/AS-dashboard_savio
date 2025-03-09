@@ -30,7 +30,7 @@ require_once($CFG->dirroot . '/question/type/essay/edit_essay_form.php');
  * @copyright  2021 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class edit_form_test extends \advanced_testcase {
+class edit_form_test extends \advanced_testcase {
     /**
      * Helper method.
      *
@@ -45,13 +45,11 @@ final class edit_form_test extends \advanced_testcase {
         $this->setAdminUser();
         $this->resetAfterTest();
 
-        $course = self::getDataGenerator()->create_course();
-        $qbank = self::getDataGenerator()->create_module('qbank', ['course' => $course->id]);
-        $bankcontext = \context_module::instance($qbank->cmid);
-        $category = question_get_default_category($bankcontext->id, true);
+        $syscontext = \context_system::instance();
+        $category = question_make_default_categories(array($syscontext));
         $fakequestion = new \stdClass();
         $fakequestion->qtype = 'essay';
-        $fakequestion->contextid = $bankcontext->id;
+        $fakequestion->contextid = $syscontext->id;
         $fakequestion->createdby = $USER->id;
         $fakequestion->category = $category->id;
         $fakequestion->questiontext = 'please writer an assay about ...';
@@ -66,7 +64,7 @@ final class edit_form_test extends \advanced_testcase {
             new \moodle_url('/'),
             $fakequestion,
             $category,
-            new \core_question\local\bank\question_edit_contexts($bankcontext)
+            new \core_question\local\bank\question_edit_contexts($syscontext)
         );
 
         return [$form, $category];
@@ -104,7 +102,7 @@ final class edit_form_test extends \advanced_testcase {
      *
      * @return array, an array of all possible options.
      */
-    public static function user_preference_provider(): array {
+    public function user_preference_provider(): array {
         $valid = [];
         $invalid = ['attachmentsrequired' => get_string('mustrequirefewer', 'qtype_essay')];
         return [

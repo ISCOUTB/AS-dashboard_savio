@@ -36,7 +36,7 @@ require_once($CFG->dirroot.'/mod/wiki/locallib.php');
  * @copyright  2013 Rajesh Taneja <rajesh@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class events_test extends \advanced_testcase {
+class events_test extends \advanced_testcase {
     private $course;
     private $wiki;
     private $wikigenerator;

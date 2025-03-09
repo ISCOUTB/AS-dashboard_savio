@@ -23,7 +23,7 @@ namespace core_backup;
  * @copyright 2010 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class ui_test extends \basic_testcase {
+class ui_test extends \basic_testcase {
 
     /**
      * Test backup_ui class

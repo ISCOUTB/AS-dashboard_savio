@@ -24,7 +24,7 @@ namespace core;
  * @copyright  2013 Damyon Wiese
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class lock_config_test extends \advanced_testcase {
+class lock_config_test extends \advanced_testcase {
 
     /**
      * Tests the static parse charset method

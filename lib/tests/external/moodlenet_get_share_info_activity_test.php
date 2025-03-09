@@ -36,7 +36,7 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \core\external\moodlenet_get_share_info_activity
  */
-final class moodlenet_get_share_info_activity_test extends externallib_advanced_testcase {
+class moodlenet_get_share_info_activity_test extends externallib_advanced_testcase {
 
     /**
      * Test the behaviour of moodlenet_get_share_info_activity().
@@ -50,7 +50,7 @@ final class moodlenet_get_share_info_activity_test extends externallib_advanced_
 
         // Generate course and activities.
         $course = $this->getDataGenerator()->create_course();
-        $activity1 = $this->getDataGenerator()->create_module('page', ['course' => $course->id, 'name' => 'Page activity']);
+        $activity1 = $this->getDataGenerator()->create_module('chat', ['course' => $course->id, 'name' => 'Chat activity']);
         $activity2 = $this->getDataGenerator()->create_module('assign', ['course' => $course->id, 'name' => 'Assign activity']);
         $activity3 = $this->getDataGenerator()->create_module('quiz', ['course' => $course->id, 'name' => 'Quiz activity']);
 
@@ -98,7 +98,7 @@ final class moodlenet_get_share_info_activity_test extends externallib_advanced_
         $result = external_api::clean_returnvalue(moodlenet_get_share_info_activity::execute_returns(), $result);
         $this->assertTrue($result['status']);
         $this->assertEquals($activity1->name, $result['name']);
-        $this->assertEquals(get_string('modulename', 'mod_page'), $result['type']);
+        $this->assertEquals(get_string('modulename', 'mod_chat'), $result['type']);
         $this->assertEquals($issuer->get_display_name(), $result['server']);
         $this->assertEquals($expectedsupporturl, $result['supportpageurl']);
 

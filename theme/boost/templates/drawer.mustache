@@ -37,24 +37,17 @@
     }}>
     <div class="drawerheader">
         <button
-            class="btn btn-icon drawertoggle hidden"
+            class="btn drawertoggle icon-no-margin hidden"
             data-toggler="drawers"
             data-action="closedrawer"
             data-target="{{$id}}{{/id}}"
-            data-bs-toggle="tooltip"
-            data-bs-placement="{{$tooltipplacement}}right{{/tooltipplacement}}"
+            data-toggle="tooltip"
+            data-placement="{{$tooltipplacement}}right{{/tooltipplacement}}"
             title="{{$closebuttontext}}{{#str}}closedrawer, core{{/str}}{{/closebuttontext}}"
         >
             {{#pix}} e/cancel, core {{/pix}}
         </button>
-        <a
-            href="{{{ config.homeurl }}}"
-            title="{{{ sitename }}}"
-            data-region="site-home-link"
-            class="aabtn text-reset d-flex align-items-center py-1 h-100 d-md-none"
-        >
-            {{$drawerheading}}{{/drawerheading}}
-        </a>
+        {{$drawerheading}}{{/drawerheading}}
         <div class="drawerheadercontent hidden">
             {{$drawerheadercontent}}{{/drawerheadercontent}}
         </div>
@@ -64,8 +57,5 @@
     </div>
 </div>
 {{#js}}
-M.util.js_pending('theme_boost/drawers:load');
-require(['theme_boost/drawers'], function() {
-    M.util.js_complete('theme_boost/drawers:load');
-});
+require(['theme_boost/drawers']);
 {{/js}}

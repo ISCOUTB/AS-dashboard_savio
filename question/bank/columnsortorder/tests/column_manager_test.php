@@ -38,7 +38,7 @@ require_once($CFG->dirroot . '/question/classes/external.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers \qbank_columnsortorder\column_manager
  */
-final class column_manager_test extends advanced_testcase {
+class column_manager_test extends advanced_testcase {
 
     /**
      * Generate a course and return a question bank view for the course context.
@@ -47,13 +47,10 @@ final class column_manager_test extends advanced_testcase {
      */
     protected static function get_question_bank(): view {
         $course = self::getDataGenerator()->create_course();
-        $qbank = self::getDataGenerator()->create_module('qbank', ['course' => $course->id]);
-        $cm = get_coursemodule_from_id('qbank', $qbank->cmid);
         $questionbank = new view(
-            new question_edit_contexts(\context_module::instance($qbank->cmid)),
+            new question_edit_contexts(context_course::instance($course->id)),
             new moodle_url('/'),
-            $course,
-            $cm
+            $course
         );
         return $questionbank;
     }

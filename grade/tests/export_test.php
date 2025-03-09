@@ -30,7 +30,7 @@ require_once($CFG->dirroot.'/grade/export/lib.php');
  * @copyright   Andrew Nicols <andrew@nicols.co.uk>
  * @license  http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
-final class export_test extends \advanced_testcase {
+class export_test extends \advanced_testcase {
 
     /**
      * Ensure that feedback is correct formatted. Test the default implementation of format_feedback
@@ -127,7 +127,7 @@ final class export_test extends \advanced_testcase {
      *
      * @return  array
      */
-    public static function format_feedback_provider(): array {
+    public function format_feedback_provider(): array {
         return [
             'Basic string (PLAIN)' => [
                 'This is an example string',

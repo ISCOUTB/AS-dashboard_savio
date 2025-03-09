@@ -24,6 +24,7 @@
  */
 
 $string['addfields'] = 'Add {$a} field(s) to form';
+$string['advancedelement'] = 'Advanced element';
 $string['close'] = 'Close';
 $string['custom'] = 'Custom';
 $string['day'] = 'Day';
@@ -90,6 +91,3 @@ $string['timing'] = 'Timing';
 $string['togglesensitive'] = 'Toggle sensitive';
 $string['unmaskpassword'] = 'Unmask';
 $string['year'] = 'Year';
-
-// Deprecated since Moodle 5.0.
-$string['advancedelement'] = 'Advanced element';

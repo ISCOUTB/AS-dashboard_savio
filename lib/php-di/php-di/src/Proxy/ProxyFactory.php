@@ -16,7 +16,7 @@ use ProxyManager\Proxy\LazyLoadingInterface;
  *
  * Wraps Ocramius/ProxyManager LazyLoadingValueHolderFactory.
  *
- * @see LazyLoadingValueHolderFactory
+ * @see \ProxyManager\Factory\LazyLoadingValueHolderFactory
  *
  * @since  5.0
  * @author Matthieu Napoli <matthieu@mnapoli.fr>

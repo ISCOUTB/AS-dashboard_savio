@@ -193,12 +193,14 @@ class helper {
         // Set Activity chooser tabs to "Starred, Recommended, All".
         static::add_item($presetid, 'activitychoosertabmode', '4');
 
-        // Modules: Hide database, external tool (lti), IMS content package (imscp), lesson, SCORM, wiki, workshop.
+        // Modules: Hide chat, database, external tool (lti), IMS content package (imscp), lesson, SCORM, survey, wiki, workshop.
+        static::add_plugin($presetid, 'mod', 'chat', false);
         static::add_plugin($presetid, 'mod', 'data', false);
         static::add_plugin($presetid, 'mod', 'lti', false);
         static::add_plugin($presetid, 'mod', 'imscp', false);
         static::add_plugin($presetid, 'mod', 'lesson', false);
         static::add_plugin($presetid, 'mod', 'scorm', false);
+        static::add_plugin($presetid, 'mod', 'survey', false);
         static::add_plugin($presetid, 'mod', 'wiki', false);
         static::add_plugin($presetid, 'mod', 'workshop', false);
 
@@ -207,7 +209,7 @@ class helper {
         static::add_plugin($presetid, 'availability', 'profile', false);
 
         // Blocks: Hide Activities, Blog menu, Blog tags, Comments, Course completion status, Courses, Flickr,
-        // Global search, Latest badges, Learning plans, Logged in user, Login, Main menu, Mentees, Online users,
+        // Global search, Latest badges, Learning plans, Logged in user, Login, Main menu, Mentees, Network servers, Online users,
         // Private files, Recent blog entries, Recently accessed courses, Search forums, Section links, Social activities,
         // Starred courses, Tags, YouTube.
         // Hidden by default: Course/site summary, RSS feeds, Self completion, Feedback.
@@ -226,6 +228,7 @@ class helper {
         static::add_plugin($presetid, 'block', 'login', false);
         static::add_plugin($presetid, 'block', 'site_main_menu', false);
         static::add_plugin($presetid, 'block', 'mentees', false);
+        static::add_plugin($presetid, 'block', 'mnet_hosts', false);
         static::add_plugin($presetid, 'block', 'private_files', false);
         static::add_plugin($presetid, 'block', 'blog_recent', false);
         static::add_plugin($presetid, 'block', 'rss_client', false);
@@ -289,7 +292,7 @@ class helper {
         static::add_item($presetid, 'enablenotes', '1');
         static::add_item($presetid, 'enableblogs', '1');
         static::add_item($presetid, 'enablebadges', '1');
-        static::add_item($presetid, 'enableanalytics', '0');
+        static::add_item($presetid, 'enableanalytics', '1');
         static::add_item($presetid, 'enabled', '1', 'core_competency');
         static::add_item($presetid, 'pushcourseratingstouserplans', '1', 'core_competency');
         static::add_item($presetid, 'showdataretentionsummary', '1', 'tool_dataprivacy');
@@ -312,7 +315,7 @@ class helper {
         static::add_plugin($presetid, 'availability', 'profile', true);
 
         // Blocks: Enable Activities, Blog menu, Blog tags, Comments, Course completion status, Courses, Flickr,
-        // Global search, Latest badges, Learning plans, Logged in user, Login, Main menu, Mentees, Online users,
+        // Global search, Latest badges, Learning plans, Logged in user, Login, Main menu, Mentees, Network servers, Online users,
         // Private files, Recent blog entries, Recently accessed courses, Search forums, Section links, Social activities,
         // Starred courses, Tags, YouTube.
         // Hidden by default: Course/site summary, RSS feeds, Self completion, Feedback.
@@ -330,6 +333,7 @@ class helper {
         static::add_plugin($presetid, 'block', 'login', true);
         static::add_plugin($presetid, 'block', 'site_main_menu', true);
         static::add_plugin($presetid, 'block', 'mentees', true);
+        static::add_plugin($presetid, 'block', 'mnet_hosts', true);
         static::add_plugin($presetid, 'block', 'private_files', true);
         static::add_plugin($presetid, 'block', 'blog_recent', true);
         static::add_plugin($presetid, 'block', 'search_forums', true);

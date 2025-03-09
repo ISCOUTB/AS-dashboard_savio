@@ -111,7 +111,7 @@ class visibility implements named_templatable, renderable {
      * @return array
      */
     protected function get_visibility_dropdown(\renderer_base $output): array {
-        $badgetext = $output->visually_hidden_text(get_string('availability'));
+        $badgetext = $output->sr_text(get_string('availability'));
         $badgetext .= get_string('hiddenfromstudents');
         $icon = $this->get_icon('hide');
 
@@ -119,12 +119,12 @@ class visibility implements named_templatable, renderable {
         $choice->add_option(
             'show',
             get_string('availability_show', 'core_courseformat'),
-            $this->get_option_data('show', 'sectionShow', 'section_show')
+            $this->get_option_data('show', 'sectionShow')
         );
         $choice->add_option(
             'hide',
             get_string('availability_hide', 'core_courseformat'),
-            $this->get_option_data('hide', 'sectionHide', 'section_hide')
+            $this->get_option_data('hide', 'sectionHide')
         );
         $choice->set_selected_value('hide');
 
@@ -140,25 +140,23 @@ class visibility implements named_templatable, renderable {
      * Get the data for the option.
      *
      * @param string $name the name of the option
-     * @param string $mutation the mutation name
-     * @param string $stateaction the state action name
+     * @param string $action the state action of the option
      * @return array
      */
-    private function get_option_data(string $name, string $mutation, string $stateaction): array {
-        $format = $this->format;
-        $nonajaxurl = $format->get_update_url(
-            action: $stateaction,
-            ids: [$this->section->id],
-            returnurl: $format->get_view_url($format->get_sectionnum(), ['navigation' => true]),
-        );
+    private function get_option_data(string $name, string $action): array {
+        $baseurl = course_get_url($this->section->course, $this->section);
+        $baseurl->param('sesskey', sesskey());
+        $baseurl->param($action,  $this->section->section);
 
         return [
             'description' => get_string("availability_{$name}_help", 'core_courseformat'),
             'icon' => $this->get_icon($name),
-            'url' => $nonajaxurl,
+            // Non-ajax behat is not smart enough to discrimante hidden links
+            // so we need to keep providing the non-ajax links.
+            'url' => $baseurl,
             'extras' => [
                 'data-id' => $this->section->id,
-                'data-action' => $mutation,
+                'data-action' => $action,
             ],
         ];
     }

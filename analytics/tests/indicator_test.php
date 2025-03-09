@@ -29,7 +29,8 @@ require_once(__DIR__ . '/fixtures/test_indicator_min.php');
  * @copyright 2017 David Monllaó {@link http://www.davidmonllao.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class indicator_test extends \advanced_testcase {
+class indicator_test extends \advanced_testcase {
+
     /**
      * test_validate_calculated_value
      *
@@ -49,7 +50,7 @@ final class indicator_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function validate_calculated_value(): array {
+    public function validate_calculated_value() {
         return [
             'max' => ['test_indicator_max', [1]],
             'min' => ['test_indicator_min', [-1]],
@@ -82,7 +83,7 @@ final class indicator_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function validate_calculated_value_exceptions(): array {
+    public function validate_calculated_value_exceptions() {
         return [
             'max' => ['test_indicator_max', 2],
             'min' => ['test_indicator_min', -2],

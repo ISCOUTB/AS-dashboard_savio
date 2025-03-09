@@ -23,7 +23,7 @@ namespace tool_uploaduser;
  * @copyright  2020 Marina Glancy
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class cli_test extends \advanced_testcase {
+class cli_test extends \advanced_testcase {
 
     /**
      * Generate cli_helper and mock $_SERVER['argv']

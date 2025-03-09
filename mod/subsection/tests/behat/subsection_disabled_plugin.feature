@@ -5,7 +5,8 @@ Feature: Courses should not lose subsection contents when mod_subsection is disa
   Courses needs to be usable with mod_subsection disabled
 
   Background:
-    Given the following "users" exist:
+    Given I enable "subsection" "mod" plugin
+    And the following "users" exist:
       | username | firstname | lastname |
       | teacher1 | Teacher   | 1        |
       | student1 | Student   | 1        |

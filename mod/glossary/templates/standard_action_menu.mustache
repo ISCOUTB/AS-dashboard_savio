@@ -117,7 +117,7 @@
     }
 }}
 <div class="container-fluid tertiary-navigation">
-    <div class="d-flex">
+    <div class="row">
         {{#addnewbutton}}
             <div class="navitem">
                 {{> core/single_button }}
@@ -134,11 +134,11 @@
                 {{#select}}
                     <div class="navitem">
                         <div class="dropdown">
-                            <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 ...
-                                <span class="visually-hidden">{{#str}} exportentries, mod_glossary {{/str}}</span>
+                                <span class="sr-only">{{#str}} exportentries, mod_glossary {{/str}}</span>
                             </button>
-                            <div class="dropdown-menu dropdown-menu-end">
+                            <div class="dropdown-menu dropdown-menu-right">
                                 {{#options}}
                                     <a class="dropdown-item" href="{{url}}"
                                     {{#openinnewwindow}}target="_blank"{{/openinnewwindow}}>{{string}}</a>
@@ -150,7 +150,7 @@
             {{/tools}}
         </div>
     </div>
-    <div class="d-flex">
+    <div class="row">
         {{#tabjumps}}
             <div class="navitem">
                 {{> core/url_select }}

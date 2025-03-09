@@ -32,7 +32,7 @@ use stdClass;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \core_search\document
  */
-final class document_test extends \advanced_testcase {
+class document_test extends \advanced_testcase {
 
     /**
      * Setup to ensure that fixtures are loaded.
@@ -213,7 +213,7 @@ final class document_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function document_author_visibility_provider(): array {
+    public function document_author_visibility_provider(): array {
         return [
             'Teacher' => [
                 'rolename' => 'editingteacher',

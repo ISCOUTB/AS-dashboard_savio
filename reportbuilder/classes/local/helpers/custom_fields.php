@@ -103,6 +103,8 @@ class custom_fields {
      * @return column[]
      */
     public function get_columns(): array {
+        global $DB;
+
         $columns = [];
 
         $categorieswithfields = $this->handler->get_categories_with_fields();
@@ -115,16 +117,18 @@ class custom_fields {
                 $customdatatablealias = $this->get_table_alias($field);
                 $customdatasql = "{$customdatatablealias}.{$datafield}";
 
-                // Numeric column (non-text) should coalesce with default, for aggregation.
+                // Numeric column (non-text) should coalesce with default, as should text fields for Oracle, for aggregation.
                 $columntype = $this->get_column_type($field, $datafield);
                 if (!in_array($columntype, [column::TYPE_TEXT, column::TYPE_LONGTEXT])) {
 
-                    // See MDL-78783 regarding no bound parameters, and SQL Server limitations of GROUP BY.
+                    // See MDL-78783 regarding no bound parameters, and Oracle limitations of GROUP BY.
                     $customdatasql = "
                         CASE WHEN {$this->tablefieldalias} IS NOT NULL
                              THEN COALESCE({$customdatasql}, " . (float) $datacontroller->get_default_value() . ")
                              ELSE NULL
                         END";
+                } else if ($columntype === column::TYPE_LONGTEXT && $DB->get_dbfamily() === 'oracle') {
+                    $customdatasql = $DB->sql_order_by_text($customdatasql, 1024);
                 }
 
                 // Select enough fields to re-create and format each custom field instance value.
@@ -141,11 +145,11 @@ class custom_fields {
                 ))
                     ->add_joins($this->get_joins())
                     ->add_join($this->get_table_join($field))
-                    ->set_type($columntype)
                     ->add_field($customdatasql, $datafield)
                     ->add_fields($customdatasqlextra)
                     ->add_field($this->tablefieldalias, 'tablefieldalias')
-                    ->set_is_sortable(true)
+                    ->set_type($columntype)
+                    ->set_is_sortable($columntype !== column::TYPE_LONGTEXT)
                     ->add_callback(static function($value, stdClass $row, field_controller $field, ?string $aggregation): string {
                         if ($row->tablefieldalias === null && $value === null) {
                             return '';
@@ -207,6 +211,8 @@ class custom_fields {
      * @return filter[]
      */
     public function get_filters(): array {
+        global $DB;
+
         $filters = [];
 
         $categorieswithfields = $this->handler->get_categories_with_fields();
@@ -220,12 +226,23 @@ class custom_fields {
                 $customdatasql = "{$customdatatablealias}.{$datafield}";
                 $customdataparams = [];
 
+                if ($datafield === 'value') {
+                    $customdatasql = $DB->sql_cast_to_char($customdatasql);
+                }
+
                 // Account for field default value, when joined to the instance table related to the custom fields.
                 if (($fielddefault = $datacontroller->get_default_value()) !== null) {
                     $paramdefault = database::generate_param_name();
+
+                    // Oracle be crazy.
+                    $paramdefaultsql = ":{$paramdefault}";
+                    if ($DB->get_dbfamily() === 'oracle' && in_array($datafield, ['intvalue', 'decvalue'])) {
+                        $paramdefaultsql = $DB->sql_cast_char2int($paramdefaultsql);
+                    }
+
                     $customdatasql = "
                         CASE WHEN {$this->tablefieldalias} IS NOT NULL
-                             THEN COALESCE({$customdatasql}, :{$paramdefault})
+                             THEN COALESCE({$customdatasql}, {$paramdefaultsql})
                              ELSE NULL
                         END";
                     $customdataparams[$paramdefault] = $fielddefault;
@@ -240,12 +257,13 @@ class custom_fields {
                     $customdataparams,
                 ))
                     ->add_joins($this->get_joins())
-                    ->add_join($this->get_table_join($field))
-                    ->set_is_available($this->handler->can_view($field, 0));
+                    ->add_join($this->get_table_join($field));
 
-                // If using a select filter, then populate the options.
-                if ($filter->get_filter_class() === select::class) {
-                    $filter->set_options_callback(fn(): array => $field->get_options());
+                // Options are stored inside configdata json string and we need to convert it to array.
+                if ($field->get('type') === 'select') {
+                    $filter->set_options_callback(static function() use ($field): array {
+                        return $field->get_options();
+                    });
                 }
 
                 $filters[] = $filter;

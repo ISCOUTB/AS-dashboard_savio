@@ -26,7 +26,7 @@ use moodle_exception;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \mod_bigbluebuttonbn\plugin
  */
-final class plugin_test extends advanced_testcase {
+class plugin_test extends advanced_testcase {
 
     /**
      * Test html2text

@@ -53,19 +53,21 @@
                 aria-label="{{#str}} search, core_search {{/str}}"
                 data-region="search-input"
             >
-            <button
-                class="btn btn-submit icon-no-margin"
-                type="button"
-                data-action="search"
-                aria-label="{{#str}} search, core_search {{/str}}"
-            >
-                <span data-region="search-icon-container">
-                    {{#pix}} a/search, core {{/pix}}
-                </span>
-                <span class="hidden" data-region="loading-icon-container">
-                    {{> core/loading }}
-                </span>
-            </button>
+            <div class="input-group-append">
+                <button
+                    class="btn btn-submit icon-no-margin"
+                    type="button"
+                    data-action="search"
+                    aria-label="{{#str}} search, core_search {{/str}}"
+                >
+                    <span data-region="search-icon-container">
+                        {{#pix}} a/search, core {{/pix}}
+                    </span>
+                    <span class="hidden" data-region="loading-icon-container">
+                        {{> core/loading }}
+                    </span>
+                </button>
+            </div>
         </div>
     </div>
 </div>

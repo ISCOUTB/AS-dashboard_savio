@@ -33,7 +33,7 @@ require_once($CFG->dirroot . '/mod/workshop/lib.php');
  * @copyright  2017 Simey Lameze <simey@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class lib_test extends \advanced_testcase {
+class lib_test extends \advanced_testcase {
 
     /**
      * Test calendar event provide action open.
@@ -537,7 +537,7 @@ final class lib_test extends \advanced_testcase {
      *
      * @return array of (submissionstart, submissionend, assessmentstart, assessmentend, eventtype, expectedmin, expectedmax)
      */
-    public static function mod_workshop_core_calendar_get_valid_event_timestart_range_due_no_limit_provider(): array {
+    public function mod_workshop_core_calendar_get_valid_event_timestart_range_due_no_limit_provider() {
         $submissionstart = time() + DAYSECS;
         $submissionend = $submissionstart + DAYSECS;
         $assessmentstart = $submissionend + DAYSECS;
@@ -692,7 +692,7 @@ final class lib_test extends \advanced_testcase {
      *
      * @return array of (submissionstart, submissionend, assessmentstart, assessmentend, eventtype, fieldtoupdate, newtime)
      */
-    public static function mod_workshop_core_calendar_event_timestart_updated_provider(): array {
+    public function mod_workshop_core_calendar_event_timestart_updated_provider() {
         $submissionstart = time() + DAYSECS;
         $submissionend = $submissionstart + DAYSECS;
         $assessmentstart = $submissionend + DAYSECS;

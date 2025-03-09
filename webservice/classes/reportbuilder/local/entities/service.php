@@ -91,9 +91,10 @@ class service extends base {
         ))
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_TEXT)
-            ->add_fields("{$tokenalias}.name, {$tokenalias}.shortname")
+            ->add_field("{$tokenalias}.name")
+            ->add_field("{$tokenalias}.shortname")
             ->set_is_sortable(true)
-            ->add_callback(static function(?string $value, \stdClass $row): string {
+            ->add_callback(static function(string $value, \stdClass $row): string {
                 $output = $value;
                 $output .= \html_writer::tag('div', format_text($row->shortname), [
                     'class' => 'small text-muted',

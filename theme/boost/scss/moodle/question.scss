@@ -243,7 +243,7 @@ table.question-bank-table {
 
 body.path-question-type {
     /* Hacks to display the labels within a form group. */
-    .fitem .col-form-label.visually-hidden:not(legend):not([for="id_category"]) {
+    .fitem .col-form-label.sr-only:not(legend):not([for="id_category"]) {
         position: static;
         width: auto;
         height: auto;
@@ -315,9 +315,7 @@ body.path-question-type {
 }
 .que .outcome,
 .que .comment {
-    color: shift-color($warning, $alert-color-scale - 9%);
-    border-color: shift-color($warning, $alert-border-scale);
-    @include gradient-bg(shift-color($warning, $alert-bg-scale));
+    @include alert-variant(shift-color($warning, $alert-bg-scale), shift-color($warning, $alert-border-scale), shift-color($warning, $alert-color-scale - 9%)); /* stylelint-disable-line max-line-length */
     // Darken link colour inside comments for better colour contrast against regular text.
     a {
         color: darken($link-color, 30%);
@@ -325,9 +323,7 @@ body.path-question-type {
 }
 
 .que .formulation {
-    color: shift-color($info, $alert-color-scale + 40%);
-    border-color: shift-color($info, $alert-border-scale);
-    @include gradient-bg(shift-color($info, $alert-bg-scale));
+    @include alert-variant(shift-color($info, $alert-bg-scale), shift-color($info, $alert-border-scale), shift-color($info, $alert-color-scale + 40%)); /* stylelint-disable-line max-line-length */
 }
 
 .que.multichoice .answer div.r0 .icon.fa-check,
@@ -358,9 +354,7 @@ body.path-question-type {
 }
 
 .que .comment {
-    color: shift-color($success, $alert-color-scale);
-    border-color: shift-color($success, $alert-border-scale);
-    @include gradient-bg(shift-color($success, $alert-bg-scale));
+    @include alert-variant(shift-color($success, $alert-bg-scale), shift-color($success, $alert-border-scale), shift-color($success, $alert-color-scale)); /* stylelint-disable-line max-line-length */
 }
 
 .que .ablock {
@@ -384,17 +378,14 @@ body.path-question-type {
 
 .que .correctness {
     &.correct {
-        color: color-contrast($success);
-        background-color: $success;
+        @include badge-variant($success);
     }
     &.partiallycorrect {
-        color: color-contrast($warning);
-        background-color: $warning;
+        @include badge-variant($warning);
     }
     &.notanswered,
     &.incorrect {
-        color: color-contrast($danger);
-        background-color: $danger;
+        @include badge-variant($danger);
     }
 }
 
@@ -671,7 +662,7 @@ body.path-question-type .mform fieldset.hidden {
     position: relative;
 }
 
-@include media-breakpoint-down(md) {
+@include media-breakpoint-down(sm) {
     .que .info {
         float: none;
         width: auto;
@@ -679,19 +670,4 @@ body.path-question-type .mform fieldset.hidden {
     .que .content {
         margin: 0;
     }
-}
-
-.qbank_managecategories-item.qbank_managecategories-droptarget-before,
-.qbank_managecategories-item .qbank_managecategories-item.qbank_managecategories-droptarget-before,
-.qbank_managecategories-categorylist.qbank_managecategories-droptarget-before > .qbank_managecategories-item:first-child {
-    border-top-color: $link-color;
-}
-.qbank_managecategories-item.qbank_managecategories-droptarget,
-.qbank_managecategories-categorylist.qbank_managecategories-droptarget > .qbank_managecategories-item:last-child {
-    border-bottom-color: $link-color;
-}
-
-.qbank_managecategories-newchild.qbank_managecategories-droptarget {
-    border-color: $link-color;
-    color: $link-color;
 }

@@ -24,7 +24,7 @@ namespace core;
  * @copyright  2012 Petr Skoda {@link http://skodak.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class geoplugin_test extends \advanced_testcase {
+class geoplugin_test extends \advanced_testcase {
 
     /**
      * Load required test libraries

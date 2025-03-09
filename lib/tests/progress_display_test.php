@@ -23,7 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-final class progress_display_test extends \advanced_testcase {
+class progress_display_test extends \advanced_testcase {
 
     /**
      * Test basic function of progress_display, updating status and outputting wibbler.

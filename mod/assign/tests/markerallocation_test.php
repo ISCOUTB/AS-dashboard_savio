@@ -30,7 +30,7 @@ require_once($CFG->dirroot . '/course/lib.php');
  * @copyright  2017 Andrés Melo <andres.torres@blackboard.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class markerallocation_test extends \advanced_testcase {
+class markerallocation_test extends \advanced_testcase {
 
     /** @var \stdClass course record. */
     private $course;
@@ -72,7 +72,7 @@ final class markerallocation_test extends \advanced_testcase {
 
         $assignelement = $this->getDataGenerator()->create_module('assign', $record, $modulesettings);
 
-        $coursesectionid = course_add_cm_to_section($this->course->id, $assignelement->id, 1, null, 'assign');
+        $coursesectionid = course_add_cm_to_section($this->course->id, $assignelement->id, 1);
 
         // Adding users to the course.
         $userdata = array();

@@ -23,8 +23,6 @@ use core_reportbuilder_generator;
 use core_external\external_api;
 use externallib_advanced_testcase;
 use core_reportbuilder\exception\report_access_exception;
-use core_reportbuilder\manager;
-use core_reportbuilder\output\report_action;
 use core_user\reportbuilder\datasource\users;
 
 defined('MOODLE_INTERNAL') || die();
@@ -40,7 +38,7 @@ require_once("{$CFG->dirroot}/webservice/tests/helpers.php");
  * @copyright   2021 David Matamoros <davidmc@moodle.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class get_test extends externallib_advanced_testcase {
+class get_test extends externallib_advanced_testcase {
 
     /**
      * Text execute method for edit mode
@@ -51,11 +49,12 @@ final class get_test extends externallib_advanced_testcase {
 
         /** @var core_reportbuilder_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('core_reportbuilder');
-        $report = $generator->create_report(['name' => 'My report', 'source' => users::class, 'default' => false]);
 
-        $instance = manager::get_report_from_persistent($report);
-        $instance->set_report_action(new report_action('Add', []));
-        $instance->set_report_info_container('Hello');
+        $report = $generator->create_report([
+            'name' => 'My report',
+            'source' => users::class,
+            'default' => false,
+        ]);
 
         // Add two filters.
         $filterfullname = $generator->create_filter(['reportid' => $report->get('id'), 'uniqueidentifier' => 'user:fullname']);
@@ -69,8 +68,6 @@ final class get_test extends externallib_advanced_testcase {
         $this->assertEquals($result['source'], users::class);
         $this->assertNotEmpty($result['table']);
         $this->assertNotEmpty($result['javascript']);
-        $this->assertEmpty($result['button']);
-        $this->assertEquals('Hello', $result['infocontainer']);
         $this->assertFalse($result['filterspresent']);
         $this->assertEmpty($result['filtersform']);
         $this->assertTrue($result['editmode']);
@@ -97,11 +94,12 @@ final class get_test extends externallib_advanced_testcase {
 
         /** @var core_reportbuilder_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('core_reportbuilder');
-        $report = $generator->create_report(['name' => 'My report', 'source' => users::class, 'default' => false]);
 
-        $instance = manager::get_report_from_persistent($report);
-        $instance->set_report_action(new report_action('Add', []));
-        $instance->set_report_info_container('Hello');
+        $report = $generator->create_report([
+            'name' => 'My report',
+            'source' => users::class,
+            'default' => false,
+        ]);
 
         // Add two filters.
         $generator->create_filter(['reportid' => $report->get('id'), 'uniqueidentifier' => 'user:fullname']);
@@ -115,12 +113,6 @@ final class get_test extends externallib_advanced_testcase {
         $this->assertEquals($result['source'], users::class);
         $this->assertNotEmpty($result['table']);
         $this->assertNotEmpty($result['javascript']);
-        $this->assertEquals([
-            'tag' => 'button',
-            'title' => 'Add',
-            'attributes' => [],
-        ], $result['button']);
-        $this->assertEquals('Hello', $result['infocontainer']);
         $this->assertTrue($result['filterspresent']);
         $this->assertNotEmpty($result['filtersform']);
         $this->assertFalse($result['editmode']);

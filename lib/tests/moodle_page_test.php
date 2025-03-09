@@ -42,7 +42,7 @@ require_once($CFG->libdir . '/blocklib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \moodle_page
  */
-final class moodle_page_test extends \advanced_testcase {
+class moodle_page_test extends \advanced_testcase {
 
     /**
      * @var testable_moodle_page
@@ -334,7 +334,7 @@ final class moodle_page_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function set_title_provider(): array {
+    public function set_title_provider(): array {
         return [
             'Do not append the site name' => [
                 'shortname', false, '', false
@@ -784,18 +784,18 @@ final class moodle_page_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function get_user_theme_provider(): array {
+    public function get_user_theme_provider() {
         return [
             'User not a member of any cohort' => [
                 'usertheme' => '',
                 'sitetheme' => 'boost',
-                'cohortthemes' => [],
+                'cohorts' => [],
                 'expected' => 'boost',
             ],
             'User member of one cohort which has a theme set' => [
                 'usertheme' => '',
                 'sitetheme' => 'boost',
-                'cohortthemes' => [
+                'cohorts' => [
                     'classic',
                 ],
                 'expected' => 'classic',
@@ -803,7 +803,7 @@ final class moodle_page_test extends \advanced_testcase {
             'User member of one cohort which has a theme set, and one without a theme' => [
                 'usertheme' => '',
                 'sitetheme' => 'boost',
-                'cohortthemes' => [
+                'cohorts' => [
                     'classic',
                     '',
                 ],
@@ -812,7 +812,7 @@ final class moodle_page_test extends \advanced_testcase {
             'User member of one cohort which has a theme set, and one with a different theme' => [
                 'usertheme' => '',
                 'sitetheme' => 'boost',
-                'cohortthemes' => [
+                'cohorts' => [
                     'classic',
                     'someother',
                 ],
@@ -821,13 +821,13 @@ final class moodle_page_test extends \advanced_testcase {
             'User with a theme but not a member of any cohort' => [
                 'usertheme' => 'classic',
                 'sitetheme' => 'boost',
-                'cohortthemes' => [],
+                'cohorts' => [],
                 'expected' => 'classic',
             ],
             'User with a theme and member of one cohort which has a theme set' => [
                 'usertheme' => 'classic',
                 'sitetheme' => 'boost',
-                'cohortthemes' => [
+                'cohorts' => [
                     'boost',
                 ],
                 'expected' => 'classic',

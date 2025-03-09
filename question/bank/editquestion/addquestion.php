@@ -29,7 +29,8 @@ use qbank_editquestion\editquestion_helper;
 
 // Read URL parameters.
 $categoryid = required_param('category', PARAM_INT);
-$cmid = required_param('cmid', PARAM_INT);
+$cmid = optional_param('cmid', 0, PARAM_INT);
+$courseid = optional_param('courseid', 0, PARAM_INT);
 $returnurl = optional_param('returnurl', 0, PARAM_LOCALURL);
 $appendqnumstring = optional_param('appendqnumstring', '', PARAM_ALPHA);
 $validationerror = optional_param('validationerror', false, PARAM_BOOL);
@@ -44,10 +45,20 @@ if (!$category = $DB->get_record('question_categories', array('id' => $categoryi
     throw new moodle_exception('categorydoesnotexist', 'question', $returnurl);
 }
 
-list($module, $cm) = get_module_from_cmid($cmid);
-require_login($cm->course, false, $cm);
-$thiscontext = context_module::instance($cmid);
-$hiddenparams['cmid'] = $cmid;
+if ($cmid) {
+    list($module, $cm) = get_module_from_cmid($cmid);
+    require_login($cm->course, false, $cm);
+    $thiscontext = context_module::instance($cmid);
+    $hiddenparams['cmid'] = $cmid;
+} else if ($courseid) {
+    require_login($courseid, false);
+    $thiscontext = context_course::instance($courseid);
+    $module = null;
+    $cm = null;
+    $hiddenparams['courseid'] = $courseid;
+} else {
+    throw new moodle_exception('missingcourseorcmid', 'question');
+}
 
 // Check permissions.
 $categorycontext = context::instance_by_id($category->contextid);
@@ -62,9 +73,11 @@ if (!empty($appendqnumstring)) {
 }
 
 $PAGE->set_url('/question/bank/editquestion/addquestion.php', $hiddenparams);
-
-$questionbankurl = new moodle_url('/question/edit.php', ['cmid' => $cmid]);
-
+if ($cmid) {
+    $questionbankurl = new moodle_url('/question/edit.php', array('cmid' => $cmid));
+} else {
+    $questionbankurl = new moodle_url('/question/edit.php', array('courseid' => $courseid));
+}
 navigation_node::override_active_url($questionbankurl);
 
 $chooseqtype = get_string('chooseqtypetoadd', 'question');

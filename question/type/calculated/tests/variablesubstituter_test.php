@@ -31,7 +31,7 @@ require_once($CFG->dirroot . '/question/type/calculated/questiontype.php');
  * @copyright  2011 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class variablesubstituter_test extends \advanced_testcase {
+class variablesubstituter_test extends \advanced_testcase {
     public function test_simple_expression(): void {
         $vs = new qtype_calculated_variable_substituter(array('a' => 1, 'b' => 2), '.');
         $this->assertEquals(3, $vs->calculate('{a} + {b}'));
@@ -60,6 +60,11 @@ final class variablesubstituter_test extends \advanced_testcase {
     }
 
     public function test_division_by_zero_expression(): void {
+
+        if (intval(PHP_VERSION) < 7) {
+            $this->markTestSkipped('Division by zero triggers a PHP warning before PHP 7.');
+        }
+
         $vs = new qtype_calculated_variable_substituter(array('a' => 1, 'b' => 0), '.');
         $this->expectException(\moodle_exception::class);
         $vs->calculate('{a} / {b}');

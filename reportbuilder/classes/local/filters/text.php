@@ -109,6 +109,7 @@ class text extends base {
      */
     public function get_sql_filter(array $values): array {
         global $DB;
+        $name = database::generate_param_name();
 
         $operator = (int) ($values["{$this->name}_operator"] ?? self::ANY_VALUE);
         $value = trim($values["{$this->name}_value"] ?? '');
@@ -121,8 +122,6 @@ class text extends base {
             // Filter configuration is invalid. Ignore the filter.
             return ['', []];
         }
-
-        $name = database::generate_param_name();
 
         switch($operator) {
             case self::CONTAINS:
@@ -154,10 +153,14 @@ class text extends base {
                 $params[$name] = "%$value";
                 break;
             case self::IS_EMPTY:
-                $res = "COALESCE({$fieldsql}, '') = ''";
+                $paramempty = database::generate_param_name();
+                $res = "COALESCE({$fieldsql}, :{$paramempty}) = :{$name}";
+                $params[$paramempty] = $params[$name] = '';
                 break;
             case self::IS_NOT_EMPTY:
-                $res = "COALESCE({$fieldsql}, '') != ''";
+                $paramempty = database::generate_param_name();
+                $res = "COALESCE({$fieldsql}, :{$paramempty}) != :{$name}";
+                $params[$paramempty] = $params[$name] = '';
                 break;
             default:
                 // Filter configuration is invalid. Ignore the filter.

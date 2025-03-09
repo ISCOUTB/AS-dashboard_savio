@@ -29,7 +29,7 @@ require_once($CFG->dirroot . '/repository/googledocs/lib.php');
  * @copyright  2021 Mihail Geshoski <mihail@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class googledocs_drive_content_test extends \googledocs_content_testcase {
+class googledocs_drive_content_test extends \googledocs_content_testcase {
 
     /**
      * Test get_content_nodes().
@@ -63,35 +63,28 @@ final class googledocs_drive_content_test extends \googledocs_content_testcase {
         // Assert that the call() method is being called twice with the given arguments consecutively. In the first
         // instance it is being called to fetch the shared drives (shared_drives_list), while in the second instance
         // to fetch the relevant drive contents (list). Also, define the returned data objects by these calls.
-        $callinvocations = $this->exactly(2);
-        $servicemock->expects($callinvocations)
+        $servicemock->expects($this->exactly(2))
             ->method('call')
-            ->willReturnCallback(function(string $method, array $params) use (
-                $callinvocations,
-                $shareddrives,
-                $listparams,
-                $drivecontents,
-            ) {
-                switch (self::getInvocationCount($callinvocations)) {
-                    case 1:
-                        $this->assertEquals('shared_drives_list', $method);
-                        $this->assertEquals([], $params);
-
-                        return (object) [
-                            'kind' => 'drive#driveList',
-                            'nextPageToken' => 'd838181f30b0f5',
-                            'drives' => $shareddrives,
-                        ];
-                    case 2:
-                        $this->assertEquals('list', $method);
-                        $this->assertEquals($listparams, $params);
-                        return (object)[
-                            'files' => $drivecontents,
-                        ];
-                    default:
-                        $this->fail('Unexpected call to the call() method.');
-                }
-            });
+            ->withConsecutive(
+                [
+                    'shared_drives_list',
+                    [],
+                ],
+                [
+                    'list',
+                    $listparams,
+                ]
+            )
+            ->willReturnOnConsecutiveCalls(
+                (object)[
+                    'kind' => 'drive#driveList',
+                    'nextPageToken' => 'd838181f30b0f5',
+                    'drives' => $shareddrives,
+                ],
+                (object)[
+                    'files' => $drivecontents,
+                ]
+            );
 
         // Set the disallowed file types (extensions).
         $this->disallowedextensions = $filterextensions;
@@ -107,7 +100,8 @@ final class googledocs_drive_content_test extends \googledocs_content_testcase {
      *
      * @return array
      */
-    public static function get_content_nodes_provider(): array {
+    public function get_content_nodes_provider(): array {
+
         $rootid = \repository_googledocs::REPOSITORY_ROOT_ID;
         $mydriveid = \repository_googledocs::MY_DRIVE_ROOT_ID;
 
@@ -119,25 +113,25 @@ final class googledocs_drive_content_test extends \googledocs_content_testcase {
                     true,
                     [],
                     [
-                        self::create_google_drive_shared_drive_object('d85b21c0f86cb5', 'Shared Drive 1'),
+                        $this->create_google_drive_shared_drive_object('d85b21c0f86cb5', 'Shared Drive 1'),
                     ],
                     [
-                        self::create_google_drive_folder_object('1c4ad262c65333', 'Folder 2'),
-                        self::create_google_drive_file_object('d85b21c0f86cb0', 'File 3.pdf',
+                        $this->create_google_drive_folder_object('1c4ad262c65333', 'Folder 2'),
+                        $this->create_google_drive_file_object('d85b21c0f86cb0', 'File 3.pdf',
                             'application/pdf', 'pdf', '1000'),
-                        self::create_google_drive_folder_object('0c4ad262c65333', 'Folder 1'),
-                        self::create_google_drive_file_object('bed5a0f08d412a', 'File 1.pdf',
+                        $this->create_google_drive_folder_object('0c4ad262c65333', 'Folder 1'),
+                        $this->create_google_drive_file_object('bed5a0f08d412a', 'File 1.pdf',
                             'application/pdf', 'pdf'),
                     ],
                     [
-                        self::create_folder_content_node_array('0c4ad262c65333', 'Folder 1',
+                        $this->create_folder_content_node_array('0c4ad262c65333', 'Folder 1',
                             "{$rootid}|Google+Drive/{$mydriveid}|My+Drive"),
-                        self::create_folder_content_node_array('1c4ad262c65333', 'Folder 2',
+                        $this->create_folder_content_node_array('1c4ad262c65333', 'Folder 2',
                             "{$rootid}|Google+Drive/{$mydriveid}|My+Drive"),
-                        self::create_file_content_node_array('bed5a0f08d412a', 'File 1.pdf', 'File 1.pdf',
+                        $this->create_file_content_node_array('bed5a0f08d412a', 'File 1.pdf', 'File 1.pdf',
                             null, '', 'https://googleusercontent.com/type/application/pdf', '',
                             'download'),
-                        self::create_file_content_node_array('d85b21c0f86cb0', 'File 3.pdf', 'File 3.pdf',
+                        $this->create_file_content_node_array('d85b21c0f86cb0', 'File 3.pdf', 'File 3.pdf',
                             '1000', '', 'https://googleusercontent.com/type/application/pdf', '',
                             'download'),
                     ],
@@ -150,16 +144,16 @@ final class googledocs_drive_content_test extends \googledocs_content_testcase {
                     [],
                     [],
                     [
-                        self::create_google_drive_folder_object('0c4ad262c65333', 'Folder 3'),
-                        self::create_google_drive_folder_object('d85b21c0f86cb0', 'Folder 1'),
-                        self::create_google_drive_folder_object('bed5a0f08d412a', 'Folder 2'),
+                        $this->create_google_drive_folder_object('0c4ad262c65333', 'Folder 3'),
+                        $this->create_google_drive_folder_object('d85b21c0f86cb0', 'Folder 1'),
+                        $this->create_google_drive_folder_object('bed5a0f08d412a', 'Folder 2'),
                     ],
                     [
-                        self::create_folder_content_node_array('0c4ad262c65333', 'Folder 3',
+                        $this->create_folder_content_node_array('0c4ad262c65333', 'Folder 3',
                             "{$rootid}|Google+Drive/{$mydriveid}|My+Drive"),
-                        self::create_folder_content_node_array('d85b21c0f86cb0', 'Folder 1',
+                        $this->create_folder_content_node_array('d85b21c0f86cb0', 'Folder 1',
                             "{$rootid}|Google+Drive/{$mydriveid}|My+Drive"),
-                        self::create_folder_content_node_array('bed5a0f08d412a', 'Folder 2',
+                        $this->create_folder_content_node_array('bed5a0f08d412a', 'Folder 2',
                             "{$rootid}|Google+Drive/{$mydriveid}|My+Drive"),
                     ],
                 ],
@@ -171,18 +165,18 @@ final class googledocs_drive_content_test extends \googledocs_content_testcase {
                     ['txt'],
                     [],
                     [
-                        self::create_google_drive_file_object('d85b21c0f86cb0', 'File 3.pdf',
+                        $this->create_google_drive_file_object('d85b21c0f86cb0', 'File 3.pdf',
                             'application/pdf', 'pdf', '1000'),
-                        self::create_google_drive_file_object('a85b21c0f86cb0', 'File 1.txt',
+                        $this->create_google_drive_file_object('a85b21c0f86cb0', 'File 1.txt',
                             'text/plain', 'txt', '3000'),
-                        self::create_google_drive_file_object('f85b21c0f86cb0', 'File 2.doc',
+                        $this->create_google_drive_file_object('f85b21c0f86cb0', 'File 2.doc',
                             'application/msword', 'doc', '2000'),
                     ],
                     [
-                        self::create_file_content_node_array('d85b21c0f86cb0', 'File 3.pdf', 'File 3.pdf',
+                        $this->create_file_content_node_array('d85b21c0f86cb0', 'File 3.pdf', 'File 3.pdf',
                             '1000', '', 'https://googleusercontent.com/type/application/pdf', '',
                             'download'),
-                        self::create_file_content_node_array('f85b21c0f86cb0', 'File 2.doc', 'File 2.doc',
+                        $this->create_file_content_node_array('f85b21c0f86cb0', 'File 2.doc', 'File 2.doc',
                             '2000', '', 'https://googleusercontent.com/type/application/msword', '',
                             'download'),
                     ],
@@ -223,7 +217,7 @@ final class googledocs_drive_content_test extends \googledocs_content_testcase {
      *
      * @return array
      */
-    public static function get_navigation_provider(): array {
+    public function get_navigation_provider(): array {
 
         $rootid = \repository_googledocs::REPOSITORY_ROOT_ID;
         $mydriveid = \repository_googledocs::MY_DRIVE_ROOT_ID;

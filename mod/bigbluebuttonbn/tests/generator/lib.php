@@ -66,8 +66,7 @@ class mod_bigbluebuttonbn_generator extends \testing_module_generator {
             "timecreated" => $now,
             "timemodified" => $now,
             "presentation" => null,
-            "recordings_preview" => 0,
-            "grade" => 0,
+            "recordings_preview" => 0
         ];
 
         $record = (array) $record;

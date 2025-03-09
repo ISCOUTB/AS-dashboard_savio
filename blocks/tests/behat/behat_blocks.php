@@ -134,7 +134,7 @@ class behat_blocks extends behat_base {
         }
 
         $this->execute('behat_general::i_click_on_in_the',
-                ["a[data-bs-toggle='dropdown']", "css_element", $this->escape($blockname), "block"]
+                array("a[data-toggle='dropdown']", "css_element", $this->escape($blockname), "block")
         );
     }
 

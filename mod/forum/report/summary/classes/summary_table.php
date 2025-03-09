@@ -148,7 +148,7 @@ class summary_table extends table_sql {
                 'id' => 'select-all-users',
                 'name' => 'select-all-users',
                 'label' => get_string('selectall'),
-                'labelclasses' => 'visually-hidden',
+                'labelclasses' => 'sr-only',
                 'classes' => 'm-1',
                 'checked' => false
             ]);

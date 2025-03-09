@@ -27,7 +27,7 @@ use profile_field_checkbox;
  * @copyright   2024 Paul Holden <paulh@moodle.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class profile_field_checkbox_test extends advanced_testcase {
+class profile_field_checkbox_test extends advanced_testcase {
 
     /**
      * Load required test libraries

@@ -134,7 +134,7 @@ class visibility implements named_templatable, renderable {
         \renderer_base $output,
         choicelist $choice,
     ): stdClass {
-        $badgetext = $output->visually_hidden_text(get_string('availability'));
+        $badgetext = $output->sr_text(get_string('availability'));
 
         if (!$this->mod->visible) {
             $badgetext .= get_string('hiddenfromstudents');
@@ -236,20 +236,20 @@ class visibility implements named_templatable, renderable {
             $choice->add_option(
                 'show',
                 get_string("availability_{$label}", 'core_courseformat'),
-                $this->get_option_data($label, 'cmShow', 'cm_show')
+                $this->get_option_data($label, 'cmShow')
             );
         }
         $choice->add_option(
             'hide',
             get_string('availability_hide', 'core_courseformat'),
-            $this->get_option_data('hide', 'cmHide', 'cm_hide')
+            $this->get_option_data('hide', 'cmHide')
         );
 
         if ($CFG->allowstealth && $this->format->allow_stealth_module_visibility($this->mod, $this->section)) {
             $choice->add_option(
                 'stealth',
                 get_string('availability_stealth', 'core_courseformat'),
-                $this->get_option_data('stealth', 'cmStealth', 'cm_stealth')
+                $this->get_option_data('stealth', 'cmStealth')
             );
         }
         return $choice;
@@ -258,25 +258,19 @@ class visibility implements named_templatable, renderable {
     /**
      * Get the data for the option.
      * @param string $name the name of the option
-     * @param string $mutation the mutation name
-     * @param string $stateaction the state action name
+     * @param string $action the state action of the option
      * @return array
      */
-    private function get_option_data(string $name, string $mutation, string $stateaction): array {
-        $format = $this->format;
-        $nonajaxurl = $format->get_update_url(
-            action: $stateaction,
-            ids: [$this->mod->id],
-            returnurl: $format->get_view_url($format->get_sectionnum(), ['navigation' => true]),
-        );
-
+    private function get_option_data(string $name, string $action): array {
         return [
             'description' => get_string("availability_{$name}_help", 'core_courseformat'),
             'icon' => $this->get_icon($name),
-            'url' => $nonajaxurl,
+            // Non-ajax behat is not smart enough to discrimante hidden links
+            // so we need to keep providing the non-ajax links.
+            'url' => $this->format->get_non_ajax_cm_action_url($action, $this->mod),
             'extras' => [
                 'data-id' => $this->mod->id,
-                'data-action' => $mutation,
+                'data-action' => $action,
             ]
         ];
     }

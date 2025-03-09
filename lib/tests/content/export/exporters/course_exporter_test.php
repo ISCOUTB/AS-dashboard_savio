@@ -33,7 +33,7 @@ use core\content\export\zipwriter;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @covers      \core\content\export\exporters\course_exporter
  */
-final class course_exporter_test extends advanced_testcase {
+class course_exporter_test extends advanced_testcase {
 
     /**
      * The course_exporter should still export a module intro when no exportables are passed.

@@ -38,7 +38,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2020 Ferran Recio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class item_definition_test extends advanced_testcase {
+class item_definition_test extends advanced_testcase {
 
     /**
      * Test item_definition creation.
@@ -72,7 +72,7 @@ final class item_definition_test extends advanced_testcase {
      *
      * @return  array
      */
-    public static function creation_provider(): array {
+    public function creation_provider(): array {
         return [
             'No interactionType' => [''],
             'Choice' => ['choice'],

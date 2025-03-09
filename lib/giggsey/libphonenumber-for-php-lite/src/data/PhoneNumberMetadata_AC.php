@@ -1,5 +1,4 @@
 <?php
-
 /**
  * libphonenumber-for-php-lite data file
  * This file has been @generated from libphonenumber data
@@ -7,77 +6,106 @@
  * @internal
  */
 
-return [
-    'id' => 'AC',
-    'countryCode' => 247,
-    'generalDesc' => [
-        'pattern' => '(?:[01589]\\d|[46])\\d{4}',
-        'posLength' => [
-            5,
-            6,
-        ],
+return  [
+  'generalDesc' =>
+   [
+    'NationalNumberPattern' => '(?:[01589]\\d|[46])\\d{4}',
+    'PossibleLength' =>
+     [
+      0 => 5,
+      1 => 6,
     ],
-    'fixedLine' => [
-        'pattern' => '6[2-467]\\d{3}',
-        'example' => '62889',
-        'posLength' => [
-            5,
-        ],
+  ],
+  'fixedLine' =>
+   [
+    'NationalNumberPattern' => '6[2-467]\\d{3}',
+    'ExampleNumber' => '62889',
+    'PossibleLength' =>
+     [
+      0 => 5,
     ],
-    'mobile' => [
-        'pattern' => '4\\d{4}',
-        'example' => '40123',
-        'posLength' => [
-            5,
-        ],
+  ],
+  'mobile' =>
+   [
+    'NationalNumberPattern' => '4\\d{4}',
+    'ExampleNumber' => '40123',
+    'PossibleLength' =>
+     [
+      0 => 5,
     ],
-    'tollFree' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'tollFree' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'premiumRate' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'premiumRate' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'sharedCost' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'sharedCost' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'personalNumber' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'personalNumber' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'voip' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'voip' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'pager' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'pager' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'uan' => [
-        'pattern' => '(?:0[1-9]|[1589]\\d)\\d{4}',
-        'example' => '542011',
-        'posLength' => [
-            6,
-        ],
+  ],
+  'uan' =>
+   [
+    'NationalNumberPattern' => '(?:0[1-9]|[1589]\\d)\\d{4}',
+    'ExampleNumber' => '542011',
+    'PossibleLength' =>
+     [
+      0 => 6,
     ],
-    'voicemail' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'voicemail' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'noInternationalDialling' => [
-        'posLength' => [
-            -1,
-        ],
+  ],
+  'noInternationalDialling' =>
+   [
+    'PossibleLength' =>
+     [
+      0 => -1,
     ],
-    'internationalPrefix' => '00',
-    'numberFormat' => [],
+  ],
+  'id' => 'AC',
+  'countryCode' => 247,
+  'internationalPrefix' => '00',
+  'sameMobileAndFixedLinePattern' => false,
+  'numberFormat' =>
+   [
+  ],
+  'mainCountryForCode' => false,
+  'mobileNumberPortableRegion' => false,
 ];

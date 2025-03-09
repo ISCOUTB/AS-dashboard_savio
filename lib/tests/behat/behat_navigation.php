@@ -937,12 +937,10 @@ class behat_navigation extends behat_base {
                 ]);
         }
 
-        // This next section handles page types starting with an activity name. For example:
-        // "forum activity" or "quiz activity editing".
         $parts = explode(' ', $type);
         if (count($parts) > 1) {
-            $modname = $parts[0];
             if ($parts[1] === 'activity') {
+                $modname = $parts[0];
                 $cm = $this->get_cm_by_activity_name($modname, $identifier);
 
                 if (count($parts) == 2) {
@@ -964,13 +962,6 @@ class behat_navigation extends behat_base {
                     // Permissions page.
                     return new moodle_url('/admin/roles/permissions.php', ['contextid' => $cm->context->id]);
                 }
-
-            } else if ($parts[1] === 'index' && count($parts) == 2) {
-                $courseid = $this->get_course_id($identifier);
-                if (!$courseid) {
-                    throw $coursenotfoundexception;
-                }
-                return new moodle_url("/mod/$modname/index.php", ['id' => $courseid]);
             }
         }
 
@@ -1168,7 +1159,7 @@ class behat_navigation extends behat_base {
     protected function select_on_administration_page($nodelist) {
         $parentnodes = $nodelist;
         $lastnode = array_pop($parentnodes);
-        $xpath = '//div[@id=\'region-main\']';
+        $xpath = '//section[@id=\'region-main\']';
 
         // Check if there is a separate tab for this submenu of the page. If found go to it.
         if ($parentnodes) {
@@ -1295,7 +1286,7 @@ class behat_navigation extends behat_base {
             $menuxpath = $this->find_header_administration_menu() ?: $this->find_page_administration_menu();
         }
         if ($menuxpath && $this->running_javascript()) {
-            $node = $this->find('xpath', $menuxpath . '//a[@data-bs-toggle=\'dropdown\']');
+            $node = $this->find('xpath', $menuxpath . '//a[@data-toggle=\'dropdown\']');
             if ($node->isVisible()) {
                 $this->execute('behat_general::i_click_on', [$node, 'NodeElement']);
             }

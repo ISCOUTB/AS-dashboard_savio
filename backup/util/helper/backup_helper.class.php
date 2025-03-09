@@ -317,6 +317,16 @@ abstract class backup_helper {
             }
         }
 
+        // Backups of type HUB (by definition never have user info)
+        // are sent to user's "user_tohub" file area. The upload process
+        // will be responsible for cleaning that filearea once finished
+        if ($backupmode == backup::MODE_HUB) {
+            $ctxid     = context_user::instance($userid)->id;
+            $component = 'user';
+            $filearea  = 'tohub';
+            $itemid    = 0;
+        }
+
         // Backups without user info or with the anonymise functionality
         // enabled are sent to user's "user_backup"
         // file area. Maintenance of such area is responsibility of
@@ -412,7 +422,7 @@ abstract class backup_helper {
             }
 
             $selectmenu = new \core\output\select_menu('coursereusetype', $menuarray, $activeurl);
-            $selectmenu->set_label(get_string('coursereusenavigationmenu'), ['class' => 'visually-hidden']);
+            $selectmenu->set_label(get_string('coursereusenavigationmenu'), ['class' => 'sr-only']);
             $options = \html_writer::tag(
                 'div',
                 $OUTPUT->render_from_template('core/tertiary_navigation_selector', $selectmenu->export_for_template($OUTPUT)),

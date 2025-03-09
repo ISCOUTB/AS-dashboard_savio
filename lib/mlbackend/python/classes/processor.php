@@ -26,11 +26,6 @@ namespace mlbackend_python;
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
-require_once($CFG->dirroot . '/analytics/tests/classes/mlbackend_helper_trait.php');
-
-use core_analytics\tests\mlbackend_helper_trait;
-
 /**
  * Python predictions processor.
  *
@@ -39,8 +34,6 @@ use core_analytics\tests\mlbackend_helper_trait;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class processor implements  \core_analytics\classifier, \core_analytics\regressor, \core_analytics\packable {
-
-    use mlbackend_helper_trait;
 
     /**
      * The required version of the python package that performs all calculations.
@@ -97,31 +90,21 @@ class processor implements  \core_analytics\classifier, \core_analytics\regresso
     public function __construct() {
         global $CFG;
 
-        if ((defined('BEHAT_SITE_RUNNING') || (defined('PHPUNIT_TEST') && PHPUNIT_TEST)) &&
-                self::is_mlbackend_python_configured()) {
-            $this->useserver = true;
-            $this->host = TEST_MLBACKEND_PYTHON_HOST;
-            $this->port = TEST_MLBACKEND_PYTHON_PORT;
-            $this->secure = false;
-            $this->username = TEST_MLBACKEND_PYTHON_USERNAME;
-            $this->password = TEST_MLBACKEND_PYTHON_PASSWORD;
-        } else {
-            $config = get_config('mlbackend_python');
+        $config = get_config('mlbackend_python');
 
-            $this->useserver = !empty($config->useserver);
+        $this->useserver = !empty($config->useserver);
 
-            if (!$this->useserver) {
-                // Set the python location if there is a value.
-                if (!empty($CFG->pathtopython)) {
-                    $this->pathtopython = $CFG->pathtopython;
-                }
-            } else {
-                $this->host = $config->host ?? '';
-                $this->port = $config->port ?? '';
-                $this->secure = $config->secure ?? false;
-                $this->username = $config->username ?? '';
-                $this->password = $config->password ?? '';
+        if (!$this->useserver) {
+            // Set the python location if there is a value.
+            if (!empty($CFG->pathtopython)) {
+                $this->pathtopython = $CFG->pathtopython;
             }
+        } else {
+            $this->host = $config->host ?? '';
+            $this->port = $config->port ?? '';
+            $this->secure = $config->secure ?? false;
+            $this->username = $config->username ?? '';
+            $this->password = $config->password ?? '';
         }
     }
 

@@ -53,8 +53,7 @@
                 "id": 35,
                 "header": {
                     "name": "Section title",
-                    "url": "#",
-                    "headinglevel": 3
+                    "url": "#"
                 },
                 "cmlist": {
                     "cms": [
@@ -84,8 +83,7 @@
                 "id": 36,
                 "header": {
                     "name": "Section 2 title",
-                    "url": "#",
-                    "headinglevel": 3
+                    "url": "#"
                 },
                 "cmlist": {
                     "cms": [
@@ -141,8 +139,7 @@
             "id": 37,
             "header": {
                 "name": "Single Section Example",
-                "url": "#",
-                "headinglevel": 3
+                "url": "#"
             },
             "cmlist": {
                 "cms": [
@@ -172,7 +169,7 @@
 <div id="course-format-{{uniqid}}">
     <h2 class="accesshide">{{{title}}}</h2>
     {{{completionhelp}}}
-    <ul class="{{format}} section-list" data-for="course_sectionlist">
+    <ul class="{{format}}" data-for="course_sectionlist">
         {{#initialsection}}
             {{$ core_courseformat/local/content/section }}
                 {{> core_courseformat/local/content/section }}
@@ -191,7 +188,7 @@
                 {{> core_courseformat/local/content/sectionnavigation }}
             {{/ core_courseformat/local/content/sectionnavigation }}
         {{/sectionnavigation}}
-        <ul class="{{format}} section-list">
+        <ul class="{{format}}">
         {{#singlesection}}
             {{$ core_courseformat/local/content/section }}
                 {{> core_courseformat/local/content/section }}
@@ -220,6 +217,6 @@
 </div>
 {{#js}}
 require(['core_courseformat/local/content'], function(component) {
-    component.init('#page', {}, {{sectionreturn}});
+    component.init('page', {}, {{sectionreturn}});
 });
 {{/js}}

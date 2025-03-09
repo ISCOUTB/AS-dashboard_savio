@@ -53,7 +53,7 @@
 <div class="ms-auto dropdown">
     {{#settingsselector}}
         <button class="dropdown-toggle btn btn-outline-secondary"
-                data-bs-toggle="dropdown"
+                data-toggle="dropdown"
                 aria-haspopup="true"
                 tabindex="0"
                 aria-controls="forum-action-menu-{{id}}-menu"
@@ -63,10 +63,10 @@
         </button>
     {{/settingsselector}}
     {{^settingsselector}}
-        <a href="#" class="{{^settings.excludetext}}dropdown-toggle{{/settings.excludetext}} btn btn-link {{#settings.togglemoreicon}}btn-icon colour-inherit text-decoration-none d-flex{{/settings.togglemoreicon}}"
+        <a href="#" class="{{^settings.excludetext}}dropdown-toggle{{/settings.excludetext}} btn btn-link {{#settings.togglemoreicon}}btn-icon colour-inherit text-decoration-none d-flex align-items-center justify-content-center{{/settings.togglemoreicon}}"
            role="button"
-           data-bs-toggle="dropdown"
-           data-bs-boundary="window"
+           data-toggle="dropdown"
+           data-boundary="window"
            aria-haspopup="true"
            tabindex="0"
            aria-controls="forum-action-menu-{{id}}-menu"
@@ -83,7 +83,7 @@
             {{/settings.excludetext}}
         </a>
     {{/settingsselector}}
-    <div class="dropdown-menu dropdown-menu-end"
+    <div class="dropdown-menu dropdown-menu-right"
          aria-labelledby="forum-action-menu-{{id}}-menu"
          data-rel="menu-content"
          role="menu"

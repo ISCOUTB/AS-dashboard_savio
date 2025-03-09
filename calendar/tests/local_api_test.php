@@ -30,7 +30,7 @@ require_once(__DIR__ . '/helpers.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \core_calendar\local\api
  */
-final class local_api_test extends \advanced_testcase {
+class local_api_test extends \advanced_testcase {
 
     /**
      * Tests set up

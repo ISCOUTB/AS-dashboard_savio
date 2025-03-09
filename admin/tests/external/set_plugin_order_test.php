@@ -33,7 +33,7 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  * @copyright   2023 Andrew Lyons <andrew@nicols.co.uk>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class set_plugin_order_test extends \externallib_advanced_testcase {
+class set_plugin_order_test extends \externallib_advanced_testcase {
     /**
      * Text execute method for editor plugins, which support ordering.
      *
@@ -72,7 +72,7 @@ final class set_plugin_order_test extends \externallib_advanced_testcase {
      *
      * @return array
      */
-    public static function execute_editor_provider(): array {
+    public function execute_editor_provider(): array {
         $pluginmanager = \core_plugin_manager::instance();
         $allplugins = array_keys($pluginmanager->get_plugins_of_type('editor'));
 
@@ -86,67 +86,47 @@ final class set_plugin_order_test extends \externallib_advanced_testcase {
         return [
             [
                 'initialstate' => 'textarea,tiny',
-                'plugin' => 'editor_textarea',
+                'pluginname' => 'editor_textarea',
                 'direction' => 1, // DOWN.
-                'neworder' => $getorder([
+                'expected' => $getorder([
                     'tiny',
                     'textarea',
                 ]),
-                'newstate' => 'tiny,textarea',
+                'newtexteditors' => 'tiny,textarea',
             ],
             [
                 'initialstate' => 'textarea,tiny',
-                'plugin' => 'editor_textarea',
+                'pluginname' => 'editor_textarea',
                 'direction' => -1, // UP.
-                'neworder' => $getorder([
+                'expected' => $getorder([
                     'textarea',
                     'tiny',
                 ]),
-                'newstate' => 'textarea,tiny',
+                'newtexteditors' => 'textarea,tiny',
             ],
             [
                 'initialstate' => 'textarea,tiny',
-                'plugin' => 'editor_tiny',
+                'pluginname' => 'editor_tiny',
                 'direction' => 1, // DOWN.
                 // Tiny is already at the bottom of the list of enabled plugins.
-                'neworder' => $getorder([
+                'expected' => $getorder([
                     'textarea',
                     'tiny',
                 ]),
-                'newstate' => 'textarea,tiny',
+                'newtexteditors' => 'textarea,tiny',
             ],
             [
                 'initialstate' => 'textarea,tiny',
-                'plugin' => 'editor_atto',
+                'pluginname' => 'editor_atto',
                 'direction' => 1, // DOWN.
                 // Atto is not enabled. Disabled editors are listed lexically after enabled editors.
-                'neworder' => $getorder([
+                'expected' => $getorder([
                     'textarea',
                     'tiny',
                 ]),
-                'newstate' => 'textarea,tiny',
+                'newtexteditors' => 'textarea,tiny',
             ],
         ];
-    }
-
-    /**
-     * Test re-ordering plugins where one plugin is not enabled.
-     *
-     *  Media plugins are ordered by rank, with enabled plugins first.
-     * This is similar to the editors test but covers a scenario that cannot be covered by the editors test due to
-     * not having enough plugins.
-     */
-    public function test_execute_media_including_disabled(): void {
-        global $CFG;
-
-        $this->resetAfterTest();
-        $this->setAdminUser();
-
-        $CFG->media_plugins_sortorder = 'videojs,vimeo,html5video';
-
-        set_plugin_order::execute('youtube', -1);
-
-        $this->assertSame('videojs,vimeo,html5video', $CFG->media_plugins_sortorder);
     }
 
     /**
@@ -162,7 +142,7 @@ final class set_plugin_order_test extends \externallib_advanced_testcase {
         $this->assertIsArray(set_plugin_order::execute($plugin, 1));
     }
 
-    public static function execute_non_orderable_provider(): array {
+    public function execute_non_orderable_provider(): array {
         return [
             // Activities do not support ordering.
             ['mod_assign'],

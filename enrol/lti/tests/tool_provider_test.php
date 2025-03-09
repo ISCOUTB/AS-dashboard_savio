@@ -40,7 +40,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2016 Jun Pataleta <jun@moodle.com>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class tool_provider_test extends \advanced_testcase {
+class tool_provider_test extends \advanced_testcase {
 
     /**
      * @var \stdClass $tool The LTI tool.
@@ -207,7 +207,7 @@ final class tool_provider_test extends \advanced_testcase {
         $consumer->consumerVersion = 'TEST CONSUMER INFO VERSION';
         $consumer->enabled = true;
         $consumer->protected = true;
-        $profilejson = file_get_contents(self::get_fixture_path(__NAMESPACE__, 'tool_consumer_profile.json'));
+        $profilejson = file_get_contents(__DIR__ . '/fixtures/tool_consumer_profile.json');
         $consumer->profile = json_decode($profilejson);
         $consumer->save();
 
@@ -240,7 +240,7 @@ final class tool_provider_test extends \advanced_testcase {
         $consumer->consumerVersion = 'TEST CONSUMER INFO VERSION';
         $consumer->enabled = true;
         $consumer->protected = true;
-        $profilejson = file_get_contents(self::get_fixture_path(__NAMESPACE__, 'tool_consumer_profile.json'));
+        $profilejson = file_get_contents(__DIR__ . '/fixtures/tool_consumer_profile.json');
         $consumer->profile = json_decode($profilejson);
         $consumer->save();
 

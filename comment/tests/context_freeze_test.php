@@ -28,7 +28,7 @@ use core_comment_external;
  * @author     Neill Magill <neill.magill@nottingham.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class context_freeze_test extends \advanced_testcase {
+class context_freeze_test extends \advanced_testcase {
     /**
      * Creates a comment by a student.
      *

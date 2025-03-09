@@ -22,11 +22,9 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['ai:acceptpolicy'] = 'Accept AI policy';
+$string['ai:acceptpolicy'] = 'Set a users AI policy acceptance';
 $string['ai:fetchanyuserpolicystatus'] = 'Get a users AI policy acceptance';
 $string['ai:fetchpolicy'] = 'Get a users AI policy acceptance';
-$string['ai:viewaipolicyacceptancereport'] = 'View AI policy acceptance report';
-$string['ai:viewaiusagereport'] = 'View AI usage report';
 $string['addinganewrole'] = 'Adding a new role';
 $string['addrole'] = 'Add a new role';
 $string['advancedoverride'] = 'Advanced role override';
@@ -219,7 +217,6 @@ $string['course:viewhiddencourses'] = 'View hidden courses';
 $string['course:viewhiddengroups'] = 'View hidden groups';
 $string['course:viewhiddensections'] = 'View hidden sections';
 $string['course:viewhiddenuserfields'] = 'View hidden user fields';
-$string['course:viewoverview'] = 'View course activities overview page';
 $string['course:viewparticipants'] = 'View participants';
 $string['course:viewscales'] = 'View scales';
 $string['course:visibility'] = 'Hide/show courses';

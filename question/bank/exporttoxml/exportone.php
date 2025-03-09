@@ -29,16 +29,24 @@ require_once($CFG->dirroot . '/question/format/xml/format.php');
 
 // Get the parameters from the URL.
 $questionid = required_param('id', PARAM_INT);
-$cmid = required_param('cmid', PARAM_INT);
+$cmid = optional_param('cmid', 0, PARAM_INT);
+$courseid = optional_param('courseid', 0, PARAM_INT);
 $urlparams = ['id' => $questionid, 'sesskey' => sesskey()];
 
 \core_question\local\bank\helper::require_plugin_enabled('qbank_exporttoxml');
 
-$cm = get_coursemodule_from_id(null, $cmid);
-require_login($cm->course, false, $cm);
-$thiscontext = context_module::instance($cmid);
-$urlparams['cmid'] = $cmid;
-
+if ($cmid) {
+    $cm = get_coursemodule_from_id(null, $cmid);
+    require_login($cm->course, false, $cm);
+    $thiscontext = context_module::instance($cmid);
+    $urlparams['cmid'] = $cmid;
+} else if ($courseid) {
+    require_login($courseid, false);
+    $thiscontext = context_course::instance($courseid);
+    $urlparams['courseid'] = $courseid;
+} else {
+    throw new moodle_exception('missingcourseorcmid', 'question');
+}
 require_sesskey();
 
 // Load the necessary data.

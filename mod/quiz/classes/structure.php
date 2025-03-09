@@ -19,7 +19,6 @@ namespace mod_quiz;
 use coding_exception;
 use context_module;
 use core\output\inplace_editable;
-use core_question\local\bank\version_options;
 use mod_quiz\event\quiz_grade_item_created;
 use mod_quiz\event\quiz_grade_item_deleted;
 use mod_quiz\event\quiz_grade_item_updated;
@@ -44,12 +43,6 @@ use stdClass;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class structure {
-
-    /**
-     * Placeholder string used when a question category is missing.
-     */
-    const MISSING_QUESTION_CATEGORY_PLACEHOLDER = 'missing_question_category';
-
     /** @var quiz_settings the quiz this is the structure of. */
     protected $quizobj = null;
 
@@ -81,9 +74,6 @@ class structure {
 
     /** @var array the slotids => question tags array for all slots containing a random question. */
     protected $randomslottags = null;
-
-    /** @var array an array of question banks course_modules records indexed by their associated contextid */
-    protected array $questionsources = [];
 
     /**
      * Create an instance of this class representing an empty quiz.
@@ -820,19 +810,32 @@ class structure {
         $slot = $this->get_slot_by_number($slotnumber);
 
         // Get all the versions which exist.
-        $versions = version_options::get_version_menu_options($slot->questionid);
-        $versioninfo = [];
+        $versions = qbank_helper::get_version_options($slot->questionid);
+        $latestversion = reset($versions);
 
-        // Loop through them and set which one is selected.
-        foreach ($versions as $versionnumber => $version) {
-            $versioninfo[] = (object)[
-                'version' => $versionnumber,
-                'versionvalue' => $version,
-                'selected' => ($versionnumber == $slot->requestedversion),
-            ];
+        // Format the choices for display.
+        $versionoptions = [];
+        foreach ($versions as $version) {
+            $version->selected = $version->version === $slot->requestedversion;
+
+            if ($version->version === $latestversion->version) {
+                $version->versionvalue = get_string('questionversionlatest', 'quiz', $version->version);
+            } else {
+                $version->versionvalue = get_string('questionversion', 'quiz', $version->version);
+            }
+
+            $versionoptions[] = $version;
         }
 
-        return $versioninfo;
+        // Make a choice for 'Always latest'.
+        $alwaysuselatest = new stdClass();
+        $alwaysuselatest->versionid = 0;
+        $alwaysuselatest->version = 0;
+        $alwaysuselatest->versionvalue = get_string('alwayslatest', 'quiz');
+        $alwaysuselatest->selected = $slot->requestedversion === null;
+        array_unshift($versionoptions, $alwaysuselatest);
+
+        return $versionoptions;
     }
 
     /**
@@ -1807,10 +1810,6 @@ class structure {
         // Now, put the data required for each slot into $this->randomslotcategories and $this->randomslottags.
         foreach ($randomcategoriesandtags as $slotid => $catandtags) {
             $qcategoryid = $catandtags['cat']['values'];
-            if (!array_key_exists($qcategoryid, $categories)) {
-                $this->randomslotcategories[$slotid] = self::MISSING_QUESTION_CATEGORY_PLACEHOLDER;
-                continue;
-            }
             $qcategory = $categories[$qcategoryid];
             $includesubcategories = $catandtags['cat']['includesubcategories'];
             $this->randomslotcategories[$slotid] = $this->get_used_category_description($qcategory, $includesubcategories);
@@ -1821,7 +1820,6 @@ class structure {
                 }
                 $this->randomslottags[$slotid] = implode(', ', $slottagnames);
             }
-
         }
     }
 
@@ -1835,13 +1833,6 @@ class structure {
      * @throws coding_exception If the context level is unsupported.
      */
     private function get_used_category_description(stdClass $qcategory, bool $includesubcategories): string {
-
-        $context = \context::instance_by_id($qcategory->contextid);
-
-        if ($context->contextlevel != CONTEXT_MODULE) {
-            throw new coding_exception('Unsupported context.');
-        }
-
         if ($qcategory->name === 'top') { // This is a "top" question category.
             if (!$includesubcategories) {
                 // Question categories labeled as "top" cannot directly contain questions. If the subcategories that may
@@ -1849,51 +1840,30 @@ class structure {
                 // that informs the user about the issues associated with these types of generated random questions.
                 return get_string('randomfaultynosubcat', 'mod_quiz');
             }
-            return get_string('randommodulewithsubcat', 'mod_quiz');
+
+            $context = \context::instance_by_id($qcategory->contextid);
+
+            switch ($context->contextlevel) {
+                case CONTEXT_MODULE:
+                    return get_string('randommodulewithsubcat', 'mod_quiz');
+
+                case CONTEXT_COURSE:
+                    return get_string('randomcoursewithsubcat', 'mod_quiz');
+
+                case CONTEXT_COURSECAT:
+                    $contextname = shorten_text($context->get_context_name(false), 100);
+                    return get_string('randomcoursecatwithsubcat', 'mod_quiz', $contextname);
+
+                case CONTEXT_SYSTEM:
+                    return get_string('randomsystemwithsubcat', 'mod_quiz');
+
+                default:
+                    throw new coding_exception('Unsupported context.');
+            }
         }
         // Otherwise, return the description of the used standard question category, also indicating whether subcategories
         // are included.
         return $includesubcategories ? get_string('randomcatwithsubcat', 'mod_quiz', $qcategory->name) :
             $qcategory->name;
-    }
-
-    /**
-     * Populate question_sources with cm records for later reference.
-     *
-     * @return void
-     */
-    private function populate_question_sources(): void {
-        global $DB;
-
-        $sql = 'SELECT c.id AS contextid, cm.id, cm.course
-                  FROM {question_categories} qc
-                  JOIN {context} c ON c.id = qc.contextid
-                  JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = ' . CONTEXT_MODULE . '
-              GROUP BY c.id, cm.id, cm.course';
-        $this->questionsources = $DB->get_records_sql($sql);
-    }
-
-    /**
-     * Get data on the question bank being used by the question in the slot.
-     *
-     * @param int $slot slot number
-     * @return stdClass|null
-     */
-    public function get_source_bank(int $slot): ?stdClass {
-        $questionid = $this->slotsinorder[$slot]->questionid;
-
-            $this->questionsources[$this->questions[$questionid]->contextid] ?? $this->populate_question_sources();
-
-        // This shouldn't happen as all categories belong to a module context level but let's account for it.
-        if (empty($this->questionsources[$this->questions[$questionid]->contextid])) {
-            return null;
-        }
-
-        $cminfo = \cm_info::create($this->questionsources[$this->questions[$questionid]->contextid]);
-
-        return (object) [
-            'cminfo' => $cminfo,
-            'issharedbank' => plugin_supports('mod', $cminfo->modname, FEATURE_PUBLISHES_QUESTIONS, false),
-        ];
     }
 }

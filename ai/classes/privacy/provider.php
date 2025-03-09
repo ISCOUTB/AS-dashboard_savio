@@ -56,7 +56,6 @@ class provider implements
             'provider' => 'privacy:metadata:ai_action_register:provider',
             'timecreated' => 'privacy:metadata:ai_action_register:timecreated',
             'timecompleted' => 'privacy:metadata:ai_action_register:timecompleted',
-            'model' => 'privacy:metadata:ai_action_register:model',
         ], 'privacy:metadata:ai_action_register');
         $collection->add_database_table('ai_action_generate_image', [
             'prompt' => 'privacy:metadata:ai_action_generate_image:prompt',
@@ -83,14 +82,6 @@ class provider implements
             'prompttokens' => 'privacy:metadata:ai_action_summarise_text:prompttokens',
             'completiontoken' => 'privacy:metadata:ai_action_summarise_text:completiontoken',
         ], 'privacy:metadata:ai_action_summarise_text');
-        $collection->add_database_table('ai_action_explain_text', [
-            'prompt' => 'privacy:metadata:ai_action_explain_text:prompt',
-            'responseid' => 'privacy:metadata:ai_action_explain_text:responseid',
-            'fingerprint' => 'privacy:metadata:ai_action_explain_text:fingerprint',
-            'generatedcontent' => 'privacy:metadata:ai_action_explain_text:generatedcontent',
-            'prompttokens' => 'privacy:metadata:ai_action_explain_text:prompttokens',
-            'completiontoken' => 'privacy:metadata:ai_action_explain_text:completiontoken',
-        ], 'privacy:metadata:ai_action_explain_text');
 
         return $collection;
     }
@@ -145,17 +136,6 @@ class provider implements
                        AND aar.userid = :userid";
         $contextlist->add_from_sql($sql, ['userid' => $userid]);
 
-        // AI action explain text.
-        $sql = "SELECT DISTINCT ctx.id
-                  FROM {context} ctx
-                  JOIN {ai_action_register} aar
-                    ON aar.contextid = ctx.id
-                  JOIN {ai_action_explain_text} aaet
-                    ON aaet.id = aar.actionid
-                 WHERE aar.actionname = 'explain_text'
-                       AND aar.userid = :userid";
-        $contextlist->add_from_sql($sql, ['userid' => $userid]);
-
         return $contextlist;
     }
 
@@ -198,7 +178,7 @@ class provider implements
         // AI action generate text.
         $sql = "SELECT aar.actionname, aar.success, aar.provider, aar.timecreated, aar.timecompleted, aar.contextid,
                        aagt.prompt, aagt.responseid, aagt.fingerprint, aagt.generatedcontent,
-                       aagt.prompttokens, aagt.completiontoken, aar.model
+                       aagt.prompttokens, aagt.completiontoken
                   FROM {ai_action_register} aar
                   JOIN {ai_action_generate_text} aagt
                     ON aar.actionid = aagt.id
@@ -227,7 +207,6 @@ class provider implements
                 'generatedcontent' => $textgeneratedetail->generatedcontent,
                 'prompttokens' => $textgeneratedetail->prompttokens,
                 'completiontoken' => $textgeneratedetail->completiontoken,
-                'model' => $textgeneratedetail->model,
                 'success' => transform::yesno($textgeneratedetail->success),
                 'provider' => $textgeneratedetail->provider,
                 'timecreated' => transform::datetime($textgeneratedetail->timecreated),
@@ -242,7 +221,7 @@ class provider implements
         // AI action generate image.
         $sql = "SELECT aar.actionname, aar.success, aar.provider, aar.timecreated, aar.timecompleted, aar.contextid,
                        aagi.prompt, aagi.numberimages, aagi.quality, aagi.aspectratio, aagi.style, aagi.sourceurl,
-                       aagi.revisedprompt, aar.model
+                       aagi.revisedprompt
                   FROM {ai_action_register} aar
                   JOIN {ai_action_generate_image} aagi
                     ON aar.actionid = aagi.id
@@ -272,7 +251,6 @@ class provider implements
                 'style' => $imagegeneratedetail->style,
                 'sourceurl' => $imagegeneratedetail->sourceurl,
                 'revisedprompt' => $imagegeneratedetail->revisedprompt,
-                'model' => $imagegeneratedetail->model,
                 'success' => transform::yesno($imagegeneratedetail->success),
                 'provider' => $imagegeneratedetail->provider,
                 'timecreated' => transform::datetime($imagegeneratedetail->timecreated),
@@ -287,7 +265,7 @@ class provider implements
         // AI action summarise text.
         $sql = "SELECT aar.actionname, aar.success, aar.provider, aar.timecreated, aar.timecompleted, aar.contextid,
                        aast.prompt, aast.responseid, aast.fingerprint, aast.generatedcontent,
-                       aast.prompttokens, aast.completiontoken, aar.model
+                       aast.prompttokens, aast.completiontoken
                   FROM {ai_action_register} aar
                   JOIN {ai_action_summarise_text} aast
                     ON aar.actionid = aast.id
@@ -316,7 +294,6 @@ class provider implements
                 'generatedcontent' => $textsummarisedetail->generatedcontent,
                 'prompttokens' => $textsummarisedetail->prompttokens,
                 'completiontoken' => $textsummarisedetail->completiontoken,
-                'model' => $textsummarisedetail->model,
                 'success' => transform::yesno($textsummarisedetail->success),
                 'provider' => $textsummarisedetail->provider,
                 'timecreated' => transform::datetime($textsummarisedetail->timecreated),
@@ -327,50 +304,6 @@ class provider implements
             writer::with_context($context)->export_related_data($subcontexts, $name, $details);
         }
         $textsummarisedetails->close();
-
-        // AI action explain text.
-        $sql = "SELECT aar.actionname, aar.success, aar.provider, aar.timecreated, aar.timecompleted, aar.contextid,
-                       aaet.prompt, aaet.responseid, aaet.fingerprint, aaet.generatedcontent,
-                       aaet.prompttokens, aaet.completiontoken, aar.model
-                  FROM {ai_action_register} aar
-                  JOIN {ai_action_explain_text} aaet
-                    ON aar.actionid = aaet.id
-                  JOIN {context} ctx
-                    ON aar.contextid = ctx.id
-                 WHERE aar.actionname = 'explain_text'
-                       AND aar.userid = :userid
-                       AND ctx.id " . $contextsql;
-        $params = [
-            'userid' => $userid,
-        ];
-        $params += $contextparams;
-        $textexplaindetails = $DB->get_recordset_sql($sql, $params);
-        foreach ($textexplaindetails as $textexplaindetail) {
-            $subcontexts = [
-                get_string('ai', 'core_ai'),
-                get_string('action_explain_text', 'core_ai'),
-                date('c', $textexplaindetail->timecreated),
-            ];
-            $details = (object) [
-                'actionname' => $textexplaindetail->actionname,
-                'contextid' => $textexplaindetail->contextid,
-                'prompt' => $textexplaindetail->prompt,
-                'responseid' => $textexplaindetail->responseid,
-                'fingerprint' => $textexplaindetail->fingerprint,
-                'generatedcontent' => $textexplaindetail->generatedcontent,
-                'prompttokens' => $textexplaindetail->prompttokens,
-                'completiontoken' => $textexplaindetail->completiontoken,
-                'model' => $textexplaindetail->model,
-                'success' => transform::yesno($textexplaindetail->success),
-                'provider' => $textexplaindetail->provider,
-                'timecreated' => transform::datetime($textexplaindetail->timecreated),
-                'timecompleted' => transform::datetime($textexplaindetail->timecompleted),
-            ];
-            $name = 'action_explain_text';
-            $context = \context::instance_by_id($textexplaindetail->contextid);
-            writer::with_context($context)->export_related_data($subcontexts, $name, $details);
-        }
-        $textexplaindetails->close();
     }
 
     /**
@@ -464,30 +397,6 @@ class provider implements
                        generatedcontent = ''
                  WHERE id " . $aastidsql;
             $DB->execute($sql, $aastidparams);
-        }
-
-        // AI action explain text.
-        $sql = "SELECT DISTINCT aaet.id
-                  FROM {ai_action_register} aar
-                  JOIN {ai_action_explain_text} aaet
-                    ON aar.actionid = aaet.id
-                  JOIN {context} ctx
-                    ON aar.contextid = ctx.id
-                 WHERE aar.actionname = 'explain_text'
-                       AND ctx.id = :contextid";
-        $params = [
-            'contextid' => $context->id,
-        ];
-        $aaetids = $DB->get_records_sql_menu($sql, $params);
-        if ($aaetids) {
-            [$aaetidsql, $aaetidparams] = $DB->get_in_or_equal(array_keys($aaetids), SQL_PARAMS_NAMED);
-            $sql = "UPDATE {ai_action_explain_text}
-                   SET prompt = '',
-                       responseid = '',
-                       fingerprint = '',
-                       generatedcontent = ''
-                 WHERE id " . $aaetidsql;
-            $DB->execute($sql, $aaetidparams);
         }
     }
 
@@ -600,33 +509,6 @@ class provider implements
                  WHERE id " . $aastidsql;
             $DB->execute($sql, $aastidparams);
         }
-
-        // AI action explain text.
-        $sql = "SELECT DISTINCT aaet.id AS textexplainid
-                  FROM {ai_action_register} aar
-                  JOIN {ai_action_explain_text} aaet
-                    ON aar.actionid = aaet.id
-                  JOIN {context} ctx
-                    ON aar.contextid = ctx.id
-                 WHERE aar.actionname = 'explain_text'
-                       AND aar.userid = :userid
-                       AND ctx.id " . $contextsql;
-        $textexplaindetails = $DB->get_recordset_sql($sql, $params);
-        $aaetids = [];
-        foreach ($textexplaindetails as $textexplaindetail) {
-            $aaetids[] = $textexplaindetail->textexplainid;
-        }
-        $textexplaindetails->close();
-        if ($aaetids) {
-            [$aaetidsql, $aaetidparams] = $DB->get_in_or_equal($aaetids, SQL_PARAMS_NAMED);
-            $sql = "UPDATE {ai_action_explain_text}
-                   SET prompt = '',
-                       responseid = '',
-                       fingerprint = '',
-                       generatedcontent = ''
-                 WHERE id " . $aaetidsql;
-            $DB->execute($sql, $aaetidparams);
-        }
     }
 
     /**
@@ -675,17 +557,6 @@ class provider implements
                   JOIN {ai_action_summarise_text} aast
                     ON aast.id = aar.actionid
                  WHERE aar.actionname = 'summarise_text'
-                       AND aar.contextid = :contextid";
-        $userlist->add_from_sql('userid', $sql, ['contextid' => $context->id]);
-
-        // AI action explain text.
-        $sql = "SELECT DISTINCT aar.userid
-                  FROM {context} ctx
-                  JOIN {ai_action_register} aar
-                    ON aar.contextid = ctx.id
-                  JOIN {ai_action_explain_text} aaet
-                    ON aaet.id = aar.actionid
-                 WHERE aar.actionname = 'explain_text'
                        AND aar.contextid = :contextid";
         $userlist->add_from_sql('userid', $sql, ['contextid' => $context->id]);
     }
@@ -782,28 +653,6 @@ class provider implements
                        generatedcontent = ''
                  WHERE id " . $aastidsql;
             $DB->execute($sql, $aastidparams);
-        }
-
-        // AI action explain text.
-        $sql = "SELECT DISTINCT aaet.id
-                  FROM {ai_action_register} aar
-                  JOIN {ai_action_explain_text} aaet
-                    ON aar.actionid = aaet.id
-                  JOIN {context} ctx
-                    ON aar.contextid = ctx.id
-                 WHERE aar.actionname = 'explain_text'
-                       AND ctx.id = :contextid
-                       AND aar.userid " . $useridssql;
-        $aaetids = $DB->get_records_sql_menu($sql, $params);
-        if ($aaetids) {
-            [$aaetidsql, $aaetidparams] = $DB->get_in_or_equal(array_keys($aaetids), SQL_PARAMS_NAMED);
-            $sql = "UPDATE {ai_action_explain_text}
-                   SET prompt = '',
-                       responseid = '',
-                       fingerprint = '',
-                       generatedcontent = ''
-                 WHERE id " . $aaetidsql;
-            $DB->execute($sql, $aaetidparams);
         }
     }
 }

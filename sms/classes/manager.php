@@ -27,6 +27,9 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class manager {
+    /** @var int The maximum length of a message */
+    const MESSAGE_LENGTH_LIMIT = 160 * 3;
+
     /**
      * Create a new SMS manager.
      *
@@ -75,39 +78,18 @@ class manager {
             throw new \coding_exception('Sensitive messages cannot be sent asynchronously');
         }
 
-        return $this->send_message(
-            message: $message,
-            async: $async,
-            gatewayid: $gatewayid,
-        );
-    }
-
-    /**
-     * Send a message using the message object.
-     *
-     * @param message $message The message object
-     * @param bool $async Whether this SMS should be sent asynchronously. Note: sensitive messages cannot be sent async
-     * @param ?int $gatewayid the gateway instance id to send the sms in a specific gateway config
-     * @return message the message object after trying to send the message
-     */
-    public function send_message(
-        message $message,
-        bool $async = true,
-        ?int $gatewayid = null,
-    ): message {
         if ($async) {
-            $message = $message->with(status: message_status::GATEWAY_QUEUED);
-            $message = $this->save_message($message);
-            \core_sms\task\send_sms_task::queue($message);
-            return $message;
+            // TODO See MDL-81015 for further information.
+            throw new \coding_exception('Asynchronous sending is not yet implemented');
         }
 
-        if ($gateway = $this->get_gateway_for_message($message, $gatewayid)) {
-            $modifiedmessage = $message->with(
-                gatewayid: $gateway->id,
-                content: $gateway->truncate_message($message->content),
+        if (\core_text::strlen($content) > self::MESSAGE_LENGTH_LIMIT) {
+            $message = $message->with(status: message_status::MESSAGE_OVER_SIZE);
+        } else if ($gateway = $this->get_gateway_for_message($message, $gatewayid)) {
+            $message = $message->with(gatewayid: $gateway->id);
+            $message = $gateway->send(
+                message: $message,
             );
-            $message = $gateway->send($modifiedmessage);
         } else {
             $message = $message->with(status: message_status::GATEWAY_NOT_AVAILABLE);
         }

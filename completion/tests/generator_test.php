@@ -25,7 +25,7 @@ namespace core_completion;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \core_completion_generator
  */
-final class generator_test extends \advanced_testcase {
+class generator_test extends \advanced_testcase {
 
     /**
      * Test create_default_completion.
@@ -80,7 +80,7 @@ final class generator_test extends \advanced_testcase {
      * Data provider for test_create_default_completion().
      * @return array[]
      */
-    public static function create_default_completion_provider(): array {
+    public function create_default_completion_provider(): array {
         global $SITE;
 
         return [

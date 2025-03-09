@@ -26,7 +26,7 @@ use mod_lesson\local\numeric\helper;
  * @copyright 2020 Peter Dias
  * @license   http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
-final class numeric_helper_test extends \advanced_testcase {
+class numeric_helper_test extends \advanced_testcase {
     /**
      * Test the lesson_unformat_numeric_value function.
      *
@@ -62,11 +62,11 @@ final class numeric_helper_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function lesson_unformat_dataprovider(): array {
+    public function lesson_unformat_dataprovider() {
         return [
             "Using a decimal as a separator" => [
                 "decsep" => ".",
-                "tests" => [
+                "test" => [
                     ["2.1", 2.1],
                     ["1:4.2", "1:4.2"],
                     ["2,1", 2],
@@ -76,7 +76,7 @@ final class numeric_helper_test extends \advanced_testcase {
             ],
             "Using a comma as a separator" => [
                 "decsep" => ",",
-                "tests" => [
+                "test" => [
                     ["2,1", 2.1],
                     ["1:4,2", "1:4.2"],
                     ["2.1", 2.1],
@@ -85,7 +85,7 @@ final class numeric_helper_test extends \advanced_testcase {
             ],
             "Using a X as a separator" => [
                 "decsep" => "X",
-                "tests" => [
+                "test" => [
                     ["2X1", 2.1],
                     ["1:4X2", "1:4.2"],
                     ["2.1", 2.1],
@@ -100,11 +100,11 @@ final class numeric_helper_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function lesson_format_dataprovider(): array {
+    public function lesson_format_dataprovider() {
         return [
             "Using a decimal as a separator" => [
                 "decsep" => ".",
-                "tests" => [
+                "test" => [
                     ["2.1", 2.1],
                     ["1:4.2", "1:4.2"],
                     ["2,1", "2,1"],
@@ -113,7 +113,7 @@ final class numeric_helper_test extends \advanced_testcase {
             ],
             "Using a comma as a separator" => [
                 "decsep" => ",",
-                "tests" => [
+                "test" => [
                     ["2,1", "2,1"],
                     ["1:4,2", "1:4,2"],
                     ["2.1", "2,1"],
@@ -123,7 +123,7 @@ final class numeric_helper_test extends \advanced_testcase {
             ],
             "Using a X as a separator" => [
                 "decsep" => "X",
-                "tests" => [
+                "test" => [
                     ["2X1", "2X1"],
                     ["1:4X2", "1:4X2"],
                     ["2.1", "2X1"],

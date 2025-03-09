@@ -30,6 +30,9 @@
 function xmldb_assign_upgrade($oldversion) {
     global $DB;
 
+    // Automatically generated Moodle v4.1.0 release upgrade line.
+    // Put any upgrade step following this.
+
     // Automatically generated Moodle v4.2.0 release upgrade line.
     // Put any upgrade step following this.
 
@@ -105,9 +108,6 @@ function xmldb_assign_upgrade($oldversion) {
         // Assign savepoint reached.
         upgrade_mod_savepoint(true, 2024042201, 'assign');
     }
-
-    // Automatically generated Moodle v4.5.0 release upgrade line.
-    // Put any upgrade step following this.
 
     return true;
 }

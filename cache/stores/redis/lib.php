@@ -66,7 +66,7 @@ class cachestore_redis extends store implements
     const TTL_EXPIRE_BATCH = 10000;
 
     /** @var int The number of seconds to wait for a connection or response from the Redis server. */
-    const CONNECTION_TIMEOUT = 3;
+    const CONNECTION_TIMEOUT = 10;
 
     /**
      * Name of this store.
@@ -116,14 +116,6 @@ class cachestore_redis extends store implements
      * @var int
      */
     protected $compressor = self::COMPRESSOR_NONE;
-
-
-    /**
-     * The number of seconds to wait for a connection or response from the Redis server.
-     *
-     * @var int
-     */
-    protected $connectiontimeout = self::CONNECTION_TIMEOUT;
 
     /**
      * Bytes read or written by last call to set()/get() or set_many()/get_many().
@@ -205,9 +197,6 @@ class cachestore_redis extends store implements
         if (array_key_exists('compressor', $configuration)) {
             $this->compressor = (int)$configuration['compressor'];
         }
-        if (array_key_exists('connectiontimeout', $configuration)) {
-            $this->connectiontimeout = (int)$configuration['connectiontimeout'];
-        }
         if (array_key_exists('lockwait', $configuration)) {
             $this->lockwait = (int)$configuration['lockwait'];
         }
@@ -288,8 +277,8 @@ class cachestore_redis extends store implements
                     $redis = new RedisCluster(
                         name: null,
                         seeds: $trimmedservers,
-                        timeout: $this->connectiontimeout, // Timeout.
-                        read_timeout: $this->connectiontimeout, // Read timeout.
+                        timeout: self::CONNECTION_TIMEOUT, // Timeout.
+                        read_timeout: self::CONNECTION_TIMEOUT, // Read timeout.
                         persistent: true,
                         auth: $password,
                         context: !empty($opts) ? $opts : null,
@@ -298,8 +287,8 @@ class cachestore_redis extends store implements
                     $redis = new RedisCluster(
                         null,
                         $trimmedservers,
-                        $this->connectiontimeout,
-                        $this->connectiontimeout,
+                        self::CONNECTION_TIMEOUT,
+                        self::CONNECTION_TIMEOUT,
                         true, $password,
                         !empty($opts) ? $opts : null,
                     );
@@ -311,18 +300,18 @@ class cachestore_redis extends store implements
                     $redis->connect(
                         host: $server,
                         port: $port,
-                        timeout: $this->connectiontimeout, // Timeout.
+                        timeout: self::CONNECTION_TIMEOUT, // Timeout.
                         retry_interval: 100, // Retry interval.
-                        read_timeout: $this->connectiontimeout, // Read timeout.
+                        read_timeout: self::CONNECTION_TIMEOUT, // Read timeout.
                         context: $opts,
                     );
                 } else {
                     $redis->connect(
                         $server, $port,
-                        $this->connectiontimeout,
+                        self::CONNECTION_TIMEOUT,
                         null,
                         100,
-                        $this->connectiontimeout,
+                        self::CONNECTION_TIMEOUT,
                         $opts,
                     );
                 }
@@ -874,7 +863,6 @@ class cachestore_redis extends store implements
             'password' => $data->password,
             'serializer' => $data->serializer,
             'compressor' => $data->compressor,
-            'connectiontimeout' => $data->connectiontimeout,
             'encryption' => $data->encryption,
             'cafile' => $data->cafile,
             'clustermode' => $data->clustermode,
@@ -898,9 +886,6 @@ class cachestore_redis extends store implements
         }
         if (!empty($config['compressor'])) {
             $data['compressor'] = $config['compressor'];
-        }
-        if (!empty($config['connectiontimeout'])) {
-            $data['connectiontimeout'] = $config['connectiontimeout'];
         }
         if (!empty($config['encryption'])) {
             $data['encryption'] = $config['encryption'];

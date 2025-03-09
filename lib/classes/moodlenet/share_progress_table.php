@@ -117,13 +117,13 @@ class share_progress_table extends table_sql {
             }
         }
         if ($deleted) {
-            $class = 'fst-italic';
+            $class = 'font-italic';
         }
         // Add a link to the resource if it was recorded.
         if (!empty($row->resourceurl)) {
             // Apply bold to resource links that aren't deleted.
             if (!$deleted) {
-                $class = 'fw-bold';
+                $class = 'font-weight-bold';
             }
             $icon = $OUTPUT->pix_icon('i/externallink', get_string('opensinnewwindow'), 'moodle', ['class' => 'ms-1']);
             $text = $name . $icon;

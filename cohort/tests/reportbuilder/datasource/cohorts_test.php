@@ -18,11 +18,17 @@ declare(strict_types=1);
 
 namespace core_cohort\reportbuilder\datasource;
 
-use core\context\{coursecat, system};
+use context_coursecat;
+use context_system;
 use core_customfield_generator;
 use core_reportbuilder_generator;
+use core_reportbuilder_testcase;
 use core_reportbuilder\local\filters\{boolean_select, date, select, text};
-use core_reportbuilder\tests\core_reportbuilder_testcase;
+
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once("{$CFG->dirroot}/reportbuilder/tests/helpers.php");
 
 /**
  * Unit tests for cohorts datasource
@@ -32,7 +38,7 @@ use core_reportbuilder\tests\core_reportbuilder_testcase;
  * @copyright   2021 Paul Holden <paulh@moodle.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class cohorts_test extends core_reportbuilder_testcase {
+class cohorts_test extends core_reportbuilder_testcase {
 
     /**
      * Test default datasource
@@ -41,7 +47,7 @@ final class cohorts_test extends core_reportbuilder_testcase {
         $this->resetAfterTest();
 
         // Test subject.
-        $contextsystem = system::instance();
+        $contextsystem = context_system::instance();
         $cohortone = $this->getDataGenerator()->create_cohort([
             'contextid' => $contextsystem->id,
             'name' => 'Legends',
@@ -50,7 +56,7 @@ final class cohorts_test extends core_reportbuilder_testcase {
         ]);
 
         $category = $this->getDataGenerator()->create_category();
-        $contextcategory = coursecat::instance($category->id);
+        $contextcategory = context_coursecat::instance($category->id);
         $cohorttwo = $this->getDataGenerator()->create_cohort([
             'contextid' => $contextcategory->id,
             'name' => 'Category cohort',
@@ -139,7 +145,7 @@ final class cohorts_test extends core_reportbuilder_testcase {
      *
      * @return array[]
      */
-    public static function datasource_filters_provider(): array {
+    public function datasource_filters_provider(): array {
         return [
             // Cohort.
             'Filter cohort' => ['cohort:cohortselect', [
@@ -147,11 +153,11 @@ final class cohorts_test extends core_reportbuilder_testcase {
             ], false],
             'Filter context' => ['cohort:context', [
                 'cohort:context_operator' => select::EQUAL_TO,
-                'cohort:context_value' => system::instance()->id,
+                'cohort:context_value' => context_system::instance()->id,
             ], true],
-            'Filter context (no match)' => ['cohort:context', [
-                'cohort:context_operator' => select::NOT_EQUAL_TO,
-                'cohort:context_value' => system::instance()->id,
+            'Filter content (no match)' => ['cohort:context', [
+                'cohort:context_operator' => select::EQUAL_TO,
+                'cohort:context_value' => -1,
             ], false],
             'Filter name' => ['cohort:name', [
                 'cohort:name_operator' => text::IS_EQUAL_TO,

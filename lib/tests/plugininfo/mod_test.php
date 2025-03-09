@@ -28,15 +28,16 @@ use advanced_testcase;
  * @copyright   2023 Andrew Lyons <andrew@nicols.co.uk>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class mod_test extends advanced_testcase {
+class mod_test extends advanced_testcase {
     public function test_get_enabled_plugins(): void {
         $this->resetAfterTest();
 
-        // The bigbluebuttonbn is disabled by default.
+        // The bigbluebuttonbn and chat plugins are disabled by default.
         // Check all default formats.
         $plugins = mod::get_enabled_plugins();
         $this->assertArrayHasKey('assign', $plugins);
         $this->assertArrayHasKey('forum', $plugins);
+        $this->assertArrayNotHasKey('chat', $plugins);
         $this->assertArrayNotHasKey('bigbluebuttonbn', $plugins);
 
         // Disable assignment.
@@ -45,6 +46,7 @@ final class mod_test extends advanced_testcase {
         $plugins = mod::get_enabled_plugins();
         $this->assertArrayHasKey('forum', $plugins);
         $this->assertArrayNotHasKey('assign', $plugins);
+        $this->assertArrayNotHasKey('chat', $plugins);
         $this->assertArrayNotHasKey('bigbluebuttonbn', $plugins);
     }
 }

@@ -25,7 +25,7 @@ namespace core;
  * @covers    \core\formatting
  * @coversDefaultClass \core\formatting
  */
-final class formatting_test extends \advanced_testcase {
+class formatting_test extends \advanced_testcase {
     /**
      * @covers ::format_string
      */

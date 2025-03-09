@@ -28,7 +28,8 @@ import {debounce} from 'core/utils';
 import {isSmall, isLarge} from 'core/pagehelpers';
 import Pending from 'core/pending';
 import {setUserPreference} from 'core_user/repository';
-import Tooltip from './bootstrap/tooltip';
+// The jQuery module is only used for interacting with Boostrap 4. It can we removed when MDL-71979 is integrated.
+import jQuery from 'jquery';
 
 let backdropPromise = null;
 
@@ -141,11 +142,12 @@ const disableDrawerTooltips = (drawerNode) => {
  */
 const disableButtonTooltip = (button, enableOnBlur) => {
     if (button.hasAttribute('data-original-title')) {
-        Tooltip.getInstance(button).disable();
+        // The jQuery is still used in Boostrap 4. It can we removed when MDL-71979 is integrated.
+        jQuery(button).tooltip('disable');
         button.setAttribute('title', button.dataset.originalTitle);
     } else {
         button.dataset.disabledToggle = button.dataset.toggle;
-        button.removeAttribute('data-bs-toggle');
+        button.removeAttribute('data-toggle');
     }
     if (enableOnBlur) {
         button.dataset.restoreTooltipOnBlur = true;
@@ -178,12 +180,13 @@ const enableDrawerTooltips = (drawerNode) => {
  * @private
  */
 const enableButtonTooltip = (button) => {
-    if (button.hasAttribute('data-bs-original-title')) {
-        Tooltip.getInstance(button).enable();
+    // The jQuery is still used in Boostrap 4. It can we removed when MDL-71979 is integrated.
+    if (button.hasAttribute('data-original-title')) {
+        jQuery(button).tooltip('enable');
         button.removeAttribute('title');
     } else if (button.dataset.disabledToggle) {
         button.dataset.toggle = button.dataset.disabledToggle;
-        new Tooltip(button);
+        jQuery(button).tooltip();
     }
     delete button.dataset.restoreTooltipOnBlur;
 };
@@ -429,7 +432,8 @@ export default class Drawers {
         // Remove open tooltip if still visible.
         let openButton = getDrawerOpenButton(this.drawerNode.id);
         if (openButton && openButton.hasAttribute('data-original-title')) {
-            Tooltip.getInstance(openButton)?.hide();
+            // The jQuery is still used in Boostrap 4. It can we removed when MDL-71979 is integrated.
+            jQuery(openButton)?.tooltip('hide');
         }
 
         Aria.unhide(this.drawerNode);
@@ -500,7 +504,8 @@ export default class Drawers {
         headerContent?.classList.toggle('hidden', true);
         // Remove the close button tooltip if visible.
         if (closeButton.hasAttribute('data-original-title')) {
-            Tooltip.getInstance(closeButton)?.hide();
+            // The jQuery is still used in Boostrap 4. It can we removed when MDL-71979 is integrated.
+            jQuery(closeButton)?.tooltip('hide');
         }
 
         const preference = this.drawerNode.dataset.preference;
@@ -773,10 +778,7 @@ const registerListeners = () => {
             drawerMap.forEach(drawerInstance => {
                 disableDrawerTooltips(drawerInstance.drawerNode);
                 if (drawerInstance.isOpen) {
-                    const currentFocus = document.activeElement;
-                    const drawerContent = drawerInstance.drawerNode.querySelector(SELECTORS.DRAWERCONTENT);
-                    const shouldClose = drawerInstance.closeOnResize && (!drawerContent || !drawerContent.contains(currentFocus));
-                    if (shouldClose) {
+                    if (drawerInstance.closeOnResize) {
                         drawerInstance.closeDrawer();
                     } else {
                         anyOpen = true;
@@ -796,12 +798,6 @@ const registerListeners = () => {
     };
 
     document.addEventListener('scroll', () => {
-        const currentFocus = document.activeElement;
-        const drawerContentElements = document.querySelectorAll(SELECTORS.DRAWERCONTENT);
-        // Check if the current focus is within any drawer content.
-        if (Array.from(drawerContentElements).some(drawer => drawer.contains(currentFocus))) {
-            return;
-        }
         const body = document.querySelector('body');
         if (window.scrollY >= window.innerHeight) {
             body.classList.add(CLASSES.SCROLLED);
@@ -817,7 +813,7 @@ const registerListeners = () => {
     document.addEventListener('focusin', preventOverlap);
     document.addEventListener('focusout', preventOverlap);
 
-    window.addEventListener('resize', debounce(closeOnResizeListener, 400, {pending: true}));
+    window.addEventListener('resize', debounce(closeOnResizeListener, 400));
 };
 
 registerListeners();

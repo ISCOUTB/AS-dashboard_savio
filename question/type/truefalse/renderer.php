@@ -105,11 +105,11 @@ class qtype_truefalse_renderer extends qtype_renderer {
             $legendclass = '';
             $questionnumber = $options->add_question_identifier_to_label(get_string('selectone', 'qtype_truefalse'), true, true);
         } else {
-            $legendclass = 'visually-hidden';
+            $legendclass = 'sr-only';
             $questionnumber = $options->add_question_identifier_to_label(get_string('answer'), true, true);
         }
         $result .= html_writer::tag('legend', $questionnumber,
-            array('class' => 'prompt h6 fw-normal ' . $legendclass));
+            array('class' => 'prompt h6 font-weight-normal ' . $legendclass));
 
         $result .= html_writer::start_tag('div', array('class' => 'answer'));
         $result .= html_writer::tag('div', $radiotrue . ' ' . $truefeedbackimg,

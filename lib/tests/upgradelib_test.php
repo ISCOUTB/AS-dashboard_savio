@@ -33,7 +33,7 @@ require_once($CFG->dirroot . '/calendar/tests/helpers.php');
 /**
  * Tests various classes and functions in upgradelib.php library.
  */
-final class upgradelib_test extends advanced_testcase {
+class upgradelib_test extends advanced_testcase {
 
     /**
      * Test the {@link upgrade_stale_php_files_present() function
@@ -744,7 +744,7 @@ final class upgradelib_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function serialized_strings_dataprovider(): array {
+    public function serialized_strings_dataprovider() {
         return [
             'A configuration that uses the old object' => [
                 'O:6:"object":3:{s:4:"text";s:32:"Nothing that anyone cares about.";s:5:"title";s:16:"Really old block";s:6:"format";s:1:"1";}',
@@ -1391,11 +1391,43 @@ final class upgradelib_test extends advanced_testcase {
     }
 
     /**
+     * Test the check_oracle_usage check when the Moodle instance is not using Oracle as a database architecture.
+     *
+     * @covers ::check_oracle_usage
+     */
+    public function test_check_oracle_usage_is_not_used(): void {
+        global $CFG;
+
+        $this->resetAfterTest();
+        $CFG->dbtype = 'pgsql';
+
+        $result = new environment_results('custom_checks');
+        $this->assertNull(check_oracle_usage($result));
+    }
+
+    /**
+     * Test the check_oracle_usage check when the Moodle instance is using Oracle as a database architecture.
+     *
+     * @covers ::check_oracle_usage
+     */
+    public function test_check_oracle_usage_is_used(): void {
+        global $CFG;
+
+        $this->resetAfterTest();
+        $CFG->dbtype = 'oci';
+
+        $result = new environment_results('custom_checks');
+        $this->assertInstanceOf(environment_results::class, check_oracle_usage($result));
+        $this->assertEquals('oracle_database_usage', $result->getInfo());
+        $this->assertFalse($result->getStatus());
+    }
+
+    /**
      * Data provider of usermenu items.
      *
      * @return array
      */
-    public static function usermenu_items_dataprovider(): array {
+    public function usermenu_items_dataprovider(): array {
         return [
             'Add new item to empty usermenu' => [
                 '',

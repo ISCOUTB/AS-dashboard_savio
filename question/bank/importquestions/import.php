@@ -25,6 +25,7 @@
 
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->dirroot . '/question/editlib.php');
+require_once($CFG->dirroot . '/question/bank/importquestions/classes/form/import_form.php');
 require_once($CFG->dirroot . '/question/format.php');
 require_once($CFG->dirroot . '/question/renderer.php');
 
@@ -47,13 +48,17 @@ if (!$category = $DB->get_record("question_categories", ['id' => $catid])) {
 
 $categorycontext = context::instance_by_id($category->contextid);
 $category->context = $categorycontext;
-// This page can be called without cmid in which case.
+// This page can be called without courseid or cmid in which case.
 // We get the context from the category object.
 if ($contexts === null) { // Need to get the course from the chosen category.
     $contexts = new core_question\local\bank\question_edit_contexts($categorycontext);
     $thiscontext = $contexts->lowest();
-    [$module, $cm] = get_module_from_cmid($thiscontext->instanceid);
-    require_login($cm->course, false, $cm);
+    if ($thiscontext->contextlevel == CONTEXT_COURSE) {
+        require_login($thiscontext->instanceid, false);
+    } else if ($thiscontext->contextlevel == CONTEXT_MODULE) {
+        list($module, $cm) = get_module_from_cmid($thiscontext->instanceid);
+        require_login($cm->course, false, $cm);
+    }
     $contexts->require_one_edit_tab_cap($edittab);
 }
 

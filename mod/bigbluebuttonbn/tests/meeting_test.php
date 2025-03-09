@@ -37,7 +37,7 @@ use mod_bigbluebuttonbn\test\testcase_helper_trait;
  * @covers \mod_bigbluebuttonbn\meeting
  * @coversDefaultClass \mod_bigbluebuttonbn\meeting
  */
-final class meeting_test extends \advanced_testcase {
+class meeting_test extends \advanced_testcase {
     use testcase_helper_trait;
 
     /**
@@ -57,7 +57,7 @@ final class meeting_test extends \advanced_testcase {
      *
      * @return array[]
      */
-    public static function get_instance_types_meeting_info(): array {
+    public function get_instance_types_meeting_info(): array {
         return [
             'Instance Type ALL - No Group' => [
                 'type' => instance::TYPE_ALL,
@@ -120,7 +120,7 @@ final class meeting_test extends \advanced_testcase {
      * @covers ::create_meeting_data
      * @covers ::create_meeting_metadata
      */
-    public function test_create_meeting(int $type, ?string $groupname, $groupmode, $canjoin): void {
+    public function test_create_meeting(int $type, ?string $groupname): void {
         $this->resetAfterTest();
         [$meeting, $useringroup, $usernotingroup, $groupid, $activity] =
             $this->prepare_meeting($type, $groupname, SEPARATEGROUPS, false);
@@ -142,7 +142,7 @@ final class meeting_test extends \advanced_testcase {
      * @covers ::get_meeting_info
      * @covers ::do_get_meeting_info
      */
-    public function test_get_meeting_info(int $type, ?string $groupname, $groupmode, $canjoin): void {
+    public function test_get_meeting_info(int $type, ?string $groupname): void {
         $this->resetAfterTest();
         [$meeting, $useringroup, $usernotingroup, $groupid, $activity] = $this->prepare_meeting($type, $groupname);
         $meetinginfo = $meeting->get_meeting_info();
@@ -417,7 +417,7 @@ final class meeting_test extends \advanced_testcase {
      *
      * @return array[]
      */
-    public static function get_data_can_join_with_dates(): array {
+    public function get_data_can_join_with_dates(): array {
         return [
             'Instance Type ALL - No Group - Closed in past' => [
                 'type' => instance::TYPE_ALL,

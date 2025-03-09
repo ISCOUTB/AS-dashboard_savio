@@ -25,7 +25,7 @@ use core_calendar\local\event\proxies\std_proxy;
  * @copyright 2017 Cameron Ball <cameron@cameron1729.xyz>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class std_proxy_test extends \advanced_testcase {
+class std_proxy_test extends \advanced_testcase {
     /**
      * @var \stdClass[] $objects Array of objects to proxy.
      */
@@ -116,7 +116,7 @@ final class std_proxy_test extends \advanced_testcase {
     /**
      * Test cases for proxying test.
      */
-    public static function proxy_testcases(): array {
+    public function proxy_testcases() {
         return [
             'Object 1 member 1' => [
                 1,
@@ -154,7 +154,7 @@ final class std_proxy_test extends \advanced_testcase {
     /**
      * Test cases for getting and setting tests.
      */
-    public static function get_set_testcases(): array {
+    public function get_set_testcases() {
         return [
             'Object 1' => [1],
             'Object 2' => [5]

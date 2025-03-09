@@ -31,7 +31,7 @@ require_once($CFG->dirroot. '/comment/lib.php');
  * @author     Matt Porritt <mattp@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class backup_test extends \advanced_testcase {
+class backup_test extends \advanced_testcase {
 
     /**
      * @var array Data object for generating a question.
@@ -74,8 +74,7 @@ final class backup_test extends \advanced_testcase {
         // Question initial set up.
         $this->category = $this->getDataGenerator()->create_category();
         $this->course = $this->getDataGenerator()->create_course(['category' => $this->category->id]);
-        $qbank = self::getDataGenerator()->create_module('qbank', ['course' => $this->course->id]);
-        $context = \context_module::instance($qbank->cmid);
+        $context = \context_coursecat::instance($this->category->id);
         $this->qgen = $this->getDataGenerator()->get_plugin_generator('core_question');
         $qcat = $this->qgen->create_question_category(['contextid' => $context->id]);
 

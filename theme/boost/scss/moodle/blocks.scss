@@ -39,7 +39,7 @@ $blocks-column-width: 360px !default;
     float: right;
 }
 
-$blocks-plus-gutter: calc(#{$blocks-column-width} + (#{$grid-gutter-width} * 0.5));
+$blocks-plus-gutter: $blocks-column-width + ( $grid-gutter-width * 0.5 );
 
 /* We put an absolutely positioned div in a relatively positioned div so it takes up no space */
 @include media-breakpoint-up(sm) {
@@ -67,7 +67,7 @@ $blocks-plus-gutter: calc(#{$blocks-column-width} + (#{$grid-gutter-width} * 0.5
     }
 }
 
-@include media-breakpoint-down(md) {
+@include media-breakpoint-down(sm) {
     #region-main-settings-menu .menubar {
         justify-content: flex-end;
     }
@@ -77,7 +77,7 @@ $blocks-plus-gutter: calc(#{$blocks-column-width} + (#{$grid-gutter-width} * 0.5
 #region-main.has-blocks {
     display: inline-block;
     width: calc(100% - #{$blocks-plus-gutter});
-    @include media-breakpoint-down(xl) {
+    @include media-breakpoint-down(lg) {
         width: 100%;
         /* MDL-63102 - Remove extra space at bottom.
         If modifying make sure block-region is horizontally stacked when in full screen */
@@ -100,7 +100,7 @@ $blocks-plus-gutter: calc(#{$blocks-column-width} + (#{$grid-gutter-width} * 0.5
 }
 
 [data-region="blocks-column"] {
-    @include media-breakpoint-down(xl) {
+    @include media-breakpoint-down(lg) {
         width: 100%;
     }
 }
@@ -148,6 +148,12 @@ $blocks-plus-gutter: calc(#{$blocks-column-width} + (#{$grid-gutter-width} * 0.5
     .multiline {
         white-space: normal;
     }
+    .btn.btn-link.btn-icon {
+        height: 36px;
+        width: 36px;
+        padding: 0;
+        border-radius: 50%;
+    }
 }
 .card-grid {
     display: flex;
@@ -190,7 +196,7 @@ $blocks-plus-gutter: calc(#{$blocks-column-width} + (#{$grid-gutter-width} * 0.5
         padding-right: 0.5rem;
         justify-content: flex-end;
     }
-    @include media-breakpoint-down(sm) {
+    @include media-breakpoint-down(xs) {
         .paging-bar-container {
             margin-top: 0;
         }
@@ -255,7 +261,7 @@ $blocks-plus-gutter: calc(#{$blocks-column-width} + (#{$grid-gutter-width} * 0.5
         width: 20rem;
         background-position: center;
         background-size: cover;
-        @include media-breakpoint-down(xl) {
+        @include media-breakpoint-down(lg) {
             width: 100%;
         }
     }
@@ -291,7 +297,7 @@ $blocks-plus-gutter: calc(#{$blocks-column-width} + (#{$grid-gutter-width} * 0.5
 }
 .block_settings .block_tree [aria-expanded="true"] > p:before,
 .block_navigation .block_tree [aria-expanded="true"] > p:before {
-    font: var(--fa-font-solid);
+    @extend .fa-solid;
     content: fa-content($fa-var-angle-down);
     margin-right: 0;
     font-size: 16px;
@@ -300,7 +306,7 @@ $blocks-plus-gutter: calc(#{$blocks-column-width} + (#{$grid-gutter-width} * 0.5
 
 .block_settings .block_tree [aria-expanded="false"] > p:before,
 .block_navigation .block_tree [aria-expanded="false"] > p:before {
-    font: var(--fa-font-solid);
+    @extend .fa-solid;
     content: fa-content($fa-var-angle-right);
     margin-right: 0;
     font-size: 16px;
@@ -309,7 +315,7 @@ $blocks-plus-gutter: calc(#{$blocks-column-width} + (#{$grid-gutter-width} * 0.5
 .dir-rtl {
     .block_settings .block_tree [aria-expanded="false"] > p:before,
     .block_navigation .block_tree [aria-expanded="false"] > p:before {
-        font: var(--fa-font-solid);
+        @extend .fa-solid;
         content: fa-content($fa-var-angle-left);
     }
 }
@@ -327,8 +333,13 @@ $blocks-plus-gutter: calc(#{$blocks-column-width} + (#{$grid-gutter-width} * 0.5
     color: $text-muted;
 }
 
-.block_tree .tree_item.branch {
-    margin-left: 8px;
+.block_social_activities li a.movehere,
+.block_site_main_menu li a.movehere {
+    display: block;
+    width: 100%;
+    height: 2rem;
+    border: 2px dashed $gray-800;
+    margin: 4px 0;
 }
 
 //
@@ -369,16 +380,14 @@ $blocks-plus-gutter: calc(#{$blocks-column-width} + (#{$grid-gutter-width} * 0.5
 // Block add button
 //
 .block-add {
-    color: $primary;
-    border-color: $primary-light-border;
-    @include gradient-bg($primary-light-background);
+    @include alert-variant($primary-light-background, $primary-light-border, $primary);
     @include border-radius();
     width: 100%;
     border-width: $border-width;
     .pluscontainer {
         border: $border-width solid $primary-light-border;
         border-radius: 50%;
-        width: map-get($iconwidthsizes, 5);
+        width: map-get($iconsizes, 5);
         height: map-get($iconsizes, 5);
     }
     &:hover {

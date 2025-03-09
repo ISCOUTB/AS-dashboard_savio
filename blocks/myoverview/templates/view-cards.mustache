@@ -51,7 +51,7 @@
     {{/progress}}
     {{$coursename}}
         <span class="multiline" title="{{fullname}}">
-            <span class="visually-hidden">{{{fullname}}}</span>
+            <span class="sr-only">{{{fullname}}}</span>
             <span aria-hidden="true">
                 {{#shortentext}}55, {{{fullname}}} {{/shortentext}}
             </span>
@@ -59,7 +59,7 @@
     {{/coursename}}
     {{$coursecategory}}
         {{#showcoursecategory}}
-            <span class="visually-hidden">
+            <span class="sr-only">
                 {{#str}}aria:coursecategory, core_course{{/str}}
             </span>
             <span class="categoryname text-truncate">

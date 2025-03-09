@@ -24,7 +24,7 @@ namespace tool_mfa;
  * @copyright   Catalyst IT
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class plugininfo_factor_test extends \advanced_testcase {
+class plugininfo_factor_test extends \advanced_testcase {
 
     /**
      * Tests getting next user factor
@@ -43,9 +43,6 @@ final class plugininfo_factor_test extends \advanced_testcase {
         // Create and login a user.
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
-
-        // Disable the email factor (enabled by default).
-        set_config('enabled', 0, 'factor_email');
 
         // Test that with no enabled factors, fallback is returned.
         $this->assertEquals('fallback', \tool_mfa\plugininfo\factor::get_next_user_login_factor()->name);
@@ -93,13 +90,21 @@ final class plugininfo_factor_test extends \advanced_testcase {
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
 
-        // Add another factor (email factor is enabled by default).
+        // Create two active user factors.
         set_config('enabled', 1, 'factor_totp');
+        set_config('enabled', 1, 'factor_webauthn');
 
         $data = new \stdClass();
         $data->userid = $user->id;
         $data->factor = 'totp';
         $data->label = 'testtotp';
+        $data->revoked = 0;
+        $DB->insert_record('tool_mfa', $data);
+
+        $data = new \stdClass();
+        $data->userid = $user->id;
+        $data->factor = 'webauthn';
+        $data->label = 'testwebauthn';
         $data->revoked = 0;
         $factorid = $DB->insert_record('tool_mfa', $data);
 

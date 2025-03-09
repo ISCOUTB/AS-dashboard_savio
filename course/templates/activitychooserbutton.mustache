@@ -39,12 +39,8 @@
 <div class="dropdown">
     <button class="btn add-content d-flex justify-content-center align-items-center p-1 icon-no-margin"
             type="button"
-            id="dropdownMenuButton-{{#modid}}{{modid}}{{/modid}}{{^modid}}{{uniqid}}{{/modid}}"
-            data-bs-toggle="dropdown"
-            data-action="open-addingcontent"
-            {{#modid}}
-            data-beforemod="{{modid}}"
-            {{/modid}}
+            id="dropdownMenuButton"
+            data-toggle="dropdown"
             aria-haspopup="true"
             aria-expanded="false"
             aria-label="{{#str}}insertcontentbefore, core, { "activityname": {{#quote}} {{activityname}} {{/quote}} } {{/str}}"
@@ -53,7 +49,7 @@
     >
         {{#pix}} t/add, core {{/pix}}
     </button>
-    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton-{{#modid}}{{modid}}{{/modid}}{{^modid}}{{uniqid}}{{/modid}}">
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
         {{> core_course/addresourceoractivitybutton }}
         {{#actionlinks}}
             {{> core/action_link}}

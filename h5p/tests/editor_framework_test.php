@@ -37,7 +37,7 @@ use core_h5p\local\library\autoloader;
  *
  * @runTestsInSeparateProcesses
  */
-final class editor_framework_test extends \advanced_testcase {
+class editor_framework_test extends \advanced_testcase {
 
     /** @var editor_framework H5P editor_framework instance */
     protected $editorframework;
@@ -125,7 +125,7 @@ final class editor_framework_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function get_language_provider(): array {
+    public function get_language_provider(): array {
         return [
             'No library' => [
                 [],
@@ -136,8 +136,7 @@ final class editor_framework_test extends \advanced_testcase {
                 2,
             ],
             'One library created but getting translation from an unexisting one' => [
-                // Library1 1.2.
-                [
+                'Library1 1.2' => [
                     'machinename' => 'Library1',
                     'title' => 'Lib1',
                     'majorversion' => 1,
@@ -152,8 +151,7 @@ final class editor_framework_test extends \advanced_testcase {
                 'AnotherLibrary',
             ],
             'One library without any translation' => [
-                // Library1 1.2.
-                [
+                'Library1 1.2' => [
                     'machinename' => 'Library1',
                     'title' => 'Lib1',
                     'majorversion' => 1,
@@ -163,8 +161,7 @@ final class editor_framework_test extends \advanced_testcase {
                 true,
             ],
             'One library with 2 translations (es and fr) - es' => [
-                // Library1 1.2.
-                [
+                'Library1 1.2' => [
                     'machinename' => 'Library1',
                     'title' => 'Lib1',
                     'majorversion' => 1,
@@ -177,8 +174,7 @@ final class editor_framework_test extends \advanced_testcase {
                 'es',
             ],
             'One library with 2 translations (es and fr) - fr' => [
-                // Library1 1.2.
-                [
+                'Library1 1.2' => [
                     'machinename' => 'Library1',
                     'title' => 'Lib1',
                     'majorversion' => 1,
@@ -191,8 +187,7 @@ final class editor_framework_test extends \advanced_testcase {
                 'fr',
             ],
             'One library with 2 translations (es and fr) - unexisting translation (de)' => [
-                // Library1 1.2.
-                [
+                'Library1 1.2' => [
                     'machinename' => 'Library1',
                     'title' => 'Lib1',
                     'majorversion' => 1,
@@ -206,8 +201,7 @@ final class editor_framework_test extends \advanced_testcase {
                 true
             ],
             'One library with 3 translations (one of them English) - fr' => [
-                // Library1 1.2.
-                [
+                'Library1 1.2' => [
                     'machinename' => 'Library1',
                     'title' => 'Lib1',
                     'majorversion' => 1,
@@ -221,8 +215,7 @@ final class editor_framework_test extends \advanced_testcase {
                 'fr',
             ],
             'One library with 3 translations (one of them English) - en' => [
-                // Library1 1.2.
-                [
+                'Library1 1.2' => [
                     'machinename' => 'Library1',
                     'title' => 'Lib1',
                     'majorversion' => 1,
@@ -296,7 +289,7 @@ final class editor_framework_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function get_available_languages_provider(): array {
+    public function get_available_languages_provider(): array {
         return [
             'No library' => [
                 [],
@@ -306,8 +299,7 @@ final class editor_framework_test extends \advanced_testcase {
                 2,
             ],
             'One library created but getting available from an unexisting one' => [
-                // Library1 1.2.
-                [
+                'Library1 1.2' => [
                     'machinename' => 'Library1',
                     'title' => 'Lib1',
                     'majorversion' => 1,
@@ -323,8 +315,7 @@ final class editor_framework_test extends \advanced_testcase {
                 2,
             ],
             'One library without any translation' => [
-                // Library1 1.2.
-                [
+                'Library1 1.2' => [
                     'machinename' => 'Library1',
                     'title' => 'Lib1',
                     'majorversion' => 1,
@@ -333,8 +324,7 @@ final class editor_framework_test extends \advanced_testcase {
                 ['en'],
             ],
             'One library with 2 translations (es and fr)' => [
-                // Library1 1.2.
-                [
+                'Library1 1.2' => [
                     'machinename' => 'Library1',
                     'title' => 'Lib1',
                     'majorversion' => 1,
@@ -347,8 +337,7 @@ final class editor_framework_test extends \advanced_testcase {
                 ['en', 'es', 'fr'],
             ],
             'One library with 3 translations (one of them English)' => [
-                // Library1 1.2.
-                [
+                'Library1 1.2' => [
                     'machinename' => 'Library1',
                     'title' => 'Lib1',
                     'majorversion' => 1,

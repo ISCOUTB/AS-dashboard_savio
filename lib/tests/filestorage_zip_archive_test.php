@@ -31,7 +31,7 @@ require_once($CFG->libdir . '/filestorage/zip_archive.php');
  * @copyright 2020 Université Rennes 2 {@link https://www.univ-rennes2.fr}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class filestorage_zip_archive_test extends \advanced_testcase {
+class filestorage_zip_archive_test extends \advanced_testcase {
     /**
      * Test mangle_pathname() method.
      *
@@ -54,7 +54,7 @@ final class filestorage_zip_archive_test extends \advanced_testcase {
      *
      * @return array Array of tested pathnames and expected results.
      */
-    public static function pathname_provider(): array {
+    public function pathname_provider() {
         return [
             // Test a string.
             ['my file.pdf', 'my file.pdf'],

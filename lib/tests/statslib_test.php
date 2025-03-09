@@ -31,7 +31,7 @@ require_once(__DIR__ . '/fixtures/stats_events.php');
  * @copyright  2012 Tyler Bannister
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class statslib_test extends \advanced_testcase {
+class statslib_test extends \advanced_testcase {
     /** The day to use for testing **/
     const DAY = 1272672000;
 
@@ -186,7 +186,7 @@ final class statslib_test extends \advanced_testcase {
      *
      * @return array of fixture XML log file names.
      */
-    public static function daily_log_provider(): array {
+    public function daily_log_provider() {
         $logfiles = array();
         $fileno = array('00', '01', '02', '03', '04', '05', '06', '07', '08');
 
@@ -202,7 +202,7 @@ final class statslib_test extends \advanced_testcase {
      *
      * @return array Dates and timezones for which the first day of the week will be calculated
      */
-    public static function get_base_weekly_provider(): array {
+    public function get_base_weekly_provider() {
         return [
             [
                 "startwday" => 0,
@@ -213,13 +213,13 @@ final class statslib_test extends \advanced_testcase {
             [
                 "startwday" => 0,
                 "timezone" => 'America/Chicago',
-                "timestart" => '25-03-2017 22:00',
+                "date" => '25-03-2017 22:00',
                 "expected" => '19-03-2017 00:00:00'
             ],
             [
                 "startwday" => 1,
                 "timezone" => 'Atlantic/Canary',
-                "timestart" => '06-08-2018 22:00',
+                "date" => '06-08-2018 22:00',
                 "expected" => '06-08-2018 00:00:00'
             ],
         ];
@@ -454,67 +454,72 @@ final class statslib_test extends \advanced_testcase {
      *       defaults for a new Moodle 2.3 install.
      */
     public function test_statslib_get_action_names(): void {
-        $basepostactions = [
-            'add',
-            'delete',
-            'edit',
-            'add mod',
-            'delete mod',
-            'edit section',
-            'loginas',
-            'new',
-            'unenrol',
-            'update',
-            'update mod',
-            'upload',
-            'submit',
-            'submit for grading',
-            'choose',
-            'choose again',
-            'record delete',
-            'add discussion',
-            'add post',
-            'delete discussion',
-            'delete post',
-            'move discussion',
-            'prune post',
-            'update post',
-            'add category',
-            'add entry',
-            'approve entry',
-            'delete category',
-            'delete entry',
-            'edit category',
-            'update entry',
-            'end',
-            'start',
-            'attempt',
-            'close attempt',
-            'preview',
-            'editquestions',
-            'delete attempt',
-            'manualgrade',
-            'enrol',
-        ];
+        $basepostactions = array (
+            0 => 'add',
+            1 => 'delete',
+            2 => 'edit',
+            3 => 'add mod',
+            4 => 'delete mod',
+            5 => 'edit section',
+            6 => 'loginas',
+            7 => 'new',
+            8 => 'unenrol',
+            9 => 'update',
+            10 => 'update mod',
+            11 => 'upload',
+            12 => 'submit',
+            13 => 'submit for grading',
+            14 => 'talk',
+            15 => 'choose',
+            16 => 'choose again',
+            17 => 'record delete',
+            18 => 'add discussion',
+            19 => 'add post',
+            20 => 'delete discussion',
+            21 => 'delete post',
+            22 => 'move discussion',
+            23 => 'prune post',
+            24 => 'update post',
+            25 => 'add category',
+            26 => 'add entry',
+            27 => 'approve entry',
+            28 => 'delete category',
+            29 => 'delete entry',
+            30 => 'edit category',
+            31 => 'update entry',
+            32 => 'end',
+            33 => 'start',
+            34 => 'attempt',
+            35 => 'close attempt',
+            36 => 'preview',
+            37 => 'editquestions',
+            38 => 'delete attempt',
+            39 => 'manualgrade',
+            40 => 'enrol',
+        );
 
-        $baseviewactions = [
-            'view',
-            'view all',
-            'history',
-            'view submission',
-            'view feedback',
-            'print',
-            'report',
-            'view discussion',
-            'search',
-            'forum',
-            'forums',
-            'subscribers',
-            'view forum',
-            'view entry',
-            'review',
-            'pre-view',
-        ];
+         $baseviewactions = array (
+            0 => 'view',
+            1 => 'view all',
+            2 => 'history',
+            3 => 'view submission',
+            4 => 'view feedback',
+            5 => 'print',
+            6 => 'report',
+            7 => 'view discussion',
+            8 => 'search',
+            9 => 'forum',
+            10 => 'forums',
+            11 => 'subscribers',
+            12 => 'view forum',
+            13 => 'view entry',
+            14 => 'review',
+            15 => 'pre-view',
+            16 => 'download',
+            17 => 'view form',
+            18 => 'view graph',
+            19 => 'view report',
+        );
 
         $postactions = stats_get_action_names('post');
 

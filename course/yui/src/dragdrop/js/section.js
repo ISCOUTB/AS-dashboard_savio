@@ -1,8 +1,6 @@
 /**
  * Section drag and drop.
  *
- * TODO: remove this module as part of MDL-83627.
- *
  * @class M.course.dragdrop.section
  * @constructor
  * @extends M.core.dragdrop
@@ -10,13 +8,6 @@
 var DRAGSECTION = function() {
     DRAGSECTION.superclass.constructor.apply(this, arguments);
 };
-
-Y.log(
-    'YUI M.course.dragdrop.section is deprecated. Please, add support_components to your course format.',
-    'warn',
-    'moodle-course-coursebase'
-);
-
 Y.extend(DRAGSECTION, M.core.dragdrop, {
     sectionlistselector: null,
 

@@ -27,7 +27,7 @@ require_once(__DIR__ . '/helpers.php');
  * @copyright  2017 Andrew Nicols <andrew@nicols.co.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class calendar_information_test extends \advanced_testcase {
+class calendar_information_test extends \advanced_testcase {
 
     /**
      * Helper to mock a course and category structure.

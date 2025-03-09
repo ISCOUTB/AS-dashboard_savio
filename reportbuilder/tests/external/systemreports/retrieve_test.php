@@ -39,7 +39,7 @@ require_once("{$CFG->dirroot}/webservice/tests/helpers.php");
  * @copyright   2023 Paul Holden <paulh@moodle.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class retrieve_test extends externallib_advanced_testcase {
+class retrieve_test extends externallib_advanced_testcase {
 
     /**
      * Text execute method
@@ -75,7 +75,7 @@ final class retrieve_test extends externallib_advanced_testcase {
 
         $this->assertStringContainsString('My second report', $name);
         $this->assertEquals(users::get_name(), $source);
-        $this->assertMatchesRegularExpression('/cat.*, .*dog/', $tags);
+        $this->assertEquals('cat, dog', $tags);
         $this->assertNotEmpty($timecreated);
         $this->assertNotEmpty($timemodified);
         $this->assertEquals('Admin User', $modifiedby);

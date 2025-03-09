@@ -37,7 +37,7 @@ final class userlist_collection_test extends advanced_testcase {
      *
      * @covers ::add_userlist
      */
-    public function test_supports_userlist(): void {
+    public function test_supports_userlist() {
         $cut = \context_system::instance();
         $uut = new userlist_collection($cut);
 
@@ -52,7 +52,7 @@ final class userlist_collection_test extends advanced_testcase {
      *
      * @covers ::add_userlist
      */
-    public function test_supports_approved_userlist(): void {
+    public function test_supports_approved_userlist() {
         $cut = \context_system::instance();
         $uut = new userlist_collection($cut);
 
@@ -67,7 +67,7 @@ final class userlist_collection_test extends advanced_testcase {
      *
      * @covers ::get_userlist_for_component
      */
-    public function test_get_userlist_for_component(): void {
+    public function test_get_userlist_for_component() {
         $cut = \context_system::instance();
         $uut = new userlist_collection($cut);
 
@@ -88,7 +88,7 @@ final class userlist_collection_test extends advanced_testcase {
      *
      * @covers ::get_userlist_for_component
      */
-    public function test_get_userlist_for_component_not_found(): void {
+    public function test_get_userlist_for_component_not_found() {
         $cut = \context_system::instance();
         $uut = new userlist_collection($cut);
 
@@ -100,7 +100,7 @@ final class userlist_collection_test extends advanced_testcase {
      *
      * @covers ::add_userlist
      */
-    public function test_duplicate_addition_throws(): void {
+    public function test_duplicate_addition_throws() {
         $cut = \context_system::instance();
         $uut = new userlist_collection($cut);
 
@@ -116,7 +116,7 @@ final class userlist_collection_test extends advanced_testcase {
      *
      * @covers ::count
      */
-    public function test_countable(): void {
+    public function test_countable() {
         $cut = \context_system::instance();
         $uut = new userlist_collection($cut);
 
@@ -135,7 +135,7 @@ final class userlist_collection_test extends advanced_testcase {
      * @covers ::rewind
      * @covers ::valid
      */
-    public function test_iteration(): void {
+    public function test_iteration() {
         $cut = \context_system::instance();
         $uut = new userlist_collection($cut);
 
@@ -165,7 +165,7 @@ final class userlist_collection_test extends advanced_testcase {
      *
      * @covers ::get_context
      */
-    public function test_get_context(): void {
+    public function test_get_context() {
         $cut = \context_system::instance();
         $uut = new userlist_collection($cut);
 

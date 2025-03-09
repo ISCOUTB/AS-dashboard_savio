@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenSpout\Reader\Wrapper;
 
-use OpenSpout\Common\Exception\IOException;
 use OpenSpout\Reader\Exception\XMLProcessingException;
 use ZipArchive;
 
@@ -53,12 +52,7 @@ final class XMLReader extends \XMLReader
         // The file path should not start with a '/', otherwise it won't be found
         $fileInsideZipPathWithoutLeadingSlash = ltrim($fileInsideZipPath, '/');
 
-        $realpath = realpath($zipFilePath);
-        if (false === $realpath) {
-            throw new IOException("Could not open {$zipFilePath} for reading! File does not exist.");
-        }
-
-        return self::ZIP_WRAPPER.$realpath.'#'.$fileInsideZipPathWithoutLeadingSlash;
+        return self::ZIP_WRAPPER.realpath($zipFilePath).'#'.$fileInsideZipPathWithoutLeadingSlash;
     }
 
     /**

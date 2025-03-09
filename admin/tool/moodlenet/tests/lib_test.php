@@ -31,7 +31,7 @@ require_once($CFG->dirroot . '/admin/tool/moodlenet/lib.php');
 /**
  * Test moodlenet functions
  */
-final class lib_test extends \advanced_testcase {
+class lib_test extends \advanced_testcase {
 
     /**
      * Test the generate_mnet_endpoint function
@@ -52,7 +52,7 @@ final class lib_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function get_endpoints_provider(): array {
+    public function get_endpoints_provider() {
         global $CFG;
         return [
             [

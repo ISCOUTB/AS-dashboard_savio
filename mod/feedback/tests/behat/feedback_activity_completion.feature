@@ -34,12 +34,12 @@ Feature: View activity completion in the feedback activity
         | Multiple choice values | drums\guitar\hurdygurdy           |
     And I log out
 
-  Scenario: Feedback module displays completion conditions to teachers
+  Scenario: View automatic completion items as a teacher
     When I am on the "Music history" "feedback activity" page logged in as teacher1
     Then "Music history" should have the "View" completion condition
     And "Music history" should have the "Submit feedback" completion condition
 
-  Scenario: Student can complete a feedback activity when all conditions are met
+  Scenario: View automatic completion items as a student
     Given I am on the "Music history" "feedback activity" page logged in as student1
     And the "View" completion condition of "Music history" is displayed as "todo"
     And the "Submit feedback" completion condition of "Music history" is displayed as "todo"
@@ -52,7 +52,7 @@ Feature: View activity completion in the feedback activity
     And the "Submit feedback" completion condition of "Music history" is displayed as "done"
 
   @javascript
-  Scenario: A student can manually mark the feedback activity as done but a teacher cannot
+  Scenario: Use manual completion
     Given I am on the "Music history" "feedback activity editing" page logged in as teacher1
     And I expand all fieldsets
     And I set the field "Students must manually mark the activity as done" to "1"

@@ -16,21 +16,21 @@ Feature: Manually complete a quiz
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
       | student1 | C1     | student        |
-    And the following "activities" exist:
-      | activity | name           | course | idnumber | completion |
-      | quiz     | Test quiz name | C1     | quiz1    | 1          |
     And the following "question categories" exist:
-      | contextlevel    | reference | name           |
-      | Activity module | quiz1     | Test questions  |
+      | contextlevel | reference | name           |
+      | Course       | C1        | Test questions |
     And the following "questions" exist:
       | questioncategory | qtype     | name           | questiontext              |
       | Test questions   | truefalse | First question | Answer the first question |
+    And the following "activities" exist:
+      | activity | name           | course | idnumber | completion |
+      | quiz     | Test quiz name | C1     | quiz1    | 1          |
     And quiz "Test quiz name" contains the following questions:
       | question       | page |
       | First question | 1    |
 
   @javascript
-  Scenario: A student can manually mark the quiz activity as done but a teacher cannot
+  Scenario: Use manual completion
     Given I am on the "Test quiz name" "quiz activity" page logged in as teacher1
     And the manual completion button for "Test quiz name" should be disabled
     And I log out

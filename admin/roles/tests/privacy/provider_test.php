@@ -40,7 +40,7 @@ use core_privacy\local\request\approved_userlist;
  * @copyright  2018 Carlos Escobedo <carlos@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class provider_test extends provider_testcase {
+class provider_test extends provider_testcase {
     /**
      * Test to check export_user_preferences.
      * returns user preferences data.
@@ -77,7 +77,7 @@ final class provider_test extends provider_testcase {
         $course = $this->getDataGenerator()->create_course();
         $course2 = $this->getDataGenerator()->create_course();
         $coursecat = $this->getDataGenerator()->create_category();
-        $cm = $this->getDataGenerator()->create_module('assign', ['course' => $course->id]);
+        $cm = $this->getDataGenerator()->create_module('chat', ['course' => $course->id]);
         $cmcontext = \context_module::instance($cm->cmid);
         $page = $this->getDataGenerator()->create_module('page', array('course' => $course->id));
         $cmcontext2 = \context_module::instance($page->cmid);
@@ -125,7 +125,7 @@ final class provider_test extends provider_testcase {
         $course = $this->getDataGenerator()->create_course();
         $course2 = $this->getDataGenerator()->create_course();
         $coursecat = $this->getDataGenerator()->create_category();
-        $cm = $this->getDataGenerator()->create_module('assign', ['course' => $course->id]);
+        $cm = $this->getDataGenerator()->create_module('chat', ['course' => $course->id]);
         $cmcontext = \context_module::instance($cm->cmid);
         $page = $this->getDataGenerator()->create_module('page', array('course' => $course->id));
         $cmcontext2 = \context_module::instance($page->cmid);
@@ -257,7 +257,7 @@ final class provider_test extends provider_testcase {
         $coursecat = $this->getDataGenerator()->create_category();
         $coursecatcontext = \context_coursecat::instance($coursecat->id);
         $systemcontext = \context_system::instance();
-        $cm = $this->getDataGenerator()->create_module('assign', ['course' => $course->id]);
+        $cm = $this->getDataGenerator()->create_module('chat', ['course' => $course->id]);
         $cmcontext = \context_module::instance($cm->cmid);
         $student = $DB->get_record('role', array('shortname' => 'student'), '*', MUST_EXIST);
         $manager = $DB->get_record('role', array('shortname' => 'manager'), '*', MUST_EXIST);
@@ -348,7 +348,7 @@ final class provider_test extends provider_testcase {
         $coursecat = $this->getDataGenerator()->create_category();
         $coursecatcontext = \context_coursecat::instance($coursecat->id);
         $systemcontext = \context_system::instance();
-        $cm = $this->getDataGenerator()->create_module('assign', ['course' => $course->id]);
+        $cm = $this->getDataGenerator()->create_module('chat', ['course' => $course->id]);
         $cmcontext = \context_module::instance($cm->cmid);
         $student = $DB->get_record('role', array('shortname' => 'student'), '*', MUST_EXIST);
         $manager = $DB->get_record('role', array('shortname' => 'manager'), '*', MUST_EXIST);
@@ -499,8 +499,8 @@ final class provider_test extends provider_testcase {
         // Create course category.
         $coursecat = $this->getDataGenerator()->create_category();
         $coursecatcontext = \context_coursecat::instance($coursecat->id);
-        // Create assignment module.
-        $cm = $this->getDataGenerator()->create_module('assign', ['course' => $course1->id]);
+        // Create chat module.
+        $cm = $this->getDataGenerator()->create_module('chat', ['course' => $course1->id]);
         $cmcontext = \context_module::instance($cm->cmid);
 
         $systemcontext = \context_system::instance();
@@ -619,8 +619,8 @@ final class provider_test extends provider_testcase {
         // Create course category.
         $coursecat = $this->getDataGenerator()->create_category();
         $coursecatcontext = \context_coursecat::instance($coursecat->id);
-        // Create assignment module.
-        $cm = $this->getDataGenerator()->create_module('assign', ['course' => $course1->id]);
+        // Create chat module.
+        $cm = $this->getDataGenerator()->create_module('chat', ['course' => $course1->id]);
         $cmcontext = \context_module::instance($cm->cmid);
 
         $systemcontext = \context_system::instance();

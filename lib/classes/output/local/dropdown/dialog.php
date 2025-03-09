@@ -33,8 +33,8 @@ use core\output\renderable;
 class dialog implements named_templatable, renderable {
     /** Dropdown dialog positions. */
     public const POSITION = [
-        'start' => 'dropdown-menu-start',
-        'end' => 'dropdown-menu-end',
+        'start' => 'dropdown-menu-left',
+        'end' => 'dropdown-menu-right',
     ];
 
     /** Dropdown dialog positions. */

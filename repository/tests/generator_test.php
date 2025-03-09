@@ -35,7 +35,7 @@ use repository_exception;
  * @copyright 2013 Frédéric Massart
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class generator_test extends \advanced_testcase {
+class generator_test extends \advanced_testcase {
 
     /**
      * Basic test of creation of repository types.

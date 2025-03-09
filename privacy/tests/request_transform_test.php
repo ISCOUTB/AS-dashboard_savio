@@ -36,7 +36,7 @@ use \core_privacy\local\request\transform;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \core_privacy\local\request\transform
  */
-final class request_transform_test extends advanced_testcase {
+class request_transform_test extends advanced_testcase {
     /**
      * Test that user translation currently does nothing.
      *
@@ -110,7 +110,7 @@ final class request_transform_test extends advanced_testcase {
      *
      * @return  array
      */
-    public static function yesno_provider(): array {
+    public function yesno_provider() {
         return [
             'Bool False' => [
                 false,

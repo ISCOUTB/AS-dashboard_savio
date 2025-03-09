@@ -809,7 +809,7 @@ function enrol_get_my_courses($fields = null, $sort = null, $limit = 0, $coursei
         }
     }
 
-    // Note: we can not use DISTINCT + text fields due to MS limitations, that is why
+    // Note: we can not use DISTINCT + text fields due to Oracle and MS limitations, that is why
     // we have the subselect there.
     $sql = "SELECT $coursefields $ccselect $timeaccessselect
               FROM {course} c
@@ -1124,7 +1124,7 @@ function enrol_get_all_users_courses($userid, $onlyactive = false, $fields = nul
     $ccjoin = "LEFT JOIN {context} ctx ON (ctx.instanceid = c.id AND ctx.contextlevel = :contextlevel)";
     $params['contextlevel'] = CONTEXT_COURSE;
 
-    //note: we can not use DISTINCT + text fields due to MS limitations, that is why we have the subselect there
+    //note: we can not use DISTINCT + text fields due to Oracle and MS limitations, that is why we have the subselect there
     $sql = "SELECT $coursefields $ccselect
               FROM {course} c
               JOIN (SELECT DISTINCT e.courseid
@@ -2159,7 +2159,6 @@ abstract class enrol_plugin {
         $hook = new \core_enrol\hook\after_user_enrolled(
             enrolinstance: $instance,
             userenrolmentinstance: $ue,
-            roleid: $roleid,
         );
         \core\di::get(\core\hook\manager::class)->dispatch($hook);
 
@@ -3608,15 +3607,14 @@ abstract class enrol_plugin {
             $rusers = [];
             if (!empty($CFG->coursecontact)) {
                 $croles = explode(',', $CFG->coursecontact);
-                [$sort] = users_order_by_sql('u');
+                [$sort, $sortparams] = users_order_by_sql('u');
                 // We only use the first user.
                 $i = 0;
                 do {
                     $userfieldsapi = \core_user\fields::for_name();
                     $allnames = $userfieldsapi->get_sql('u', false, '', '', false)->selects;
-                    $rusers = get_role_users($croles[$i], $context, true,
-                        "u.id, u.confirmed, u.username, {$allnames}, u.email, u.maildisplay, r.sortorder, ra.id AS raid",
-                        "r.sortorder, ra.id ASC, {$sort}");
+                    $rusers = get_role_users($croles[$i], $context, true, 'u.id,  u.confirmed, u.username, '. $allnames . ',
+                    u.email, r.sortorder, ra.id AS raid', 'r.sortorder, ra.id ASC, ' . $sort, null, '', '', '', '', $sortparams);
                     $i++;
                 } while (empty($rusers) && !empty($croles[$i]));
             }
@@ -3646,29 +3644,25 @@ abstract class enrol_plugin {
      * @param int $userid User ID.
      * @param int $sendoption Send email from constant ENROL_SEND_EMAIL_FROM_*
      * @param null|string $message Message to send to the user.
-     * @param int|null $roleid The assigned role ID
      */
     public function send_course_welcome_message_to_user(
         stdClass $instance,
         int $userid,
         int $sendoption,
         ?string $message = '',
-        ?int $roleid = null,
     ): void {
-        global $DB, $CFG;
-        require_once($CFG->dirroot . '/course/lib.php');
-
+        global $DB;
         $context = context_course::instance($instance->courseid);
         $user = core_user::get_user($userid);
         $course = get_course($instance->courseid);
-
-        // Fallback to the instance role ID if parameter not specified.
-        $courseroleid = $roleid ?: $instance->roleid;
-        $courserole = $DB->get_record('role', ['id' => $courseroleid]);
+        $courserole = $DB->get_field(
+            table: 'role',
+            return: 'shortname',
+            conditions: ['id' => $instance->roleid],
+        );
 
         $a = new stdClass();
         $a->coursename = format_string($course->fullname, true, ['context' => $context, 'escape' => false]);
-        $a->courselink = course_get_url($course)->out();
         $a->profileurl = (new moodle_url(
             url: '/user/view.php',
             params: [
@@ -3685,7 +3679,6 @@ abstract class enrol_plugin {
         if ($message && trim($message) !== '') {
             $placeholders = [
                 '{$a->coursename}',
-                '{$a->courselink}',
                 '{$a->profileurl}',
                 '{$a->fullname}',
                 '{$a->email}',
@@ -3695,13 +3688,12 @@ abstract class enrol_plugin {
             ];
             $values = [
                 $a->coursename,
-                $a->courselink,
                 $a->profileurl,
                 fullname($user),
                 $user->email,
                 $user->firstname,
                 $user->lastname,
-                role_get_name($courserole, $context),
+                $courserole,
             ];
             $message = str_replace($placeholders, $values, $message);
             if (strpos($message, '<') === false) {

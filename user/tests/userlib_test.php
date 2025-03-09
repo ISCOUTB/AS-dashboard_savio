@@ -29,7 +29,7 @@ require_once($CFG->dirroot.'/user/lib.php');
  * @copyright  2013 Rajesh Taneja <rajesh@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class userlib_test extends \advanced_testcase {
+class userlib_test extends \advanced_testcase {
     /**
      * Test user_get_user_details_courses
      */
@@ -386,7 +386,7 @@ final class userlib_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function data_create_user_invalid_username(): array {
+    public function data_create_user_invalid_username() {
         return [
             'empty_string' => [
                 '',

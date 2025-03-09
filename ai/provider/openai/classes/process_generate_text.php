@@ -17,8 +17,10 @@
 namespace aiprovider_openai;
 
 use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Uri;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\UriInterface;
 
 /**
  * Class process text generation.
@@ -28,10 +30,19 @@ use Psr\Http\Message\ResponseInterface;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class process_generate_text extends abstract_processor {
+    #[\Override]
+    protected function get_endpoint(): UriInterface {
+        return new Uri(get_config('aiprovider_openai', 'action_generate_text_endpoint'));
+    }
+
+    #[\Override]
+    protected function get_model(): string {
+        return get_config('aiprovider_openai', 'action_generate_text_model');
+    }
 
     #[\Override]
     protected function get_system_instruction(): string {
-        return $this->provider->actionconfig[$this->action::class]['settings']['systeminstruction'];
+        return get_config('aiprovider_openai', 'action_generate_text_systeminstruction');
     }
 
     #[\Override]
@@ -57,19 +68,13 @@ class process_generate_text extends abstract_processor {
             $requestobj->messages = [$userobj];
         }
 
-        // Append the extra model settings.
-        $modelsettings = $this->get_model_settings();
-        foreach ($modelsettings as $setting => $value) {
-            $requestobj->$setting = $value;
-        }
-
         return new Request(
             method: 'POST',
             uri: '',
+            body: json_encode($requestobj),
             headers: [
                 'Content-Type' => 'application/json',
             ],
-            body: json_encode($requestobj),
         );
     }
 
@@ -91,7 +96,6 @@ class process_generate_text extends abstract_processor {
             'finishreason' => $bodyobj->choices[0]->finish_reason,
             'prompttokens' => $bodyobj->usage->prompt_tokens,
             'completiontokens' => $bodyobj->usage->completion_tokens,
-            'model' => $bodyobj->model ?? $this->get_model(), // Fallback to config model.
         ];
     }
 }

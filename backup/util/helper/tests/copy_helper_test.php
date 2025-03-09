@@ -34,7 +34,7 @@ require_once($CFG->libdir . '/completionlib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \copy_helper
  */
-final class copy_helper_test extends \advanced_testcase {
+class copy_helper_test extends \advanced_testcase {
 
     /**
      *

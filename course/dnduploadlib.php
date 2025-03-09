@@ -32,22 +32,12 @@ require_once($CFG->dirroot.'/course/lib.php');
 /**
  * Add the Javascript to enable drag and drop upload to a course page
  *
- * @deprecated since Moodle 5.0
- * @todo Remove this method in Moodle 6.0 (MDL-83627).
  * @param object $course The currently displayed course
  * @param array $modnames The list of enabled (visible) modules on this site
  * @return void
  */
-#[\core\attribute\deprecated(
-    replacement: 'core_courformat::base\\use_component returning true',
-    since: '5.0',
-    mdl: 'MDL-82341',
-    reason: 'Moodle 3.9 course editor is deprecated. Make your format compatible to 4.0 editor.',
-)]
 function dndupload_add_to_course($course, $modnames) {
     global $CFG, $PAGE;
-
-    \core\deprecation::emit_deprecation_if_present(__FUNCTION__);
 
     $showstatus = optional_param('notifyeditingon', false, PARAM_BOOL);
 
@@ -631,7 +621,7 @@ class dndupload_ajax_processor {
         // Rebuild the course cache after update action
         rebuild_course_cache($this->course->id, true, true);
 
-        $sectionid = course_add_cm_to_section($this->course, $this->cm->id, $this->section, modname: $this->module->name);
+        $sectionid = course_add_cm_to_section($this->course, $this->cm->id, $this->section);
 
         set_coursemodule_visible($this->cm->id, $visible);
         if (!$visible) {

@@ -1,4 +1,7 @@
 <?php
+// phpcs:ignoreFile
+// @codeCoverageIgnoreStart
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -40,7 +43,8 @@ require_once($CFG->libdir . '/behat/classes/behat_config_manager.php');
  * @copyright  2016 Rajesh Taneja
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class manager_util_test extends \advanced_testcase {
+class manager_util_test extends \advanced_testcase {
+
     /** @var array Fixtures features which are available. */
     private $featurepaths = array(
         'default' => array(
@@ -103,11 +107,11 @@ final class manager_util_test extends \advanced_testcase {
      */
     private function get_behat_config_util($behatconfigutil, $notheme = false) {
         // Create a map of arguments to return values.
-        $map = [
-            ['withfeatures', self::get_fixture_path(__NAMESPACE__, 'theme/withfeatures')],
-            ['nofeatures', self::get_fixture_path(__NAMESPACE__, 'theme/nofeatures')],
-            ['defaulttheme', self::get_fixture_path(__NAMESPACE__, 'theme/defaulttheme')],
-        ];
+        $map = array(
+            array('withfeatures', __DIR__.'/fixtures/theme/withfeatures'),
+            array('nofeatures', __DIR__.'/fixtures/theme/nofeatures'),
+            array('defaulttheme', __DIR__.'/fixtures/theme/defaulttheme'),
+        );
         // List of themes is const for test.
         if ($notheme) {
             $themelist = array('defaulttheme');
@@ -468,7 +472,7 @@ final class manager_util_test extends \advanced_testcase {
         $CFG->dirroot = $oldroot;
     }
 
-    public static function clean_features_path_list() {
+    public function clean_features_path_list() {
         return array(
             ['/home/test/this/that/test/behat/mod_assign.feature', 'mod_assign_behat_test_that_this_test', '/home/test/this/that/test/behat/mod_assign.feature'],
             ['/home/this/that/test/behat/mod_assign.feature', 'mod_assign_behat_test_that_this_home', '/home/this/that/test/behat/mod_assign.feature'],

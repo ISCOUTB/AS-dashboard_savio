@@ -178,7 +178,6 @@ class editor extends \texteditor {
             'currentLanguage' => current_language(),
 
             'branding' => property_exists($siteconfig, 'branding') ? !empty($siteconfig->branding) : true,
-            'extended_valid_elements' => $siteconfig->extended_valid_elements ?? 'script[*],p[*],i[*]',
 
             // Language options.
             'language' => [

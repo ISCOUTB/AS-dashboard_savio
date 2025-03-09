@@ -170,7 +170,7 @@ class insights_list implements \renderable, \templatable {
                             'id' => 'id-toggle-all-' . $key,
                             'name' => 'toggle-all-' . $key,
                             'label' => get_string('selectall'),
-                            'labelclasses' => 'visually-hidden',
+                            'labelclasses' => 'sr-only',
                             'checked' => false
                         ]);
                         $prediction['checkboxtoggleall'] = $output->render($toggleall);

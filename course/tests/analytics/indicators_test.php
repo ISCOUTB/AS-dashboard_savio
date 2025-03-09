@@ -16,8 +16,6 @@
 
 namespace core_course\analytics;
 
-use core_analytics\tests\mlbackend_helper_trait;
-
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
@@ -33,8 +31,7 @@ require_once(__DIR__ . '/../../../analytics/tests/fixtures/test_target_course_us
  * @copyright 2017 David Monllaó {@link http://www.davidmonllao.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class indicators_test extends \advanced_testcase {
-    use mlbackend_helper_trait;
+class indicators_test extends \advanced_testcase {
 
     /**
      * test_no_teacher
@@ -318,10 +315,6 @@ final class indicators_test extends \advanced_testcase {
      */
     public function test_activities_due(): void {
         global $DB;
-
-        if (!self::is_mlbackend_python_configured()) {
-            $this->markTestSkipped('mlbackend_python is not configured.');
-        }
 
         $this->resetAfterTest(true);
         $this->setAdminuser();

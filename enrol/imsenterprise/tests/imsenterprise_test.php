@@ -33,7 +33,7 @@ require_once($CFG->dirroot . '/enrol/imsenterprise/lib.php');
  * @copyright  2012 David Monllaó
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class imsenterprise_test extends \advanced_testcase {
+class imsenterprise_test extends \advanced_testcase {
 
     /**
      * @var $imsplugin enrol_imsenterprise_plugin IMS plugin instance.
@@ -117,7 +117,7 @@ final class imsenterprise_test extends \advanced_testcase {
         $user2 = new \stdClass();
         $user2->recstatus = enrol_imsenterprise_plugin::IMSENTERPRISE_ADD;
         $user2->username = 'u2';
-        $user2->auth = 'db';
+        $user2->auth = 'cas';
         $user2->email = 'u2@u2.org';
         $user2->firstname = 'U';
         $user2->lastname = '2';

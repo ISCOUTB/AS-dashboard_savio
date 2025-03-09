@@ -81,6 +81,7 @@ class admin_preset extends base {
      * @return column[]
      */
     protected function get_all_columns(): array {
+        global $DB;
         $apalias = $this->get_table_alias('adminpresets');
 
         // Name.
@@ -105,6 +106,10 @@ class admin_preset extends base {
             });
 
         // Description.
+        $descriptionfieldsql = "{$apalias}.comments";
+        if ($DB->get_dbfamily() === 'oracle') {
+            $descriptionfieldsql = $DB->sql_order_by_text($descriptionfieldsql, 1024);
+        }
         $columns[] = (new column(
             'description',
             new lang_string('description'),
@@ -112,9 +117,9 @@ class admin_preset extends base {
         ))
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_LONGTEXT)
-            ->add_field("{$apalias}.comments")
+            ->add_field($descriptionfieldsql, 'description')
             ->set_is_sortable(true)
-            ->set_callback(static function(?string $description): string {
+            ->set_callback(static function(?string $description, \stdClass $row): string {
                 return format_text($description, FORMAT_HTML, ['context' => \context_system::instance()]);
             });
 

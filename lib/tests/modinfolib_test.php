@@ -36,7 +36,7 @@ use Exception;
  * @copyright  2012 Andrew Davis
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class modinfolib_test extends advanced_testcase {
+class modinfolib_test extends advanced_testcase {
     /**
      * Setup to ensure that fixtures are loaded.
      */
@@ -1176,7 +1176,7 @@ final class modinfolib_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function get_section_info_by_id_provider(): array {
+    public function get_section_info_by_id_provider() {
         return [
             'Valid section id' => [
                 'sectionnum' => 1,
@@ -1796,6 +1796,9 @@ final class modinfolib_test extends advanced_testcase {
     public function test_get_sections_delegated_by_cm(): void {
         $this->resetAfterTest();
 
+        $manager = \core_plugin_manager::resolve_plugininfo_class('mod');
+        $manager::enable_plugin('subsection', 1);
+
         $course = $this->getDataGenerator()->create_course(['numsections' => 1]);
 
         $modinfo = get_fast_modinfo($course);
@@ -1824,6 +1827,9 @@ final class modinfolib_test extends advanced_testcase {
      */
     public function test_get_delegated_section_info(): void {
         $this->resetAfterTest();
+
+        $manager = \core_plugin_manager::resolve_plugininfo_class('mod');
+        $manager::enable_plugin('subsection', 1);
 
         $course = $this->getDataGenerator()->create_course(['numsections' => 1]);
 
@@ -1860,6 +1866,9 @@ final class modinfolib_test extends advanced_testcase {
         bool $expected,
     ): void {
         $this->resetAfterTest();
+
+        $manager = \core_plugin_manager::resolve_plugininfo_class('mod');
+        $manager::enable_plugin('subsection', 1);
 
         $course = $this->getDataGenerator()->create_course(['numsections' => 1]);
         $subsection = $this->getDataGenerator()->create_module('subsection', ['course' => $course], ['section' => 1]);
@@ -1962,6 +1971,9 @@ final class modinfolib_test extends advanced_testcase {
     ): void {
         $this->resetAfterTest();
 
+        $manager = \core_plugin_manager::resolve_plugininfo_class('mod');
+        $manager::enable_plugin('subsection', 1);
+
         $course = $this->getDataGenerator()->create_course(['numsections' => 1]);
         $subsection = $this->getDataGenerator()->create_module('subsection', ['course' => $course], ['section' => 1]);
 
@@ -1971,7 +1983,6 @@ final class modinfolib_test extends advanced_testcase {
         $user = $this->getDataGenerator()->create_and_enrol($course, $role);
 
         if (!$enabled) {
-            $manager = \core_plugin_manager::resolve_plugininfo_class('mod');
             $manager::enable_plugin('subsection', 0);
             rebuild_course_cache($course->id, true);
         }
@@ -2051,6 +2062,9 @@ final class modinfolib_test extends advanced_testcase {
                 ],
             ]
         );
+
+        $manager = \core_plugin_manager::resolve_plugininfo_class('mod');
+        $manager::enable_plugin('subsection', 1);
 
         $course = $this->getDataGenerator()->create_course(['numsections' => 1]);
 
@@ -2159,8 +2173,12 @@ final class modinfolib_test extends advanced_testcase {
      * @return void
      */
     public function test_is_orphan(): void {
+        global $DB;
 
         $this->resetAfterTest();
+
+        $manager = \core_plugin_manager::resolve_plugininfo_class('mod');
+        $manager::enable_plugin('subsection', 1);
 
         $course = $this->getDataGenerator()->create_course(['numsections' => 1]);
         $subsection = $this->getDataGenerator()->create_module('subsection', ['course' => $course], ['section' => 1]);
@@ -2173,7 +2191,6 @@ final class modinfolib_test extends advanced_testcase {
         $this->assertFalse($delegatedsection->is_orphan());
 
         // Delegated sections without a component instance (disabled mod_subsection) is considered orphan.
-        $manager = \core_plugin_manager::resolve_plugininfo_class('mod');
         $manager::enable_plugin('subsection', 0);
         rebuild_course_cache($course->id, true);
 
@@ -2239,35 +2256,5 @@ final class modinfolib_test extends advanced_testcase {
         $sectioninfo = $modinfo->get_section_info(2);
         $cms = $sectioninfo->get_sequence_cm_infos();
         $this->assertCount(0, $cms);
-    }
-
-    /**
-     * Test for cm_info::get_instance_record
-     *
-     * @covers \cm_info::get_instance_record
-     * @return void
-     */
-    public function test_section_get_instance_record(): void {
-        global $DB;
-
-        $this->resetAfterTest();
-
-        $course = $this->getDataGenerator()->create_course(['numsections' => 2]);
-        $activity = $this->getDataGenerator()->create_module('page', ['course' => $course], ['section' => 0]);
-
-        $modinfo = get_fast_modinfo($course->id);
-        $cminfo = $modinfo->get_cm($activity->cmid);
-
-        $instancerecord = $DB->get_record('page', ['id' => $activity->id]);
-
-        $instance = $cminfo->get_instance_record();
-        $this->assertEquals($instancerecord, $instance);
-
-        // The instance record should be cached.
-        $DB->delete_records('page', ['id' => $activity->id]);
-
-        $instance2 = $cminfo->get_instance_record();
-        $this->assertEquals($instancerecord, $instance);
-        $this->assertEquals($instance, $instance2);
     }
 }

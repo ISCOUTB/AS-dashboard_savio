@@ -36,7 +36,7 @@ use moodle_url;
  * @copyright 2016 Marina Glancy
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class player_test extends \advanced_testcase {
+class player_test extends \advanced_testcase {
 
     /**
      * Pre-test setup. Preserves $CFG.
@@ -289,7 +289,7 @@ final class player_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function youtube_start_time_provider(): array {
+    public function youtube_start_time_provider(): array {
         return [
             ['https://www.youtube.com/watch?v=JNJMF1l3udM&t=1h11s', 3611],
             ['https://www.youtube.com/watch?v=dv2f_xfmbD8&index=4&list=PLxcO_MFWQBDcyn9xpbmx601YSDlDcTcr0&t=1m5s', 65],

@@ -22,7 +22,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
  */
-final class h5p_clean_orphaned_records_task_test extends advanced_testcase {
+class h5p_clean_orphaned_records_task_test extends advanced_testcase {
 
     /**
      * Test task execution

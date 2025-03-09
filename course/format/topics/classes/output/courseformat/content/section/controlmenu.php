@@ -24,11 +24,8 @@
 
 namespace format_topics\output\courseformat\content\section;
 
-use core\output\action_menu\link as action_menu_link;
-use core\output\action_menu\link_secondary as action_menu_link_secondary;
-use core\output\pix_icon;
 use core_courseformat\output\local\content\section\controlmenu as controlmenu_base;
-use core\url;
+use moodle_url;
 
 /**
  * Base class to render a course section menu.
@@ -53,39 +50,54 @@ class controlmenu extends controlmenu_base {
      * @return array of edit control items
      */
     public function section_control_items() {
+
+        $format = $this->format;
         $section = $this->section;
+        $coursecontext = $format->get_context();
+
         $parentcontrols = parent::section_control_items();
 
-        if ($section->is_orphan() || !$section->sectionnum) {
+        if ($section->is_orphan() || !$section->section) {
             return $parentcontrols;
         }
 
-        if (!has_capability('moodle/course:setcurrentsection', $this->coursecontext)) {
-            return $parentcontrols;
+        $controls = [];
+        if (has_capability('moodle/course:setcurrentsection', $coursecontext)) {
+            $controls['highlight'] = $this->get_highlight_control();
         }
 
-        return $this->add_control_after($parentcontrols, 'edit', 'highlight', $this->get_section_highlight_item());
+        // If the edit key exists, we are going to insert our controls after it.
+        if (array_key_exists("edit", $parentcontrols)) {
+            $merged = [];
+            // We can't use splice because we are using associative arrays.
+            // Step through the array and merge the arrays.
+            foreach ($parentcontrols as $key => $action) {
+                $merged[$key] = $action;
+                if ($key == "edit") {
+                    // If we have come to the edit key, merge these controls here.
+                    $merged = array_merge($merged, $controls);
+                }
+            }
+
+            return $merged;
+        } else {
+            return array_merge($controls, $parentcontrols);
+        }
     }
 
     /**
      * Return the course url.
      *
-     * @return url
+     * @return moodle_url
      */
-    #[\core\attribute\deprecated(
-        since: '5.0',
-        mdl: 'MDL-82767',
-        reason: 'Not used anymore, use $this->format->get_update_url instead',
-    )]
-    protected function get_course_url(): url {
-        \core\deprecation::emit_deprecation_if_present([self::class, __FUNCTION__]);
+    protected function get_course_url(): moodle_url {
         $format = $this->format;
         $section = $this->section;
         $course = $format->get_course();
         $sectionreturn = $format->get_sectionnum();
 
         if ($sectionreturn) {
-            $url = course_get_url($course, $section->sectionnum);
+            $url = course_get_url($course, $section->section);
         } else {
             $url = course_get_url($course);
         }
@@ -94,79 +106,11 @@ class controlmenu extends controlmenu_base {
     }
 
     /**
-     * Retrieves the view item for the section control menu.
-     *
-     * @return action_menu_link|null The menu item if applicable, otherwise null.
-     */
-    protected function get_section_highlight_item(): action_menu_link_secondary {
-        $format = $this->format;
-        $section = $this->section;
-        $course = $format->get_course();
-        $sectionreturn = $format->get_sectionnum();
-
-        $highlightoff = get_string('highlightoff');
-        $highlightofficon = 'i/marked';
-
-        $highlighton = get_string('highlight');
-        $highlightonicon = 'i/marker';
-
-        if ($course->marker == $section->sectionnum) {  // Show the "light globe" on/off.
-            $action = 'section_unhighlight';
-            $icon = $highlightofficon;
-            $name = $highlightoff;
-            $attributes = [
-                'class' => 'editing_highlight',
-                'data-action' => 'sectionUnhighlight',
-                'data-sectionreturn' => $sectionreturn,
-                'data-id' => $section->id,
-                'data-icon' => $highlightofficon,
-                'data-swapname' => $highlighton,
-                'data-swapicon' => $highlightonicon,
-            ];
-        } else {
-            $action = 'section_highlight';
-            $icon = $highlightonicon;
-            $name = $highlighton;
-            $attributes = [
-                'class' => 'editing_highlight',
-                'data-action' => 'sectionHighlight',
-                'data-sectionreturn' => $sectionreturn,
-                'data-id' => $section->id,
-                'data-icon' => $highlightonicon,
-                'data-swapname' => $highlightoff,
-                'data-swapicon' => $highlightofficon,
-            ];
-        }
-
-        $url = $this->format->get_update_url(
-            action: $action,
-            ids: [$section->id],
-            returnurl: $this->baseurl,
-        );
-
-        return new action_menu_link_secondary(
-                url: $url,
-                icon: new pix_icon($icon, ''),
-                text: $name,
-                attributes: $attributes,
-        );
-    }
-
-    /**
      * Return the specific section highlight action.
      *
-     * @deprecated since Moodle 5.0
-     * @todo Remove this method in Moodle 6.0 (MDL-83530).
      * @return array the action element.
      */
-    #[\core\attribute\deprecated(
-        replacement: 'get_section_highlight_item',
-        since: '5.0',
-        mdl: 'MDL-83527',
-        reason: 'Wrong return type',
-    )]
     protected function get_highlight_control(): array {
-        \core\deprecation::emit_deprecation_if_present([self::class, __FUNCTION__]);
         $format = $this->format;
         $section = $this->section;
         $course = $format->get_course();

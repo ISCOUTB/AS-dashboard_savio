@@ -25,7 +25,7 @@ namespace core_adminpresets\local\setting;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \core_adminpresets\local\setting\adminpresets_admin_setting_bloglevel
  */
-final class adminpresets_admin_setting_bloglevel_test extends \advanced_testcase {
+class adminpresets_admin_setting_bloglevel_test extends \advanced_testcase {
 
     /**
      * Test the behaviour of save_value() method.
@@ -72,18 +72,18 @@ final class adminpresets_admin_setting_bloglevel_test extends \advanced_testcase
      *
      * @return array
      */
-    public static function save_value_provider(): array {
+    public function save_value_provider(): array {
         return [
             'Save the bloglevel and set blog_menu block visibility to true' => [
-                'settingvalue' => BLOG_USER_LEVEL,
+                'setttingvalue' => BLOG_USER_LEVEL,
                 'expectedsaved' => true,
             ],
             'Same value to bloglevel, so it will not be saved' => [
-                'settingvalue' => BLOG_SITE_LEVEL,
+                'setttingvalue' => BLOG_SITE_LEVEL,
                 'expectedsaved' => false,
             ],
             'Save the bloglevel and set blog_menu block visibility to false' => [
-                'settingvalue' => 0,
+                'setttingvalue' => 0,
                 'expectedsaved' => true,
             ],
         ];

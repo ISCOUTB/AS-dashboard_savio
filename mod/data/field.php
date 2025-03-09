@@ -92,7 +92,7 @@ require_capability('mod/data:managetemplates', $context);
 
 $actionbar = new \mod_data\output\action_bar($data->id, $PAGE->url);
 
-$PAGE->add_body_class('limitedwidth');
+$PAGE->add_body_class('mediumwidth');
 $PAGE->set_heading($course->fullname);
 $PAGE->activityheader->disable();
 
@@ -430,7 +430,7 @@ if (($mode == 'new') && (!empty($newtype))) { // Adding a new field.
     echo '<input type="hidden" name="mode" value="sort" />';
     echo '<input type="hidden" name="sesskey" value="'.sesskey().'" />';
     echo '<label for="defaultsort">'.get_string('defaultsortfield','data').'</label>';
-    echo '<select id="defaultsort" name="defaultsort" class="form-select">';
+    echo '<select id="defaultsort" name="defaultsort" class="custom-select">';
     if ($fields = $DB->get_records('data_fields', array('dataid'=>$data->id))) {
         echo '<optgroup label="'.get_string('fields', 'data').'">';
         foreach ($fields as $field) {
@@ -465,7 +465,7 @@ if (($mode == 'new') && (!empty($newtype))) { // Adding a new field.
     $options = array(0 => get_string('ascending', 'data'),
                      1 => get_string('descending', 'data'));
     echo html_writer::label(get_string('sortby'), 'menudefaultsortdir', false, array('class' => 'accesshide'));
-    echo html_writer::select($options, 'defaultsortdir', $data->defaultsortdir, false, ['class' => 'form-select']);
+    echo html_writer::select($options, 'defaultsortdir', $data->defaultsortdir, false, array('class' => 'custom-select'));
     echo '<input type="submit" class="btn btn-secondary ms-1" value="'.get_string('save', 'data').'" />';
     echo '</div>';
     echo '</form>';

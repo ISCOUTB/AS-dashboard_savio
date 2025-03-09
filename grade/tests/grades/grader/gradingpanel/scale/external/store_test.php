@@ -35,7 +35,7 @@ use grade_item;
  * @copyright 2019 Andrew Nicols <andrew@nicols.co.uk>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class store_test extends advanced_testcase {
+class store_test extends advanced_testcase {
 
     /**
      * Ensure that an execute with an invalid component is rejected.
@@ -398,19 +398,19 @@ final class store_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function execute_out_of_range_provider(): array {
+    public function execute_out_of_range_provider(): array {
         return [
             'above' => [
-                'suppliedvalue' => 500,
+                'supplied' => 500,
             ],
             'above just' => [
-                'suppliedvalue' => 4,
+                'supplied' => 4,
             ],
             'below' => [
-                'suppliedvalue' => -100,
+                'supplied' => -100,
             ],
             '-10' => [
-                'suppliedvalue' => -10,
+                'supplied' => -10,
             ],
         ];
     }

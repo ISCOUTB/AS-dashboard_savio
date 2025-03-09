@@ -65,7 +65,7 @@ if (! $scorms = get_all_instances_in_course("scorm", $course)) {
 $table = new html_table();
 
 if ($usesections) {
-    $strsectionname = course_get_format($course)->get_generic_section_name();
+    $strsectionname = get_string('sectionname', 'format_'.$course->format);
     $table->head  = array ($strsectionname, $strname, $strsummary, $strreport);
     $table->align = array ("center", "left", "left", "left");
 } else {

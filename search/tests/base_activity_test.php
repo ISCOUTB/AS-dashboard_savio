@@ -29,7 +29,7 @@ require_once($CFG->dirroot . '/search/tests/fixtures/mock_search_area.php');
  * @copyright   2017 Matt Porritt <mattp@catalyst-au.net>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class base_activity_test extends \advanced_testcase {
+class base_activity_test extends \advanced_testcase {
     /**
      * @var \core_search::manager
      */

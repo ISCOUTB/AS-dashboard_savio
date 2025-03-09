@@ -90,7 +90,7 @@ class summarise_text extends external_api {
         );
 
         // Send the action to the AI manager.
-        $manager = \core\di::get(\core_ai\manager::class);
+        $manager = new \core_ai\manager();
         $response = $manager->process_action($action);
         // Return the response.
         return [

@@ -37,9 +37,6 @@ class custom_category_condition_helper extends \qbank_managecategories\helper {
         global $CFG;
         $pcontexts = [];
         foreach ($contexts as $context) {
-            if ($context->contextlevel !== CONTEXT_MODULE) {
-                continue;
-            }
             $pcontexts[] = $context->id;
         }
         $contextslist = join(', ', $pcontexts);
@@ -105,11 +102,8 @@ class custom_category_condition_helper extends \qbank_managecategories\helper {
         bool $top = false, int $showallversions = 0): array {
         global $DB;
         $topwhere = $top ? '' : 'AND c.parent <> 0';
-        $statuscondition = "AND qv.status = :status";
-        $params = [
-            'status' => question_version_status::QUESTION_STATUS_READY,
-            'substatus' => question_version_status::QUESTION_STATUS_HIDDEN,
-        ];
+        $statuscondition = "AND qv.status = '". question_version_status::QUESTION_STATUS_READY . "' ";
+
         $sql = "SELECT c.*,
                     (SELECT COUNT(1)
                        FROM {question} q
@@ -122,7 +116,7 @@ class custom_category_condition_helper extends \qbank_managecategories\helper {
                                 OR (qv.version = (SELECT MAX(v.version)
                                                     FROM {question_versions} v
                                                     JOIN {question_bank_entries} be ON be.id = v.questionbankentryid
-                                                   WHERE be.id = qbe.id AND v.status <> :substatus)
+                                                   WHERE be.id = qbe.id)
                                    )
                                 )
                             ) AS questioncount
@@ -130,6 +124,6 @@ class custom_category_condition_helper extends \qbank_managecategories\helper {
                  WHERE c.contextid IN ($contexts) $topwhere
               ORDER BY $sortorder";
 
-        return $DB->get_records_sql($sql, $params);
+        return $DB->get_records_sql($sql);
     }
 }

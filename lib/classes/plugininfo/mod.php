@@ -163,10 +163,17 @@ class mod extends base {
     }
 
     /**
-     * Activity modules that declare feature flag FEATURE_CAN_UNINSTALL as false cannot be uninstalled.
+     * Allow all activity modules but Forum to be uninstalled.
+     *
+     * This exception for the Forum has been hard-coded in Moodle since ages,
+     * we may want to re-think it one day.
      */
     public function is_uninstall_allowed() {
-        return plugin_supports('mod', $this->name, FEATURE_CAN_UNINSTALL, true);
+        if ($this->name === 'forum') {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     /**

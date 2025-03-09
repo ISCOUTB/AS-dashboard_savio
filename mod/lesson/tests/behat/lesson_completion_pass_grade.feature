@@ -34,12 +34,12 @@ Feature: Pass grade activity completion in the lesson activity
       | Numerical question | 3               | End of lesson | 1     |
       | Numerical question | @#wronganswer#@ | Next page     | 0     |
 
-  Scenario: Lesson activity displays completion conditions to teachers
+  Scenario: View automatic completion items as a teacher
     When I am on the "Music history" "lesson activity" page logged in as teacher1
     And "Music history" should have the "Receive a grade" completion condition
     And "Music history" should have the "Receive a passing grade" completion condition
 
-  Scenario: A student can complete an lesson activity by achieving a passing grade
+  Scenario: View automatic completion items as a student
     Given I am on the "Music history" "lesson activity" page logged in as student1
     And the "Receive a grade" completion condition of "Music history" is displayed as "todo"
     And the "Receive a passing grade" completion condition of "Music history" is displayed as "todo"

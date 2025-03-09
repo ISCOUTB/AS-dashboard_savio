@@ -30,7 +30,7 @@ require_once($CFG->dirroot . '/question/bank/comment/lib.php');
  * @author     Matt Porritt <mattp@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class lib_test extends \advanced_testcase {
+class lib_test extends \advanced_testcase {
 
     /**
      * Test the comment validation callback.
@@ -84,8 +84,7 @@ final class lib_test extends \advanced_testcase {
         $category = $this->getDataGenerator()->create_category();
         $course = $this->getDataGenerator()->create_course(['category' => $category->id]);
         $qgen = $this->getDataGenerator()->get_plugin_generator('core_question');
-        $qbank = self::getDataGenerator()->create_module('qbank', ['course' => $course->id]);
-        $context = \context_module::instance($qbank->cmid);
+        $context = \context_coursecat::instance($category->id);
         $qcat = $qgen->create_question_category(['contextid' => $context->id]);
         $question = $qgen->create_question('shortanswer', null, ['category' => $qcat->id, 'idnumber' => 'q1']);
 
@@ -112,9 +111,8 @@ final class lib_test extends \advanced_testcase {
         // Make a test question.
         $category = $this->getDataGenerator()->create_category();
         $course = $this->getDataGenerator()->create_course(['category' => $category->id]);
-        $qbank = self::getDataGenerator()->create_module('qbank', ['course' => $course->id]);
-        $context = \context_module::instance($qbank->cmid);
         $qgen = $this->getDataGenerator()->get_plugin_generator('core_question');
+        $context = \context_coursecat::instance($category->id);
         $qcat = $qgen->create_question_category(['contextid' => $context->id]);
         $question = $qgen->create_question('shortanswer', null, ['category' => $qcat->id, 'idnumber' => 'q1']);
         $args = [

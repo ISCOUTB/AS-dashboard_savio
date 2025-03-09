@@ -141,10 +141,6 @@
     text-align: left;
 }
 
-#page-admin-index .upgradekeyreq {
-    min-width: 220px;
-}
-
 #page-admin-index .adminwarning.availableupdatesinfo .moodleupdateinfo span {
     display: block;
 }
@@ -344,7 +340,7 @@
 }
 
 .form-item .form-setting .defaultsnext {
-    display: inline-block;
+    display: inline;
 }
 
 .form-item .form-setting .locked-checkbox {
@@ -404,7 +400,7 @@
     }
 }
 
-@include media-breakpoint-down(md) {
+@include media-breakpoint-down(sm) {
     .jsenabled .admin_colourpicker {
         height: 150px;
         margin-bottom: 10px;
@@ -477,8 +473,7 @@
     }
 
     #plugins-control-panel {
-        .status-missing td,
-        .deprecatedtype td {
+        .status-missing td {
             background-color: $state-warning-bg;
         }
 
@@ -523,7 +518,6 @@
     // Plugins check table.
     #plugins-check {
         .status-missing,
-        .deprecatedtype,
         .status-downgrade {
             td {
                 background-color: $state-danger-bg;

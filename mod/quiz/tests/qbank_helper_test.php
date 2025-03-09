@@ -34,7 +34,7 @@ require_once(__DIR__ . '/quiz_question_helper_test_trait.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \mod_quiz\question\bank\qbank_helper
  */
-final class qbank_helper_test extends \advanced_testcase {
+class qbank_helper_test extends \advanced_testcase {
     use \quiz_question_helper_test_trait;
 
     /**
@@ -88,7 +88,6 @@ final class qbank_helper_test extends \advanced_testcase {
         $slots = $structure->get_slots();
         $slot = reset($slots);
         $this->assertEquals(3, count(qbank_helper::get_version_options($question->id)));
-        $this->assertDebuggingCalled();
         $this->assertEquals($question->id, qbank_helper::choose_question_for_redo(
                 $quiz->id, $context, $slot->id, new \qubaid_list([])));
 

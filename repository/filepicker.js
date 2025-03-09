@@ -347,7 +347,7 @@ YUI.add('moodle-core_filepicker', function(Y) {
 
             var checkboxLabel = Y.Node.create('<label>')
                 .setHTML("Select file '" + o.data.fullname + "'")
-                .addClass('visually-hidden')
+                .addClass('sr-only')
                 .setAttrs({
                     for: checkbox.generateID(),
                 });
@@ -392,7 +392,7 @@ YUI.add('moodle-core_filepicker', function(Y) {
 
             var checkboxLabel = Y.Node.create('<label>')
                 .setHTML(M.util.get_string('selectallornone', 'form'))
-                .addClass('visually-hidden')
+                .addClass('sr-only')
                 .setAttrs({
                     for: checkbox.generateID(),
                 });
@@ -688,30 +688,13 @@ M.core_filepicker.init = function(Y, options) {
                         }
                         // error checking
                         if (data && data.error) {
-                            if (data.errorcode === 'invalidfiletype') {
-                                // File type errors are not really errors, so report them less scarily.
-                                Y.use('moodle-core-notification-alert', function() {
-                                    return new M.core.alert({
-                                        title: M.util.get_string('error', 'moodle'),
-                                        message: data.error,
-                                    });
-                                });
-                            } else {
-                                Y.use('moodle-core-notification-ajaxexception', function() {
-                                    return new M.core.ajaxException(data);
-                                });
-                            }
-                            if (args.onerror) {
-                                args.onerror(id, data, p);
-                            } else {
-                                // Don't know what to do, so blank the dialogue to ensure it is not left in an inconsistent state.
-                                // This is not great. The user needs to re-click 'Upload file' to reset the display.
-                                this.fpnode.one('.fp-content').setContent('');
-                            }
+                            Y.use('moodle-core-notification-ajaxexception', function () {
+                                return new M.core.ajaxException(data);
+                            });
+                            this.fpnode.one('.fp-content').setContent('');
                             return;
                         } else {
                             if (data.msg) {
-                                // As far as I can tell, msg will never be set by any PHP code. -- Tim Oct 2024.
                                 scope.print_msg(data.msg, 'info');
                             }
                             // cache result if applicable
@@ -1241,14 +1224,6 @@ M.core_filepicker.init = function(Y, options) {
                         .one('.fp-value').setContent(Y.Escape.html(value));
                 }
             }
-            // Load popover for the filepicker content.
-            var filepickerContent = Y.one('.file-picker.fp-select');
-            require(['theme_boost/bootstrap/popover'], function(Popover) {
-                var popoverTriggerList = filepickerContent.getDOMNode().querySelectorAll('[data-bs-toggle="popover"]');
-                popoverTriggerList.forEach((popoverTriggerEl) => {
-                    new Popover(popoverTriggerEl);
-                });
-            });
         },
         setup_select_file: function() {
             var client_id = this.options.client_id;
@@ -1793,15 +1768,7 @@ M.core_filepicker.init = function(Y, options) {
             if (obj.repo_id && scope.options.repositories[obj.repo_id]) {
                 scope.fpnode.addClass('repository_'+scope.options.repositories[obj.repo_id].type)
             }
-            var filepickerContent = Y.one('.file-picker .fp-repo-items');
-            filepickerContent.focus();
-            // Load popover for the filepicker content.
-            require(['theme_boost/bootstrap/popover'], function(Popover) {
-                var popoverTriggerList = filepickerContent.getDOMNode().querySelectorAll('[data-bs-toggle="popover"]');
-                popoverTriggerList.forEach((popoverTriggerEl) => {
-                    new Popover(popoverTriggerEl);
-                });
-            });
+            Y.one('.file-picker .fp-repo-items').focus();
 
             // display response
             if (obj.login) {

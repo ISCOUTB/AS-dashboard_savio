@@ -22,9 +22,8 @@ namespace tool_recyclebin;
  * @package    tool_recyclebin
  * @copyright  2015 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \tool_recyclebin\category_bin
  */
-final class category_bin_test extends \advanced_testcase {
+class category_bin_test extends \advanced_testcase {
 
     /**
      * @var \stdClass $course
@@ -73,25 +72,6 @@ final class category_bin_test extends \advanced_testcase {
         // Try with the API.
         $recyclebin = new \tool_recyclebin\category_bin($this->course->category);
         $this->assertEquals(1, count($recyclebin->get_items()));
-    }
-
-    public function test_delete_course_with_long_names(): void {
-        global $DB;
-
-        // Create a course with its name at the upper limit of what is allowed.
-        $course = $this->getDataGenerator()->create_course([
-            'shortname' => str_repeat("S", \core_course\constants::SHORTNAME_MAXIMUM_LENGTH),
-            'fullname' => str_repeat("F", \core_course\constants::FULLNAME_MAXIMUM_LENGTH),
-        ]);
-
-        // Should have nothing in the recycle bin.
-        $this->assertEquals(0, $DB->count_records('tool_recyclebin_category'));
-
-        delete_course($course, false);
-
-        // Verify the course is now in the recycle bin.
-        $recyclebin = new \tool_recyclebin\category_bin($course->category);
-        $this->assertCount(1, $recyclebin->get_items());
     }
 
     /**
@@ -196,7 +176,7 @@ final class category_bin_test extends \advanced_testcase {
      * Used to verify that recycle bin is immune to various settings. Provides plugin, name, value for
      * direct usage with set_config()
      */
-    public static function recycle_bin_settings_provider(): array {
+    public function recycle_bin_settings_provider() {
         return [
             'backup/backup_auto_storage moodle' => [[
                 (object)['plugin' => 'backup', 'name' => 'backup_auto_storage', 'value' => 0],

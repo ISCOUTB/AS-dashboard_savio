@@ -26,7 +26,7 @@ use tool_usertours\local\filter\accessdate;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers    \tool_usertours\local\filter\accessdate
  */
-final class accessdate_filter_test extends \advanced_testcase {
+class accessdate_filter_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);

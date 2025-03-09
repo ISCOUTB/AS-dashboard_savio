@@ -16,7 +16,6 @@
 
 namespace core_ai\table;
 
-use core_ai\manager;
 use core_table\dynamic as dynamic_table;
 use flexible_table;
 use moodle_url;
@@ -33,33 +32,26 @@ class aiprovider_action_management_table extends flexible_table implements dynam
     /** @var string The name of the plugin these actions related too */
     protected string $pluginname;
 
-    /** @var int the provider instance id */
-    protected int $providerid;
-
     /** @var array The list of actions this manager covers */
     protected array $actions;
-
-    /** @var \core_ai\manager The AI manager */
-    protected \core_ai\manager $manager;
 
     /**
      * Constructor.
      *
-     * @param string $uniqueid The table unique id.
+     * @param string $uniqueid The table unique id
      */
     public function __construct(string $uniqueid) {
         $parseuniqueid = explode('-', $uniqueid);
-        $this->pluginname = reset($parseuniqueid);
-        $this->providerid = (int)end($parseuniqueid);
+        $pluginname = end($parseuniqueid);
+        $this->pluginname = $pluginname;
 
         // Get the list of actions that this provider supports.
         $this->actions = \core_ai\manager::get_supported_actions($this->pluginname);
 
-        parent::__construct($uniqueid);
+        parent::__construct($this->get_table_id());
 
         $this->setup_column_configuration();
         $this->set_filterset(new aiprovider_action_management_table_filterset());
-        $this->manager = \core\di::get(manager::class);
         $this->setup();
     }
 
@@ -83,7 +75,7 @@ class aiprovider_action_management_table extends flexible_table implements dynam
      * @return string
      */
     protected function get_table_id(): string {
-        return "aiprovider_action_management_table-{$this->pluginname}";
+        return "aiprovideraction_management_table-{$this->pluginname}";
     }
 
     /**
@@ -103,18 +95,14 @@ class aiprovider_action_management_table extends flexible_table implements dynam
      * @return string
      */
     protected function get_table_js_module(): string {
-        return 'core_ai/aiprovider_action_management_table';
+        return 'core_admin/plugin_management_table';
     }
 
     #[\Override]
     protected function get_dynamic_table_html_end(): string {
         global $PAGE;
 
-        $PAGE->requires->js_call_amd(
-            $this->get_table_js_module(),
-            'init',
-            [$this->providerid]
-        );
+        $PAGE->requires->js_call_amd($this->get_table_js_module(), 'init');
         return parent::get_dynamic_table_html_end();
     }
 
@@ -174,7 +162,7 @@ class aiprovider_action_management_table extends flexible_table implements dynam
             ],
             'title' => $labelstr,
             'label' => $labelstr,
-            'labelclasses' => 'visually-hidden',
+            'labelclasses' => 'sr-only',
         ];
 
         return $OUTPUT->render_from_template('core_admin/setting_configtoggle', $params);
@@ -187,21 +175,15 @@ class aiprovider_action_management_table extends flexible_table implements dynam
      * @return string
      */
     protected function col_settings(stdClass $row): string {
-        $providerclass = "\\$this->pluginname\\provider";
-        $mform = $providerclass::get_action_settings($row->action);
-
-        // Only show the per action settings options if we have a form to display.
-        if ($mform) {
-            $urlparams = [
-                'provider' => $this->pluginname,
-                'action' => $row->action,
-                'providerid' => $this->providerid,
-            ];
-            $url = new \moodle_url('/ai/configure_actions.php', $urlparams);
-            return \html_writer::link($url, get_string('settings'));
-        } else {
-            return '';
+        global $CFG;
+        require_once($CFG->libdir . '/adminlib.php'); // Needed for the AJAX calls.
+        $tree = \admin_get_root();
+        $sectionname = $this->pluginname . '_' . $row->action::get_basename();
+        $section = $tree->locate($sectionname);
+        if ($section) {
+            return \html_writer::link($section->get_settings_page_url(), get_string('settings'));
         }
+        return '';
     }
 
     /**
@@ -236,10 +218,7 @@ class aiprovider_action_management_table extends flexible_table implements dynam
             // Construct the row data.
             $rowdata = (object) [
                 'action' => $actionclass,
-                'enabled' => $this->manager->is_action_enabled(
-                    plugin: $this->pluginname,
-                    actionclass: $actionclass,
-                    instanceid: $this->providerid),
+                'enabled' => \core_ai\manager::is_action_enabled($this->pluginname, $actionclass),
             ];
             $this->add_data_keyed(
                 $this->format_row($rowdata),

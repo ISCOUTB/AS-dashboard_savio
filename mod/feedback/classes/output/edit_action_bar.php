@@ -95,9 +95,8 @@ class edit_action_bar extends base_action_bar {
         $actionsselect = new action_menu();
         $actionsselect->set_menu_trigger(get_string('actions'), 'btn btn-outline-primary');
 
-        $hasitems = $DB->record_exists('feedback_item', ['feedback' => $this->feedback->id]);
         // Export.
-        if ($hasitems) {
+        if ($DB->record_exists('feedback_item', ['feedback' => $this->feedback->id])) {
             $exporturl = new moodle_url('/mod/feedback/export.php', $this->urlparams + ['action' => 'exportfile']);
             $actionsselect->add(new action_menu_link(
                 $exporturl,
@@ -120,7 +119,7 @@ class edit_action_bar extends base_action_bar {
         $cancreatetemplates = has_any_capability([
             'mod/feedback:createprivatetemplate',
             'mod/feedback:createpublictemplate'], \context_module::instance($this->cmid));
-        if ($cancreatetemplates && $hasitems) {
+        if ($cancreatetemplates) {
             $PAGE->requires->js_call_amd('mod_feedback/createtemplate', 'init');
             $actionsselect->add(new action_menu_link(
                 new moodle_url('#'),

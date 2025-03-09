@@ -14,17 +14,28 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace assignsubmission_file\privacy;
-
 /**
- * Unit tests for mod/assign/submission/file/classes/privacy/
+ * Unit tests for assignsubmission_file.
  *
  * @package    assignsubmission_file
  * @copyright  2018 Adrian Greeve <adrian@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers \assignsubmission_file\privacy\provider
  */
-final class provider_test extends \mod_assign\tests\provider_testcase {
+namespace assignsubmission_file\privacy;
+
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->dirroot . '/mod/assign/tests/privacy/provider_test.php');
+
+/**
+ * Unit tests for mod/assign/submission/file/classes/privacy/
+ *
+ * @copyright  2018 Adrian Greeve <adrian@moodle.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class provider_test extends \mod_assign\privacy\provider_test {
+
     /**
      * Convenience function for creating feedback data.
      *

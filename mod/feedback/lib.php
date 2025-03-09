@@ -964,7 +964,7 @@ function feedback_get_incomplete_users(cm_info $cm,
                                             $group,
                                             '',
                                             true)) {
-        return [];
+        return false;
     }
     // Filter users that are not in the correct group/grouping.
     $info = new \core_availability\info_module($cm);
@@ -2810,7 +2810,7 @@ function feedback_extend_settings_navigation(settings_navigation $settings, navi
             navigation_node::TYPE_CUSTOM, null, 'questionnode');
 
         $feedbacknode->add(get_string('templates', 'feedback'),
-            new moodle_url('/mod/feedback/manage_templates.php', ['id' => $settings->get_page()->cm->id]),
+            new moodle_url('/mod/feedback/manage_templates.php', ['id' => $settings->get_page()->cm->id, 'mode' => 'manage']),
             navigation_node::TYPE_CUSTOM, null, 'templatenode');
     }
 
@@ -2867,7 +2867,7 @@ function feedback_page_type_list($pagetype, $parentcontext, $currentcontext) {
 
 /**
  * Move save the items of the given $feedback in the order of $itemlist.
- * @param array $itemlist a list with item ids
+ * @param string $itemlist a comma separated list with item ids
  * @param stdClass $feedback
  * @return bool true if success
  */

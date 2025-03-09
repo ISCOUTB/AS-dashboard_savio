@@ -25,14 +25,14 @@ namespace core_question;
  * @copyright 2023 Jun Pataleta
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class question_display_options_test extends \advanced_testcase {
+class question_display_options_test extends \advanced_testcase {
 
     /**
      * Data provider for {@see self::test_has_question_identifier()}
      *
      * @return array[]
      */
-    public static function has_question_identifier_provider(): array {
+    public function has_question_identifier_provider(): array {
         return [
             'Empty string' => ['', false],
             'Empty space' => ['   ', false],
@@ -61,18 +61,12 @@ final class question_display_options_test extends \advanced_testcase {
      *
      * @return array[]
      */
-    public static function add_question_identifier_to_label_provider(): array {
+    public function add_question_identifier_to_label_provider(): array {
         return [
             'Empty string identifier' => ['Hello', '', false, false, "Hello"],
             'Null identifier' => ['Hello', null, false, false, "Hello"],
             'With identifier' => ['Hello', 'World', false, false, "Hello World"],
-            'With identifier, visually-hidden' => [
-                'Hello',
-                'World',
-                true,
-                false,
-                'Hello <span class="visually-hidden">World</span>',
-            ],
+            'With identifier, sr-only' => ['Hello', 'World', true, false, 'Hello <span class="sr-only">World</span>'],
             'With identifier, prepend' => ['Hello', 'World', false, true, "World Hello"],
         ];
     }
@@ -84,7 +78,7 @@ final class question_display_options_test extends \advanced_testcase {
      * @dataProvider add_question_identifier_to_label_provider
      * @param string $label The label string.
      * @param string|null $identifier The question identifier.
-     * @param bool $sronly Whether to render the question identifier in a visually-hidden container
+     * @param bool $sronly Whether to render the question identifier in a sr-only container
      * @param bool $addbefore Whether to render the question identifier before the label.
      * @param string $expected The expected return value.
      * @return void

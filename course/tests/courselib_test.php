@@ -64,7 +64,7 @@ require_once($CFG->dirroot . '/course/lib.php');
  * @copyright  2012 Petr Skoda {@link http://skodak.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class courselib_test extends advanced_testcase {
+class courselib_test extends advanced_testcase {
 
     /**
      * Load required libraries and fixtures.
@@ -638,7 +638,7 @@ final class courselib_test extends advanced_testcase {
      *
      * @return array An array of arrays contain test data
      */
-    public static function provider_course_delete_module(): array {
+    public function provider_course_delete_module() {
         $data = array();
 
         $data['assign'] = array('assign', array('duedate' => time()));
@@ -811,7 +811,7 @@ final class courselib_test extends advanced_testcase {
     /**
      * Relative dates mode settings provider for course creation.
      */
-    public static function create_course_relative_dates_provider(): array {
+    public function create_course_relative_dates_provider() {
         return [
             [0, 0, 0],
             [0, 1, 0],
@@ -880,15 +880,13 @@ final class courselib_test extends advanced_testcase {
         rebuild_course_cache($course->id, true);
 
         // Create some cms for testing.
-        $mods = $DB->get_records('modules');
-        $mod = reset($mods);
         $cmids = array();
         for ($i=0; $i<4; $i++) {
-            $cmids[$i] = $DB->insert_record('course_modules', ['course' => $course->id, 'module' => $mod->id]);
+            $cmids[$i] = $DB->insert_record('course_modules', array('course' => $course->id));
         }
 
         // Add it to section that exists.
-        course_add_cm_to_section($course, $cmids[0], 1, null, $mod->name);
+        course_add_cm_to_section($course, $cmids[0], 1);
 
         // Check it got added to sequence.
         $sequence = $DB->get_field('course_sections', 'sequence', array('course' => $course->id, 'section' => 1));
@@ -896,7 +894,7 @@ final class courselib_test extends advanced_testcase {
 
         // Add a second, this time using courseid variant of parameters.
         $coursecacherev = $DB->get_field('course', 'cacherev', array('id' => $course->id));
-        course_add_cm_to_section($course->id, $cmids[1], 1, null, $mod->name);
+        course_add_cm_to_section($course->id, $cmids[1], 1);
         $sequence = $DB->get_field('course_sections', 'sequence', array('course' => $course->id, 'section' => 1));
         $this->assertEquals($cmids[0] . ',' . $cmids[1], $sequence);
 
@@ -906,55 +904,16 @@ final class courselib_test extends advanced_testcase {
         $this->assertEmpty(cache::make('core', 'coursemodinfo')->get_versioned($course->id, $newcacherev));
 
         // Add one to section that doesn't exist (this might rebuild modinfo).
-        course_add_cm_to_section($course, $cmids[2], 2, null, $mod->name);
+        course_add_cm_to_section($course, $cmids[2], 2);
         $this->assertEquals(3, $DB->count_records('course_sections', array('course' => $course->id)));
         $sequence = $DB->get_field('course_sections', 'sequence', array('course' => $course->id, 'section' => 2));
         $this->assertEquals($cmids[2], $sequence);
 
         // Add using the 'before' option.
-        course_add_cm_to_section($course, $cmids[3], 2, $cmids[2], $mod->name);
+        course_add_cm_to_section($course, $cmids[3], 2, $cmids[2]);
         $this->assertEquals(3, $DB->count_records('course_sections', array('course' => $course->id)));
         $sequence = $DB->get_field('course_sections', 'sequence', array('course' => $course->id, 'section' => 2));
         $this->assertEquals($cmids[3] . ',' . $cmids[2], $sequence);
-    }
-
-    /**
-     * Module types that have FEATURE_CAN_DISPLAY flag set to false cannot be in any section other than 0.
-     *
-     * @return void
-     * @covers ::course_add_cm_to_section()
-     */
-    public function test_add_non_display_types_to_cm_section(): void {
-        global $DB;
-
-        $this->resetAfterTest(true);
-        $generator = self::getDataGenerator();
-
-        // Create course with 1 section.
-        $course = self::getDataGenerator()->create_course(
-            [
-                'shortname' => 'GrowingCourse',
-                'fullname' => 'Growing Course',
-                'numsections' => 1,
-            ],
-            ['createsections' => true]
-        );
-
-        // Create the module and assert in section 0.
-        $sectionzero = $DB->get_record('course_sections', ['course' => $course->id, 'section' => 0], '*', MUST_EXIST);
-        $module = $generator->create_module('qbank', ['course' => $course, 'section' => $sectionzero->section]);
-
-        // Try to add to section 1.
-        $this->expectExceptionMessage("Modules with FEATURE_CAN_DISPLAY set to false can not be moved from section 0");
-
-        try {
-            course_add_cm_to_section($course, $module->cmid, 1, null, 'qbank');
-        } finally {
-            // Assert still in section 0.
-            $cm = $DB->get_record('course_modules', ['id' => $module->cmid]);
-            $modsection = $DB->get_record('course_sections', ['id' => $cm->section]);
-            $this->assertEquals($sectionzero->section, $modsection->section);
-        }
     }
 
     public function test_reorder_sections(): void {
@@ -1361,36 +1320,6 @@ final class courselib_test extends advanced_testcase {
         $newsection = $DB->get_record('course_sections', array('id' => $newsection->id));
         $newsequences = explode(',', $newsection->sequence);
         $this->assertTrue(in_array($cm->id, $newsequences));
-    }
-
-    /**
-     * Ensure that qbank module which has feature flag FEATURE_CAN_DISPLAY set to false cannot be moved from section 0.
-     *
-     * @return void
-     * @covers ::moveto_module()
-     */
-    public function test_move_feature_cannot_display(): void {
-        $this->resetAfterTest(true);
-        // Setup fixture.
-        $course = $this->getDataGenerator()->create_course(['numsections' => 5], ['createsections' => true]);
-        $qbank = $this->getDataGenerator()->create_module('qbank', ['course' => $course->id]);
-        $qbankcms = get_fast_modinfo($course)->get_instances_of('qbank');
-        $qbankcm = reset($qbankcms);
-
-        // Check that mods with FEATURE_CAN_DISPLAY set to false cannot be moved from section 0.
-        $newsection = get_fast_modinfo($course)->get_section_info(3);
-
-        $codingerror = "/ .* Modules with FEATURE_CAN_DISPLAY set to false can not be moved from section 0/";
-
-        // Try to perform the move.
-        $this->expectExceptionMessageMatches($codingerror);
-        try {
-            moveto_module($qbankcm, $newsection);
-        } finally {
-            $qbankcms = get_fast_modinfo($course)->get_instances_of('qbank');
-            $qbankcm = reset($qbankcms);
-            $this->assertEquals(0, $qbankcm->sectionnum);
-        }
     }
 
     public function test_module_visibility(): void {
@@ -2008,10 +1937,7 @@ final class courselib_test extends advanced_testcase {
 
         // Create the XML file we want to use.
         $course->category = (array)$course->category;
-
-        // Note: this is a violation of component communication principles.
-        // TODO MDL-83789.
-        $imstestcase = new imsenterprise_test('courselib_imsenterprise_test');
+        $imstestcase = new imsenterprise_test();
         $imstestcase->imsplugin = enrol_get_plugin('imsenterprise');
         $imstestcase->set_test_config();
         $imstestcase->set_xml_file(false, array($course));
@@ -3208,22 +3134,6 @@ final class courselib_test extends advanced_testcase {
     }
 
     /**
-     * Ensure that modules with the feature flag FEATURE_CAN_DISPLAY set to false cannot be duplicated into a section other than 0.
-     * @covers ::duplicate_module()
-     */
-    public function test_duplicate_cannot_display_mods(): void {
-        self::setAdminUser();
-        $this->resetAfterTest();
-        $course = self::getDataGenerator()->create_course(['numsections' => 2], ['createsections' => true]);
-        $res = self::getDataGenerator()->create_module('qbank', ['course' => $course]);
-        $cm = get_coursemodule_from_id('qbank', $res->cmid, 0, false, MUST_EXIST);
-        $sectionid = get_fast_modinfo($course)->get_section_info(1)->id;
-
-        $this->expectExceptionMessage("Modules with FEATURE_CAN_DISPLAY set to false can not be moved from section 0");
-        duplicate_module($course, $cm, $sectionid);
-    }
-
-    /**
      * Tests that when creating or updating a module, if the availability settings
      * are present but set to an empty tree, availability is set to null in
      * database.
@@ -3650,7 +3560,7 @@ final class courselib_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function course_enddate_provider(): array {
+    public function course_enddate_provider() {
         // Each provided example contains startdate, enddate and the expected exception error code if there is any.
         return [
             [
@@ -3732,7 +3642,7 @@ final class courselib_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function course_dates_reset_provider(): array {
+    public function course_dates_reset_provider() {
 
         // Each example contains the following:
         // - course startdate
@@ -4633,7 +4543,7 @@ final class courselib_test extends advanced_testcase {
     /**
      * Test cases for the course_classify_courses_for_timeline test.
      */
-    public static function get_course_classify_courses_for_timeline_test_cases(): array {
+    public function get_course_classify_courses_for_timeline_test_cases() {
         $now = time();
         $day = 86400;
 
@@ -4744,7 +4654,7 @@ final class courselib_test extends advanced_testcase {
     /**
      * Test the course_classify_courses_for_timeline function.
      *
-     * @dataProvider get_course_classify_courses_for_timeline_test_cases
+     * @dataProvider get_course_classify_courses_for_timeline_test_cases()
      * @param array $coursesdata Courses to create
      * @param array $expected Expected test results.
      */
@@ -4786,7 +4696,7 @@ final class courselib_test extends advanced_testcase {
     /**
      * Test cases for the course_get_enrolled_courses_for_logged_in_user tests.
      */
-    public static function get_course_get_enrolled_courses_for_logged_in_user_test_cases(): array {
+    public function get_course_get_enrolled_courses_for_logged_in_user_test_cases() {
         $buildexpectedresult = function($limit, $offset) {
             $result = [];
             for ($i = $offset; $i < $offset + $limit; $i++) {
@@ -4874,7 +4784,7 @@ final class courselib_test extends advanced_testcase {
     /**
      * Test the course_get_enrolled_courses_for_logged_in_user function.
      *
-     * @dataProvider get_course_get_enrolled_courses_for_logged_in_user_test_cases
+     * @dataProvider get_course_get_enrolled_courses_for_logged_in_user_test_cases()
      * @param int $dbquerylimit Number of records to load per DB request
      * @param int $totalcourses Number of courses to create
      * @param int $limit Maximum number of results to get.
@@ -4922,7 +4832,7 @@ final class courselib_test extends advanced_testcase {
     /**
      * Test cases for the course_filter_courses_by_timeline_classification tests.
      */
-    public static function get_course_filter_courses_by_timeline_classification_test_cases(): array {
+    public function get_course_filter_courses_by_timeline_classification_test_cases() {
         $now = time();
         $day = 86400;
 
@@ -5172,7 +5082,7 @@ final class courselib_test extends advanced_testcase {
     /**
      * Test the course_filter_courses_by_timeline_classification function.
      *
-     * @dataProvider get_course_filter_courses_by_timeline_classification_test_cases
+     * @dataProvider get_course_filter_courses_by_timeline_classification_test_cases()
      * @param array $coursedata Course test data to create.
      * @param string $classification Timeline classification.
      * @param int $limit Maximum number of results to return.
@@ -5221,7 +5131,7 @@ final class courselib_test extends advanced_testcase {
     /**
      * Test cases for the course_filter_courses_by_timeline_classification tests.
      */
-    public static function get_course_filter_courses_by_customfield_test_cases(): array {
+    public function get_course_filter_courses_by_customfield_test_cases() {
         global $CFG;
         require_once($CFG->dirroot.'/blocks/myoverview/lib.php');
         $coursedata = [
@@ -5391,7 +5301,7 @@ final class courselib_test extends advanced_testcase {
     /**
      * Test the course_filter_courses_by_customfield function.
      *
-     * @dataProvider get_course_filter_courses_by_customfield_test_cases
+     * @dataProvider get_course_filter_courses_by_customfield_test_cases()
      * @param array $coursedata Course test data to create.
      * @param string $customfield Shortname of the customfield.
      * @param string $customfieldvalue the value to filter by.
@@ -5477,7 +5387,7 @@ final class courselib_test extends advanced_testcase {
     /**
      * Test cases for the course_filter_courses_by_timeline_classification w/ hidden courses tests.
      */
-    public static function get_course_filter_courses_by_timeline_classification_hidden_courses_test_cases(): array {
+    public function get_course_filter_courses_by_timeline_classification_hidden_courses_test_cases() {
         $now = time();
         $day = 86400;
 
@@ -5636,7 +5546,7 @@ final class courselib_test extends advanced_testcase {
     /**
      * Test the course_filter_courses_by_timeline_classification function hidden courses.
      *
-     * @dataProvider get_course_filter_courses_by_timeline_classification_hidden_courses_test_cases
+     * @dataProvider get_course_filter_courses_by_timeline_classification_hidden_courses_test_cases()
      * @param array $coursedata Course test data to create.
      * @param string $classification Timeline classification.
      * @param int $limit Maximum number of results to return.
@@ -5846,7 +5756,7 @@ final class courselib_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function course_get_recent_courses_sort_validation_provider(): array {
+    function course_get_recent_courses_sort_validation_provider() {
         return [
             'Invalid sort format (SQL injection attempt)' =>
                 [
@@ -5920,7 +5830,7 @@ final class courselib_test extends advanced_testcase {
     /**
      * Test cases for the course_get_course_dates_for_user_ids tests.
      */
-    public static function get_course_get_course_dates_for_user_ids_test_cases(): array {
+    public function get_course_get_course_dates_for_user_ids_test_cases() {
         $now = time();
         $pastcoursestart = $now - 100;
         $futurecoursestart = $now + 100;
@@ -7134,7 +7044,7 @@ final class courselib_test extends advanced_testcase {
     /**
      * Test the course_get_course_dates_for_user_ids function.
      *
-     * @dataProvider get_course_get_course_dates_for_user_ids_test_cases
+     * @dataProvider get_course_get_course_dates_for_user_ids_test_cases()
      * @param bool $relativedatemode Set the course to relative dates mode
      * @param int $coursestart Course start date
      * @param int $usercount Number of users to create
@@ -7227,7 +7137,7 @@ final class courselib_test extends advanced_testcase {
      *
      * @return array An array of arrays contain test data
      */
-    public static function provider_course_modules_pending_deletion(): array {
+    public function provider_course_modules_pending_deletion() {
         return [
             'Non-gradable activity, check all'              => [['forum'], 0, false, true],
             'Gradable activity, check all'                  => [['assign'], 0, false, true],

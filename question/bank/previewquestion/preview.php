@@ -35,7 +35,6 @@ use \core\notification;
 use qbank_previewquestion\form\preview_options_form;
 use qbank_previewquestion\question_preview_options;
 use qbank_previewquestion\helper;
-use core_question\local\bank\version_options;
 
 /**
  * The maximum number of variants previewable. If there are more variants than this for a question
@@ -64,6 +63,11 @@ if ($cmid = optional_param('cmid', 0, PARAM_INT)) {
     $cm = get_coursemodule_from_id(false, $cmid);
     require_login($cm->course, false, $cm);
     $context = context_module::instance($cmid);
+
+} else if ($courseid = optional_param('courseid', 0, PARAM_INT)) {
+    require_login($courseid);
+    $context = context_course::instance($courseid);
+
 } else {
     require_login();
     $category = $DB->get_record('question_categories', ['id' => $question->category], '*', MUST_EXIST);
@@ -131,15 +135,13 @@ if ($previewid) {
 $options->behaviour = $quba->get_preferred_behaviour();
 $options->maxmark = $quba->get_question_max_mark($slot);
 
-// Load the question versions and convert to a simple array for select menu.
-$versions = version_options::get_version_menu_options($question->id);
 $versionids = helper::load_versions($question->questionbankentryid);
 // Create the settings form, and initialise the fields.
 $optionsform = new preview_options_form(helper::question_preview_form_url($question->id, $context, $previewid, $returnurl),
         [
             'quba' => $quba,
             'maxvariant' => $maxvariant,
-            'versions' => $versions,
+            'versions' => array_combine(array_values($versionids), array_values($versionids)),
             'restartversion' => $restartversion,
         ]);
 $optionsform->set_data($options);
@@ -319,7 +321,7 @@ if (!is_null($returnurl)) {
     $previewdata['redirect'] = true;
     $previewdata['redirecturl'] = $returnurl;
 }
-$closeurl = new moodle_url('/question/edit.php', ['cmid' => $context->instanceid]);
+$closeurl = new moodle_url('/question/edit.php', ['courseid' => $COURSE->id]);
 echo $PAGE->get_renderer('qbank_previewquestion')->render_preview_page($previewdata);
 
 // Log the preview of this question.

@@ -25,16 +25,17 @@ Feature: Add badges to the system
       | badges_defaultissuername    | Test Badge Site      |
       | badges_defaultissuercontact | testuser@example.com |
     And I navigate to "Badges > Add a new badge" in site administration
-    And the field "issuername" matches value "Test Badge Site"
-    And the field "Email" matches value "testuser@example.com"
+    And the field "Issuer name" matches value "Test Badge Site"
+    And the field "Issuer contact" matches value "testuser@example.com"
     And I set the following fields to these values:
       | Name           | Test badge with 'apostrophe' and other friends (<>&@#) |
       | Version        | v1                                                     |
       | Language       | English                                                |
       | Description    | Test badge description                                 |
+      | Image author   | http://author.example.com                              |
       | Image caption  | Test caption image                                     |
       | Tags           | Math, Physics                                          |
-      | Email          | issuer@example.com                                     |
+      | Issuer contact | issuer@example.com                                     |
     And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
     When I press "Create badge"
     Then I should see "Edit details"
@@ -62,6 +63,7 @@ Feature: Add badges to the system
       | Version | v1 |
       | Language | French |
       | Description | Test badge related description |
+      | Image author | http://author.example.com |
       | Image caption | Test caption image |
     And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
     And I press "Create badge"
@@ -72,6 +74,7 @@ Feature: Add badges to the system
       | Version | v2 |
       | Language | English |
       | Description | Test badge description |
+      | Image author | http://author.example.com |
       | Image caption | Test caption image |
     And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
     And I press "Create badge"
@@ -93,6 +96,7 @@ Feature: Add badges to the system
       | Version | v1 |
       | Language | English |
       | Description | Test badge description |
+      | Image author | http://author.example.com |
       | Image caption | Test caption image |
     And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
     When I press "Create badge"
@@ -100,11 +104,11 @@ Feature: Add badges to the system
     And I should see "Endorsement"
     And I select "Endorsement" from the "jump" singleselect
     And I set the following fields to these values:
-      | Endorser name       | Endorser                    |
-      | Email               | endorsement@example.com     |
-      | URL                 | http://example.com          |
-      | Claim URL           | http://claimurl.example.com |
-      | Endorsement comment | Test Endorsement comment    |
+      | Endorser name | Endorser |
+      | Email | endorsement@example.com |
+      | Issuer URL | http://example.com  |
+      | Claim URL | http://claimurl.example.com |
+      | Endorsement comment | Test Endorsement comment |
     And I press "Save changes"
     Then I should see "Changes saved"
 
@@ -116,6 +120,7 @@ Feature: Add badges to the system
       | Version | v1 |
       | Language | English |
       | Description | Test badge description |
+      | Image author | http://author.example.com |
       | Image caption | Test caption image |
     And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
     When I press "Create badge"
@@ -148,6 +153,7 @@ Feature: Add badges to the system
       | Version | v1 |
       | Language | English |
       | Description | Test badge description |
+      | Image author | http://author.example.com |
       | Image caption | Test caption image |
     And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
     And I press "Create badge"
@@ -174,6 +180,7 @@ Feature: Add badges to the system
       | language       | ca                             |
       | description    | Test badge description         |
       | image          | badges/tests/behat/badge.png   |
+      | imageauthorurl | http://imtheauthor.example.com |
       | imagecaption   | My caption image               |
       | issuercontact  | testuser@example.com           |
     And the following "core_badges > Criterias" exist:
@@ -182,15 +189,16 @@ Feature: Add badges to the system
     And I navigate to "Badges > Manage badges" in site administration
     When I press "Edit" action in the "Testing site badge" report row
     And I should see "Testing site badge"
-    And the field "Email" matches value "testuser@example.com"
+    And the field "Issuer contact" matches value "testuser@example.com"
     And I set the following fields to these values:
       | Name           | Test badge with 'apostrophe' and other friends (<>&@#) |
       | Version        | secondversion                                          |
       | Language       | English                                                |
       | Description    | Modified test badge description                        |
+      | Image author   | http://author.example.com                              |
       | Image caption  | Test caption image                                     |
       | Tags           | Math, History                                          |
-      | Email          | issuer@invalid.cat                                     |
+      | Issuer contact | issuer@invalid.cat                                     |
     And I press "Save changes"
     And I select "Overview" from the "jump" singleselect
     And I expand all fieldsets
@@ -205,8 +213,8 @@ Feature: Add badges to the system
 
   Scenario: Default value for issuer name
     When I navigate to "Badges > Add a new badge" in site administration
-    Then the field "issuername" matches value "Acceptance test site"
+    Then the field "Issuer name" matches value "Acceptance test site"
     But the following config values are set as admin:
       | badges_defaultissuername    | Test Badge Site      |
     And I navigate to "Badges > Add a new badge" in site administration
-    And the field "issuername" matches value "Test Badge Site"
+    And the field "Issuer name" matches value "Test Badge Site"

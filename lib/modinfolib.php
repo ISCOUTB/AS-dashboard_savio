@@ -1149,16 +1149,6 @@ class course_modinfo {
         // Because this is a versioned cache, there is no need to actually delete the cache item,
         // only increase the required version number.
     }
-
-    /**
-     * Can this module type be displayed on a course page or selected from the activity types when adding an activity to a course?
-     *
-     * @param string $modname The module type name
-     * @return bool
-     */
-    public static function is_mod_type_visible_on_course(string $modname): bool {
-        return plugin_supports('mod', $modname, FEATURE_CAN_DISPLAY, true);
-    }
 }
 
 
@@ -1480,12 +1470,6 @@ class cm_info implements IteratorAggregate {
      * @var string
      */
     private $iconcomponent;
-
-    /**
-     * The instance record form the module table
-     * @var stdClass
-     */
-    private $instancerecord;
 
     /**
      * Name of module e.g. 'forum' (this is the same name as the module's main database
@@ -2223,25 +2207,6 @@ class cm_info implements IteratorAggregate {
     }
 
     /**
-     * Return the activity database table record.
-     *
-     * The instance record will be cached after the first call.
-     *
-     * @return stdClass
-     */
-    public function get_instance_record() {
-        global $DB;
-        if (!isset($this->instancerecord)) {
-            $this->instancerecord = $DB->get_record(
-                table: $this->modname,
-                conditions: ['id' => $this->instance],
-                strictness: MUST_EXIST,
-            );
-        }
-        return $this->instancerecord;
-    }
-
-    /**
      * Returns the section delegated by this module, if any.
      *
      * @return ?section_info
@@ -2600,15 +2565,6 @@ class cm_info implements IteratorAggregate {
     public function is_visible_on_course_page() {
         $this->obtain_dynamic_data();
         return $this->uservisibleoncoursepage;
-    }
-
-    /**
-     * Use this method if you want to check if the plugin overrides any visibility checks to block rendering to the display.
-     *
-     * @return bool
-     */
-    public function is_of_type_that_can_display(): bool {
-        return course_modinfo::is_mod_type_visible_on_course($this->modname);
     }
 
     /**
@@ -3726,7 +3682,7 @@ class section_info implements IteratorAggregate {
      * Get the delegate component instance.
      */
     public function get_component_instance(): ?sectiondelegate {
-        if (!$this->is_delegated()) {
+        if (empty($this->_component)) {
             return null;
         }
         if ($this->_delegateinstance !== null) {

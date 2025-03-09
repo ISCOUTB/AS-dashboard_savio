@@ -31,7 +31,7 @@ require_once('all_checks.php');
 /**
  * Class legend_text_not_empty_test
  */
-final class legend_text_not_empty_test extends all_checks {
+class legend_text_not_empty_test extends all_checks {
     /** @var string Check type */
     public $checktype = 'legend_text_not_empty';
 

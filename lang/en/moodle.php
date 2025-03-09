@@ -217,13 +217,10 @@ $string['backuptakealook'] = 'Please take a look at your backup logs in:
 $string['backupuserfileshelp'] = 'Choose whether user files (eg profile images) should be included in automated backups';
 $string['backupversion'] = 'Backup version';
 $string['badges'] = 'Badges';
-$string['between'] = 'Between';
 $string['block'] = 'Block';
 $string['blockconfiga'] = 'Configuring a {$a} block';
 $string['blockconfigbad'] = 'This block has not been implemented correctly and thus cannot provide a configuration interface.';
 $string['blocks'] = 'Blocks';
-$string['blocks_main'] = 'Main content blocks';
-$string['blocks_supplementary'] = 'Supplementary blocks';
 $string['blocksaddedit'] = 'Add/Edit blocks';
 $string['blockseditoff'] = 'Blocks editing off';
 $string['blocksediton'] = 'Blocks editing on';
@@ -300,7 +297,6 @@ $string['confirmednot'] = 'Your registration has not yet been confirmed. Please 
 $string['confirmcheckfull'] = 'Are you absolutely sure you want to confirm {$a} ?';
 $string['confirmcoursemove'] = 'Are you sure you want to move this course ({$a->course}) into this category ({$a->category})?';
 $string['considereddigitalminor'] = 'You are too young to create an account on this site.';
-$string['contactsbyrolelist'] = '{$a->role}: {$a->contacts}';
 $string['content'] = 'Content';
 $string['contentexport_aboutthiscourse'] = 'Course summary';
 $string['contentexport_coursesummary'] = 'This file is part of the content downloaded from <a href="{$a->courselink}">{$a->coursename}</a>.';
@@ -343,7 +339,6 @@ $string['copyrightnotice'] = 'Copyright notice';
 $string['coresystem'] = 'System';
 $string['cost'] = 'Cost';
 $string['costdefault'] = 'Default cost';
-$string['count_of_total'] = '<strong>{$a->count}</strong> of {$a->total}';
 $string['counteditems'] = '{$a->count} {$a->items}';
 $string['country'] = 'Country';
 $string['course'] = 'Course';
@@ -503,8 +498,6 @@ $string['dataformats'] = 'Data formats';
 $string['date'] = 'Date';
 $string['datemostrecentfirst'] = 'Date - most recent first';
 $string['datemostrecentlast'] = 'Date - most recent last';
-$string['datetimefilterafter'] = '{$a->title} after';
-$string['datetimefilterbefore'] = '{$a->title} before';
 $string['day'] = 'day';
 $string['days'] = 'days';
 $string['decodinginternallinks'] = 'Decoding internal links';
@@ -615,7 +608,7 @@ $string['editcategorythis'] = 'Edit this category';
 $string['editcoursesettings'] = 'Edit course settings';
 $string['editsettings'] = 'Edit settings';
 $string['editfiles'] = 'Edit files';
-$string['editgroupprofile'] = 'Edit group description';
+$string['editgroupprofile'] = 'Edit group profile';
 $string['editingteachershort'] = 'Editor';
 $string['editmode'] = 'Edit mode';
 $string['editlock'] = 'This value cannot be edited!';
@@ -835,7 +828,6 @@ $string['eventcoursemodulecreated'] = 'Course module created';
 $string['eventcoursemoduledeleted'] = 'Course module deleted';
 $string['eventcoursemoduleupdated'] = 'Course module updated';
 $string['eventcoursemoduleviewed'] = 'Course module viewed';
-$string['eventcourseoverviewviewed'] = 'Course activities overview page viewed';
 $string['eventcoursessearched'] = 'Courses searched';
 $string['eventcourseresetended'] = 'Course reset ended';
 $string['eventcourseresetstarted'] = 'Course reset started';
@@ -900,6 +892,7 @@ $string['failedtaskbody'] = '<p>Hi {$a->firstname},</p>
 <p>The task <b>{$a->taskname}</b> has failed multiple times and requires attention.</p>
 <p><a href="{$a->link}">See task</a></p>';
 $string['failedtasksubject'] = 'Task failed: {$a}';
+$string['failedtaskcontexturlname'] = 'Status report';
 $string['feedback'] = 'Feedback';
 $string['file'] = 'File';
 $string['fileexists'] = 'There is already a file called {$a}';
@@ -1446,8 +1439,6 @@ $string['movedown'] = 'Move down';
 $string['movefilestohere'] = 'Move files to here';
 $string['movefull'] = 'Move {$a} to this location';
 $string['movehere'] = 'Move to here';
-$string['moveitemdown'] = 'Move {$a} down';
-$string['moveitemup'] = 'Move {$a} up';
 $string['moveleft'] = 'Move left';
 $string['moremenu'] = 'More';
 $string['moreactions'] = 'More actions';
@@ -1510,18 +1501,20 @@ $string['newuser'] = 'New user';
 $string['newusernewpasswordsubj'] = 'New user account';
 $string['newusernewpasswordtext'] = 'Hi {$a->firstname},
 
-An account has been created for you at \'{$a->sitename}\'.
+A new account has been created for you at \'{$a->sitename}\'
+and you have been issued with a new temporary password.
 
+Your login information is:
    username: {$a->username}
    password: {$a->newpassword}
-
-(You will be prompted to change your password when you log in for the first time.)
+             (you will have to change your password
+              when you log in for the first time)
 
 To start using \'{$a->sitename}\', log in at
    {$a->link}
 
-If you need help, contact the site administrator,
-{$a->signoff}';
+If you need help, you can contact the site administrator,
+{$a->admin}';
 $string['newusers'] = 'New users';
 $string['newwindow'] = 'New window';
 $string['next'] = 'Next';
@@ -1558,6 +1551,10 @@ $string['nopotentialcreators'] = 'No potential course creators';
 $string['nopotentialstudents'] = 'No potential students';
 $string['nopotentialteachers'] = 'No potential teachers';
 $string['norecentactivity'] = 'No recent activity';
+$string['noreplybouncemessage'] = 'You have replied to a no-reply email address. If you were attempting to reply to a forum post, please instead reply using the {$a} forums.
+
+Following is the content of your email:';
+$string['noreplybouncesubject'] = '{$a} - bounced email.';
 $string['noreplyname'] = 'Do not reply to this email';
 $string['noresetrecord'] = 'There is no record of that reset request. Please initiate a new password reset request.';
 $string['noresults'] = 'No results';
@@ -1860,7 +1857,6 @@ $string['resortsubcategoriesby'] = 'Sort subcategories by {$a} ascending';
 $string['resortsubcategoriesbyreverse'] = 'Sort subcategories by {$a} descending';
 $string['resortcourses'] = 'Sort courses';
 $string['resource'] = 'Resource';
-$string['resource_type'] = 'Resource type';
 $string['resourcedisplayauto'] = 'Automatic';
 $string['resourcedisplaydownload'] = 'Force download';
 $string['resourcedisplayembed'] = 'Embed';
@@ -1981,7 +1977,6 @@ $string['selectallusersonpage'] = 'Select all users on this page';
 $string['selectalluserswithcount'] = 'Select all {$a} users';
 $string['selectamodule'] = 'Please select an activity module';
 $string['selectanoptions'] = 'Select an option';
-$string['selectdates'] = 'Select dates';
 $string['selectdefault'] = 'Select default';
 $string['selectedfile'] = 'Selected file';
 $string['selectedcategories'] = 'Selected categories';
@@ -2527,12 +2522,5 @@ line at the top of your web browser window.
 
 Cheers from the \'{$a->sitename}\' administrator,
 {$a->signoff}';
-$string['noreplybouncemessage'] = 'You have replied to a no-reply email address. If you were attempting to reply to a forum post, please instead reply using the {$a} forums.
-
-Following is the content of your email:';
-$string['noreplybouncesubject'] = '{$a} - bounced email.';
 $string['registrationcontactno'] = 'No, I do not want to be contacted by other people';
 $string['registrationcontactyes'] = 'Yes, provide a form for other Moodlers to contact me';
-
-// Deprecated since Moodle 5.0.
-$string['failedtaskcontexturlname'] = 'Status report';

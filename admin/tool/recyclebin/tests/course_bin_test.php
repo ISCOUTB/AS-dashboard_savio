@@ -26,7 +26,7 @@ use stdClass;
  * @copyright  2015 University of Kent
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class course_bin_test extends \advanced_testcase {
+class course_bin_test extends \advanced_testcase {
 
     /**
      * @var \stdClass $course
@@ -176,7 +176,7 @@ final class course_bin_test extends \advanced_testcase {
      * Used to verify that recycle bin is immune to various settings. Provides plugin, name, value for
      * direct usage with set_config()
      */
-    public static function recycle_bin_settings_provider(): array {
+    public function recycle_bin_settings_provider() {
         return [
             'backup/backup_auto_storage moodle' => [[
                 (object)['plugin' => 'backup', 'name' => 'backup_auto_storage', 'value' => 0],

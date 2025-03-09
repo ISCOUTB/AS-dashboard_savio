@@ -28,7 +28,7 @@ namespace tool_monitor\event;
 /**
  * Tests that the tool_monitor events are valid and triggered correctly.
  */
-final class events_test extends \advanced_testcase {
+class events_test extends \advanced_testcase {
 
     /**
      * Tests set up.

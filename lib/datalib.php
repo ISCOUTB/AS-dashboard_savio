@@ -382,10 +382,12 @@ function users_order_by_sql(string $usertablealias = '', ?string $search = null,
     }
 
     $exactconditions = array();
+    $paramkey = 'usersortexact1';
 
     $exactconditions[] = $DB->sql_fullname($tableprefix . 'firstname', $tableprefix  . 'lastname') .
-            ' = :usersortexact';
-    $params['usersortexact'] = $search;
+            ' = :' . $paramkey;
+    $params[$paramkey] = $search;
+    $paramkey++;
 
     if ($customfieldmappings) {
         $fieldstocheck = array_merge([$tableprefix . 'firstname', $tableprefix . 'lastname'], array_values($customfieldmappings));
@@ -397,8 +399,9 @@ function users_order_by_sql(string $usertablealias = '', ?string $search = null,
     }
 
     foreach ($fieldstocheck as $key => $field) {
-        $exactconditions[] = 'LOWER(' . $field . ') = LOWER(:usersortfield' . $key . ')';
-        $params['usersortfield' . $key] = $search;
+        $exactconditions[] = 'LOWER(' . $field . ') = LOWER(:' . $paramkey . ')';
+        $params[$paramkey] = $search;
+        $paramkey++;
     }
 
     $sort = 'CASE WHEN ' . implode(' OR ', $exactconditions) .
@@ -730,17 +733,21 @@ function get_courses_search($searchterms, $sort, $page, $recordsperpage, &$total
 
     $i = 0;
 
-    $concat = $DB->sql_concat("COALESCE(c.summary, '')", "' '", 'c.fullname', "' '", 'c.idnumber', "' '", 'c.shortname');
+    // Thanks Oracle for your non-ansi concat and type limits in coalesce. MDL-29912
+    if ($DB->get_dbfamily() == 'oracle') {
+        $concat = "(c.summary|| ' ' || c.fullname || ' ' || c.idnumber || ' ' || c.shortname)";
+    } else {
+        $concat = $DB->sql_concat("COALESCE(c.summary, '')", "' '", 'c.fullname', "' '", 'c.idnumber', "' '", 'c.shortname');
+    }
 
     foreach ($searchterms as $searchterm) {
         $i++;
 
-        // Initially we aren't going to perform NOT LIKE searches, only MSSQL
-        // will use it to simulate the "-" operator with LIKE clause.
-        $NOT = false;
+        $NOT = false; /// Initially we aren't going to perform NOT LIKE searches, only MSSQL and Oracle
+                   /// will use it to simulate the "-" operator with LIKE clause
 
-        // Under MSSQL, trim the + and - operators and perform
-        // simpler LIKE (or NOT LIKE) queries.
+    /// Under Oracle and MSSQL, trim the + and - operators and perform
+    /// simpler LIKE (or NOT LIKE) queries
         if (!$DB->sql_regex_supported()) {
             if (substr($searchterm, 0, 1) == '-') {
                 $NOT = true;
@@ -1100,7 +1107,7 @@ function get_my_remotecourses($userid=0) {
         $userid = $USER->id;
     }
 
-    // We can not use SELECT DISTINCT + text field (summary) because of MS SQL, subselect used therefore.
+    // we can not use SELECT DISTINCT + text field (summary) because of MS SQL and Oracle, subselect used therefore
     $sql = "SELECT c.id, c.remoteid, c.shortname, c.fullname,
                    c.hostid, c.summary, c.summaryformat, c.categoryname AS cat_name,
                    h.name AS hostname
@@ -1722,7 +1729,7 @@ function print_object($item, array $expandclasses = ['/./'], bool $textonly = fa
         switch (gettype($item)) {
             case 'NULL':
             case 'boolean':
-                return 'fst-italic';
+                return 'font-italic';
             case 'integer':
             case 'double':
                 return 'text-primary';
@@ -1867,11 +1874,11 @@ function print_object($item, array $expandclasses = ['/./'], bool $textonly = fa
                 switch ($access) {
                     case 'protected':
                         // Protected is in normal font.
-                        $bootstrapstyle = ' fw-normal';
+                        $bootstrapstyle = ' font-weight-normal';
                         break;
                     case 'private':
                         // Private is italic.
-                        $bootstrapstyle = ' fw-normal fst-italic';
+                        $bootstrapstyle = ' font-weight-normal font-italic';
                         break;
                     default:
                         // Public is bold, same for array keys.

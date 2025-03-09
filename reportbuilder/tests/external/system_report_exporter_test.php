@@ -21,7 +21,6 @@ namespace core_reportbuilder\external;
 use advanced_testcase;
 use context_system;
 use moodle_url;
-use core_reportbuilder\output\report_action;
 use core_reportbuilder\system_report_available;
 use core_reportbuilder\system_report_factory;
 
@@ -33,7 +32,7 @@ use core_reportbuilder\system_report_factory;
  * @copyright   2021 Paul Holden <paulh@moodle.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class system_report_exporter_test extends advanced_testcase {
+class system_report_exporter_test extends advanced_testcase {
 
     /**
      * Load test fixture
@@ -50,10 +49,10 @@ final class system_report_exporter_test extends advanced_testcase {
      *
      * @return array[]
      */
-    public static function export_provider(): array {
+    public function export_provider(): array {
         return [
-            'With filters' => [true],
-            'Without filters' => [false],
+            ['With filters' => true],
+            ['Without filters' => false],
         ];
     }
 
@@ -72,21 +71,16 @@ final class system_report_exporter_test extends advanced_testcase {
         // Prevent debug warnings from flexible_table.
         $PAGE->set_url(new moodle_url('/'));
 
-        $instance = system_report_factory::create(system_report_available::class, context_system::instance(), '', '', 0,
-            ['withfilters' => $withfilters]);
-        $instance->set_report_action(new report_action('Add', []));
-        $instance->set_report_info_container('Hello');
-        $instance->add_attributes(['data-foo' => 'bar', 'data-another' => '1']);
+        $systemreport = system_report_factory::create(system_report_available::class, context_system::instance(), '', '', 0,
+            ['withfilters' => $withfilters])->add_attributes(['data-foo' => 'bar', 'data-another' => '1']);
 
-        $exporter = new system_report_exporter($instance->get_report_persistent(), [
-            'source' => $instance,
-            'parameters' => json_encode($instance->get_parameters()),
+        $exporter = new system_report_exporter($systemreport->get_report_persistent(), [
+            'source' => $systemreport,
+            'parameters' => json_encode($systemreport->get_parameters()),
         ]);
 
         $data = $exporter->export($PAGE->get_renderer('core_reportbuilder'));
         $this->assertNotEmpty($data->table);
-        $this->assertNotEmpty($data->button);
-        $this->assertEquals('Hello', $data->infocontainer);
 
         if ($withfilters) {
             $this->assertEquals('{"withfilters":true}', $data->parameters);

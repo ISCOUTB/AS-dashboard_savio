@@ -3,7 +3,7 @@
 <!-- question: 0  -->
   <question type="category">
     <category>
-        <text>$module$/Pi</text>
+        <text>$course$/Pi</text>
     </category>
   </question>
 
@@ -38,7 +38,7 @@
 <!-- question: 0  -->
   <question type="category">
     <category>
-        <text>$module$/Pi/Rho</text>
+        <text>$course$/Pi/Rho</text>
     </category>
   </question>
 

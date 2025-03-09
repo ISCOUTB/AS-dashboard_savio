@@ -31,7 +31,7 @@ require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/capability/locallib.php'
 /**
  * Tests for the capability overview helper functions.
  */
-final class locallib_test extends \advanced_testcase {
+class locallib_test extends \advanced_testcase {
 
     /**
      * Test the function that gets the data - simple case.

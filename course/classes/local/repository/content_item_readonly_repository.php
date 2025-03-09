@@ -109,19 +109,6 @@ class content_item_readonly_repository implements content_item_readonly_reposito
     }
 
     /**
-     * Filter out any modules that are not to be rendered or managed on the course page.
-     *
-     * @param content_item[] $contentitems items to be filtered
-     * @return content_item[] filtered items
-     */
-    private static function filter_out_items_not_to_be_displayed(array $contentitems): array {
-        return array_filter($contentitems, static function ($module) {
-            [, $name] = core_component::normalize_component($module->get_component_name());
-            return \course_modinfo::is_mod_type_visible_on_course($name);
-        });
-    }
-
-    /**
      * Find all the available content items, not restricted to course or user.
      *
      * @return array the array of content items.
@@ -180,9 +167,7 @@ class content_item_readonly_repository implements content_item_readonly_reposito
                 $return[] = $contentitem;
             }
         }
-
-        // These module types are not to be rendered to the course page.
-        return self::filter_out_items_not_to_be_displayed($return);
+        return $return;
     }
 
     /**
@@ -256,7 +241,6 @@ class content_item_readonly_repository implements content_item_readonly_reposito
             }
         }
 
-        // These module types are not to be rendered to the course page.
-        return self::filter_out_items_not_to_be_displayed($return);
+        return $return;
     }
 }

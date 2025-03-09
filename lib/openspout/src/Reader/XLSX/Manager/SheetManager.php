@@ -13,7 +13,6 @@ use OpenSpout\Reader\XLSX\Options;
 use OpenSpout\Reader\XLSX\RowIterator;
 use OpenSpout\Reader\XLSX\Sheet;
 use OpenSpout\Reader\XLSX\SheetHeaderReader;
-use OpenSpout\Reader\XLSX\SheetMergeCellsReader;
 
 /**
  * @internal
@@ -50,7 +49,6 @@ final class SheetManager
      * State value to represent a hidden sheet.
      */
     public const SHEET_STATE_HIDDEN = 'hidden';
-    public const SHEET_STATE_VERY_HIDDEN = 'veryHidden';
 
     /** @var string Path of the XLSX file being read */
     private readonly string $filePath;
@@ -180,7 +178,7 @@ final class SheetManager
         \assert(null !== $sheetId);
 
         $sheetState = $xmlReaderOnSheetNode->getAttribute(self::XML_ATTRIBUTE_STATE);
-        $isSheetVisible = (self::SHEET_STATE_HIDDEN !== $sheetState && self::SHEET_STATE_VERY_HIDDEN !== $sheetState);
+        $isSheetVisible = (self::SHEET_STATE_HIDDEN !== $sheetState);
 
         $escapedSheetName = $xmlReaderOnSheetNode->getAttribute(self::XML_ATTRIBUTE_NAME);
         \assert(null !== $escapedSheetName);
@@ -188,24 +186,13 @@ final class SheetManager
 
         $sheetDataXMLFilePath = $this->getSheetDataXMLFilePathForSheetId($sheetId);
 
-        $mergeCells = [];
-        if ($this->options->SHOULD_LOAD_MERGE_CELLS) {
-            $mergeCells = (new SheetMergeCellsReader(
-                $this->filePath,
-                $sheetDataXMLFilePath,
-                $xmlReader = new XMLReader(),
-                new XMLProcessor($xmlReader)
-            ))->getMergeCells();
-        }
-
         return new Sheet(
             $this->createRowIterator($this->filePath, $sheetDataXMLFilePath, $this->options, $this->sharedStringsManager),
             $this->createSheetHeaderReader($this->filePath, $sheetDataXMLFilePath),
             $sheetIndexZeroBased,
             $sheetName,
             $isSheetActive,
-            $isSheetVisible,
-            $mergeCells
+            $isSheetVisible
         );
     }
 
@@ -253,6 +240,8 @@ final class SheetManager
         Options $options,
         SharedStringsManager $sharedStringsManager
     ): RowIterator {
+        $xmlReader = new XMLReader();
+
         $workbookRelationshipsManager = new WorkbookRelationshipsManager($filePath);
         $styleManager = new StyleManager(
             $filePath,
@@ -273,7 +262,7 @@ final class SheetManager
             $filePath,
             $sheetDataXMLFilePath,
             $options->SHOULD_PRESERVE_EMPTY_ROWS,
-            $xmlReader = new XMLReader(),
+            $xmlReader,
             new XMLProcessor($xmlReader),
             $cellValueFormatter,
             new RowManager()

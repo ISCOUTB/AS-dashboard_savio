@@ -20,13 +20,14 @@ namespace core_badges\reportbuilder\datasource;
 
 use core_badges_generator;
 use core_reportbuilder_generator;
+use core_reportbuilder_testcase;
 use core_reportbuilder\local\filters\{boolean_select, date, select, tags, text};
 use core_reportbuilder\manager;
-use core_reportbuilder\tests\core_reportbuilder_testcase;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
+require_once("{$CFG->dirroot}/reportbuilder/tests/helpers.php");
 require_once("{$CFG->libdir}/badgeslib.php");
 
 /**
@@ -188,12 +189,12 @@ final class badges_test extends core_reportbuilder_testcase {
         $this->assertEquals($badgetwo->name, $badgename);
         $this->assertEmpty($fullname);
         $this->assertEquals($expectedbadgetwolink, $namewithlink);
-        $this->assertStringContainsString('no-criteria-set', $criteria);
+        $this->assertEquals('Criteria for this badge have not been set up yet.', $criteria);
         $this->assertStringContainsString('Image caption', $image);
         $this->assertEquals('English', $language);
         $this->assertEquals(2, $version);
         $this->assertEquals('Available', $status);
-        $this->assertEquals('Never: this badge does not expire.', $expiry);
+        $this->assertEquals('Never', $expiry);
         $this->assertEmpty($tag);
         $this->assertEmpty($expires);
         $this->assertEmpty($visible);
@@ -376,7 +377,7 @@ final class badges_test extends core_reportbuilder_testcase {
         $generator = $this->getDataGenerator()->get_plugin_generator('core_reportbuilder');
 
         // Create report containing single username column, and given filter.
-        $report = $generator->create_report(['name' => 'Badges', 'source' => badges::class, 'default' => 0]);
+        $report = $generator->create_report(['name' => 'My report', 'source' => badges::class, 'default' => 0]);
         $generator->create_column(['reportid' => $report->get('id'), 'uniqueidentifier' => 'badge:name']);
 
         // Add filter, set it's values.

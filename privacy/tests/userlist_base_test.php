@@ -36,7 +36,7 @@ use \core_privacy\local\request\userlist_base;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \core_privacy\local\request\userlist_base
  */
-final class userlist_base_test extends advanced_testcase {
+class userlist_base_test extends advanced_testcase {
     /**
      * Ensure that get_userids returns the list of unique userids.
      *
@@ -64,7 +64,7 @@ final class userlist_base_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function get_userids_provider(): array {
+    public function get_userids_provider() {
         return [
             'basic' => [
                 [1, 2, 3, 4, 5],

@@ -31,7 +31,7 @@ require_once('all_checks.php');
 /**
  * Class a_must_contain_text_testcase
  */
-final class a_must_contain_text_test extends all_checks {
+class a_must_contain_text_test extends all_checks {
     /** @var string Check type */
     protected $checktype = 'a_must_contain_text';
 

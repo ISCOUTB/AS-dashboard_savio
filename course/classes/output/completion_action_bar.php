@@ -65,12 +65,11 @@ class completion_action_bar implements templatable, renderable {
         );
         $selectmenu->set_label(
             get_string('coursecompletionnavigation', 'completion'),
-            ['class' => 'visually-hidden']
+            ['class' => 'sr-only']
         );
 
         return [
             'navigation' => $selectmenu->export_for_template($output),
-            'headinglevel' => 2,
         ];
     }
 }

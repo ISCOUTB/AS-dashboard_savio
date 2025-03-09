@@ -31,11 +31,11 @@ require_once($CFG->dirroot . '/calendar/lib.php');
  * @copyright 2017 Cameron Ball <cameron@cameron1729.xyz>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class event_factory_test extends \advanced_testcase {
+class event_factory_test extends \advanced_testcase {
     /**
      * Test event class getters.
      *
-     * @dataProvider create_instance_testcases
+     * @dataProvider create_instance_testcases()
      * @param \stdClass $dbrow Row from the event table.
      * @param callable  $actioncallbackapplier     Action callback applier.
      * @param callable  $visibilitycallbackapplier Visibility callback applier.
@@ -346,7 +346,7 @@ final class event_factory_test extends \advanced_testcase {
      *
      * @return array Array of testcases.
      */
-    public static function create_instance_testcases(): array {
+    public function create_instance_testcases() {
         return [
             'Sample event record with event exposed' => [
                 'dbrow' => (object)[
@@ -379,8 +379,8 @@ final class event_factory_test extends \advanced_testcase {
                 'bailoutcheck' => function() {
                     return false;
                 },
-                'expectedclass' => event_interface::class,
-                'expectedattributevalue' => 'Hello'
+                event_interface::class,
+                'Hello'
             ],
             'Sample event record with event hidden' => [
                 'dbrow' => (object)[
@@ -413,8 +413,8 @@ final class event_factory_test extends \advanced_testcase {
                 'bailoutcheck' => function() {
                     return false;
                 },
-                'expectedclass' => null,
-                'expectedattributevalue' => null
+                null,
+                null
             ],
             'Sample event record with early bail' => [
                 'dbrow' => (object)[
@@ -447,8 +447,8 @@ final class event_factory_test extends \advanced_testcase {
                 'bailoutcheck' => function() {
                     return true;
                 },
-                'expectedclass' => null,
-                'expectedattributevalue' => null
+                null,
+                null
             ]
         ];
     }

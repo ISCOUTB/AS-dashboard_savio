@@ -16,8 +16,6 @@
 
 namespace core\task;
 
-use core\url;
-
 /**
  * Test class for adhoc tasks.
  *
@@ -60,16 +58,15 @@ final class adhoc_task_test extends \advanced_testcase {
     public function test_get_next_adhoc_task_now(): void {
         $this->resetAfterTest(true);
 
-        $clock = \core\di::get(\core\clock::class);
-
         // Create an adhoc task.
         $task = new adhoc_test_task();
 
         // Queue it.
         manager::queue_adhoc_task($task);
 
+        $now = time();
         // Get it from the scheduler.
-        $task = manager::get_next_adhoc_task($clock->time());
+        $task = manager::get_next_adhoc_task($now);
         $this->assertInstanceOf('\\core\\task\\adhoc_test_task', $task);
         $task->execute();
         manager::adhoc_task_complete($task);
@@ -81,21 +78,20 @@ final class adhoc_task_test extends \advanced_testcase {
     public function test_get_next_adhoc_task_class(): void {
         $this->resetAfterTest(true);
 
-        $clock = $this->mock_clock_with_frozen();
-
         // Create an adhoc task.
         $task = new \core\task\adhoc_test_task();
 
         // Queue it.
         manager::queue_adhoc_task($task);
 
+        $now = time();
         $classname = get_class($task);
 
         // The task will not be returned.
-        $this->assertNull(manager::get_next_adhoc_task($clock->time(), true, "{$classname}notexists"));
+        $this->assertNull(manager::get_next_adhoc_task($now, true, "{$classname}notexists"));
 
         // Get it from the scheduler.
-        $task = manager::get_next_adhoc_task($clock->time(), true, $classname);
+        $task = manager::get_next_adhoc_task($now, true, $classname);
         $this->assertInstanceOf('\\core\\task\\adhoc_test_task', $task);
         $task->execute();
         manager::adhoc_task_complete($task);
@@ -107,13 +103,11 @@ final class adhoc_task_test extends \advanced_testcase {
     public function test_get_next_adhoc_task_fail_retry(): void {
         $this->resetAfterTest(true);
 
-        $clock = $this->mock_clock_with_frozen();
-
         // Create an adhoc task.
         $task = new adhoc_test_task();
         manager::queue_adhoc_task($task);
 
-        $now = $clock->time();
+        $now = time();
 
         // Get it from the scheduler, execute it, and mark it as failed.
         $task = manager::get_next_adhoc_task($now);
@@ -125,8 +119,7 @@ final class adhoc_task_test extends \advanced_testcase {
         $this->assertNull(manager::get_next_adhoc_task($now));
 
         // Should get the adhoc task (retry after delay). Fail it again.
-        $clock->bump(120);
-        $task = manager::get_next_adhoc_task($clock->time());
+        $task = manager::get_next_adhoc_task($now + 120);
         $this->assertInstanceOf('\\core\\task\\adhoc_test_task', $task);
         $this->assertEquals($taskid, $task->get_id());
         $task->execute();
@@ -151,8 +144,7 @@ final class adhoc_task_test extends \advanced_testcase {
     public function test_get_next_adhoc_task_maximum_fail_delay(): void {
         $this->resetAfterTest(true);
 
-        $clock = \core\di::get(\core\clock::class);
-        $now = $clock->time();
+        $now = time();
 
         // Create an adhoc task.
         $task = new adhoc_test_task();
@@ -177,9 +169,7 @@ final class adhoc_task_test extends \advanced_testcase {
         global $DB;
         $this->resetAfterTest();
 
-        $clock = \core\di::get(\core\clock::class);
-
-        $now = $clock->time();
+        $now = time();
         // Create a normal adhoc task.
         $task = new adhoc_test_task();
         $taskid1 = manager::queue_adhoc_task(task: $task);
@@ -207,7 +197,7 @@ final class adhoc_task_test extends \advanced_testcase {
         $this->assertEquals(expected: 12 - 1, actual: $attemptsavailable);
 
         // Create a no-retry adhoc task.
-        $now = $clock->time();
+        $now = time();
         $task = new no_retry_adhoc_task();
         $taskid2 = manager::queue_adhoc_task(task: $task);
 
@@ -278,8 +268,6 @@ final class adhoc_task_test extends \advanced_testcase {
         global $DB, $CFG;
         $this->resetAfterTest();
 
-        $clock = \core\di::get(\core\clock::class);
-
         // Create two no-retry adhoc tasks.
         $task1 = new no_retry_adhoc_task();
         $taskid1 = manager::queue_adhoc_task(task: $task1);
@@ -329,7 +317,7 @@ final class adhoc_task_test extends \advanced_testcase {
         $DB->set_field(
             table: 'task_adhoc',
             newfield: 'firststartingtime',
-            newvalue: $clock->time() - (DAYSECS * 2) - 10, // Plus 10 seconds to make sure it is older than 2 days.
+            newvalue: time() - (DAYSECS * 2) - 10, // Plus 10 seconds to make sure it is older than 2 days.
             conditions: ['id' => $taskid2],
         );
 
@@ -347,7 +335,7 @@ final class adhoc_task_test extends \advanced_testcase {
             table: 'task_adhoc',
             newfield: 'firststartingtime',
             // Plus 10 seconds to make sure it is older than the retention time.
-            newvalue: $clock->time() - $CFG->task_adhoc_failed_retention - 10,
+            newvalue: time() - $CFG->task_adhoc_failed_retention - 10,
             conditions: ['id' => $taskid1],
         );
 
@@ -380,9 +368,7 @@ final class adhoc_task_test extends \advanced_testcase {
         global $DB;
         $this->resetAfterTest();
 
-        $clock = \core\di::get(\core\clock::class);
-
-        $now = $clock->time();
+        $now = time();
         // Create an adhoc task.
         $task = new adhoc_test_task();
         // Queue it.
@@ -392,7 +378,7 @@ final class adhoc_task_test extends \advanced_testcase {
         $DB->set_field(
             table: 'task_adhoc',
             newfield: 'timecreated',
-            newvalue: $clock->time() - DAYSECS,
+            newvalue: time() - DAYSECS,
             conditions: ['id' => $taskid],
         );
 
@@ -427,9 +413,7 @@ final class adhoc_task_test extends \advanced_testcase {
     public function test_get_next_adhoc_task_future(): void {
         $this->resetAfterTest(true);
 
-        $clock = \core\di::get(\core\clock::class);
-
-        $now = $clock->time();
+        $now = time();
         // Create an adhoc task in future.
         $task = new adhoc_test_task();
         $task->set_next_run_time($now + 1000);
@@ -482,10 +466,7 @@ final class adhoc_task_test extends \advanced_testcase {
         $task = new \mod_fake\task\adhoc_component_task();
 
         manager::queue_adhoc_task($task);
-        $this->assertdebuggingcalledcount(
-            2,
-            array_fill(0, 2, 'Component not set and the class namespace does not match a valid component (mod_fake).'),
-        );
+        $this->assertDebuggingCalled('Component not set and the class namespace does not match a valid component (mod_fake).');
     }
 
     /**
@@ -590,12 +571,10 @@ final class adhoc_task_test extends \advanced_testcase {
     public function test_reschedule_or_queue_adhoc_task_match_no_change(): void {
         $this->resetAfterTest(true);
 
-        $clock = \core\di::get(\core\clock::class);
-
         // Schedule adhoc task.
         $task = new adhoc_test_task();
         $task->set_custom_data(['courseid' => 10]);
-        $task->set_next_run_time($clock->time() + DAYSECS);
+        $task->set_next_run_time(time() + DAYSECS);
         manager::reschedule_or_queue_adhoc_task($task);
 
         $before = manager::get_adhoc_tasks('core\task\adhoc_test_task');
@@ -614,11 +593,8 @@ final class adhoc_task_test extends \advanced_testcase {
      */
     public function test_reschedule_or_queue_adhoc_task_match_update_runtime(): void {
         $this->resetAfterTest(true);
-
-        $clock = \core\di::get(\core\clock::class);
-
-        $initialruntime = $clock->time() + DAYSECS;
-        $newruntime = $clock->time() + WEEKSECS;
+        $initialruntime = time() + DAYSECS;
+        $newruntime = time() + WEEKSECS;
 
         // Schedule adhoc task.
         $task = new adhoc_test_task();
@@ -714,14 +690,12 @@ final class adhoc_task_test extends \advanced_testcase {
     public function test_adhoc_task_user_empty(): void {
         $this->resetAfterTest(true);
 
-        $clock = \core\di::get(\core\clock::class);
-
         // Create an adhoc task in future.
         $task = new adhoc_test_task();
         manager::queue_adhoc_task($task);
 
         // Get it back from the scheduler.
-        $now = $clock->time();
+        $now = time();
         $task = manager::get_next_adhoc_task($now);
         manager::adhoc_task_complete($task);
 
@@ -744,8 +718,7 @@ final class adhoc_task_test extends \advanced_testcase {
         manager::queue_adhoc_task($task);
 
         // Get it back from the scheduler.
-        $clock = \core\di::get(\core\clock::class);
-        $now = $clock->time();
+        $now = time();
         $task = manager::get_next_adhoc_task($now);
         manager::adhoc_task_complete($task);
 
@@ -759,8 +732,7 @@ final class adhoc_task_test extends \advanced_testcase {
         global $DB;
         $this->resetAfterTest(true);
 
-        $clock = $this->mock_clock_with_frozen();
-        $now = $clock->time();
+        $now = time();
 
         // Create an adhoc task.
         $task = new adhoc_test_task();
@@ -776,7 +748,7 @@ final class adhoc_task_test extends \advanced_testcase {
         $this->assertNull($firststartingtime);
 
         // This will make sure that the task will be started after the $now value.
-        $clock->bump(5);
+        sleep(3);
 
         // Get the task from the scheduler.
         $task = manager::get_next_adhoc_task(timestart: $now);
@@ -796,11 +768,8 @@ final class adhoc_task_test extends \advanced_testcase {
         $this->assertNotNull($origintimestarted);
         $this->assertGreaterThan($now, $origintimestarted);
 
-        // Time travel 24 hours into the future.
-        $clock->bump(DAYSECS * 3);
-        $now = $clock->time();
         // Get the task from the scheduler.
-        $task = manager::get_next_adhoc_task(timestart: $now);
+        $task = manager::get_next_adhoc_task(timestart: $now + 86400);
         // Mark the task as starting.
         manager::adhoc_task_starting($task);
         // Execute the task.
@@ -863,8 +832,6 @@ final class adhoc_task_test extends \advanced_testcase {
     public function test_get_next_adhoc_task_sorting(): void {
         $this->resetAfterTest(true);
 
-        $clock = \core\di::get(\core\clock::class);
-
         // Create adhoc tasks.
         $task1 = new adhoc_test_task();
         $task1->set_next_run_time(1510000000);
@@ -892,15 +859,15 @@ final class adhoc_task_test extends \advanced_testcase {
         manager::reschedule_or_queue_adhoc_task($task2);
 
         // Confirm, that tasks are sorted by nextruntime and then by id (ascending).
-        $task = manager::get_next_adhoc_task($clock->time());
+        $task = manager::get_next_adhoc_task(time());
         $this->assertEquals('Task 2', $task->get_custom_data_as_string());
         manager::adhoc_task_complete($task);
 
-        $task = manager::get_next_adhoc_task($clock->time());
+        $task = manager::get_next_adhoc_task(time());
         $this->assertEquals('Task 3', $task->get_custom_data_as_string());
         manager::adhoc_task_complete($task);
 
-        $task = manager::get_next_adhoc_task($clock->time());
+        $task = manager::get_next_adhoc_task(time());
         $this->assertEquals('Task 1', $task->get_custom_data_as_string());
         manager::adhoc_task_complete($task);
     }
@@ -960,8 +927,6 @@ final class adhoc_task_test extends \advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        $clock = \core\di::get(\core\clock::class);
-
         // Redirect messages.
         $messagesink = $this->redirectMessages();
 
@@ -969,7 +934,7 @@ final class adhoc_task_test extends \advanced_testcase {
         $task = new adhoc_test_task();
         manager::queue_adhoc_task($task);
 
-        $now = $clock->time();
+        $now = time();
 
         // Get it from the scheduler, execute it, and mark it as failed.
         $task = manager::get_next_adhoc_task($now);
@@ -1020,11 +985,6 @@ final class adhoc_task_test extends \advanced_testcase {
         $this->assertEquals('failedtaskmaxdelay', $messages[0]->eventtype);
         $this->assertEquals('-10', $messages[0]->useridfrom);
         $this->assertEquals('2', $messages[0]->useridto);
-        $this->assertEquals('Task logs', $messages[0]->contexturlname);
-        $this->assertEquals(
-            (new url('/admin/tasklogs.php', ['filter' => get_class($task)]))->out(false),
-            $messages[0]->contexturl,
-        );
 
         // Close sink.
         $messagesink->close();

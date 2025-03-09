@@ -28,7 +28,7 @@ require_once($CFG->dirroot . '/repository/googledocs/tests/repository_googledocs
  * @copyright  2021 Mihail Geshoski <mihail@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class folder_node_test extends \repository_googledocs_testcase {
+class folder_node_test extends \repository_googledocs_testcase {
 
     /**
      * Test create_node_array().
@@ -50,26 +50,23 @@ final class folder_node_test extends \repository_googledocs_testcase {
      *
      * @return array
      */
-    public static function create_node_array_provider(): array {
+    public function create_node_array_provider(): array {
+
         $rootid = \repository_googledocs::REPOSITORY_ROOT_ID;
 
         return [
             'Google Drive folder with modified date.' =>
                 [
-                    self::create_google_drive_folder_object('d85b21c0f86cb0', 'Folder', '01/01/21 0:30'),
+                    $this->create_google_drive_folder_object('d85b21c0f86cb0', 'Folder', '01/01/21 0:30'),
                     "{$rootid}|Google+Drive",
-                    self::create_folder_content_node_array(
-                        'd85b21c0f86cb0',
-                        'Folder',
-                        "{$rootid}|Google+Drive",
-                        '1609432200',
-                    ),
+                    $this->create_folder_content_node_array('d85b21c0f86cb0', 'Folder',
+                        "{$rootid}|Google+Drive", '1609432200'),
                 ],
             'Google Drive folder without modified date.' =>
                 [
-                    self::create_google_drive_folder_object('d85b21c0f86cb0', 'Folder', ''),
+                    $this->create_google_drive_folder_object('d85b21c0f86cb0', 'Folder', ''),
                     '',
-                    self::create_folder_content_node_array('d85b21c0f86cb0', 'Folder', '', ''),
+                    $this->create_folder_content_node_array('d85b21c0f86cb0', 'Folder', '', ''),
                 ],
         ];
     }

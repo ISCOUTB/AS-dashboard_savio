@@ -55,13 +55,12 @@ Feature: Authentication
     And the page should meet accessibility standards with "wcag131, wcag141, wcag412" extra tests
 
   @javascript @accessibility
-  Scenario: The login page must meet accessibility standards
+  Scenario: The login page must have sufficient colour contrast
     Given the following config values are set as admin:
       | custommenuitems | -This is a custom item\|/customurl/ |
     When I am on site homepage
-    Then the page should meet accessibility standards with "best-practice" extra tests
-    And I follow "Log in"
-    And the page should meet accessibility standards with "best-practice" extra tests
+    Then the page should meet "wcag143" accessibility standards
+    And the page should meet accessibility standards with "wcag143" extra tests
 
   Scenario: Alternate login URL can be bypassed
     Given the following config values are set as admin:

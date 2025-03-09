@@ -23,7 +23,7 @@ namespace core_competency;
  * @copyright  2019 Damyon Wiese
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class course_module_competency_test extends \advanced_testcase {
+class course_module_competency_test extends \advanced_testcase {
 
     public function test_count_competencies(): void {
         global $CFG, $DB;

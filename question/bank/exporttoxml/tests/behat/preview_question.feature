@@ -14,12 +14,9 @@ Feature: A teacher can export a question as XML from the preview question screen
     And the following "course enrolments" exist:
       | user    | course | role           |
       | teacher | C1     | editingteacher |
-    And the following "activities" exist:
-      | activity | name    | course | idnumber |
-      | qbank    | Qbank 1 | C1     | qbank1   |
     And the following "question categories" exist:
-      | contextlevel    | reference | name           |
-      | Activity module | qbank1    | Test questions |
+      | name           | contextlevel | reference |
+      | Test questions | Course       | C1        |
     And the following "questions" exist:
       | questioncategory | qtype     | name                          |
       | Test questions   | numerical | Test question to be previewed |

@@ -25,14 +25,14 @@ namespace smsgateway_aws;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \smsgateway_aws\helper
  */
-final class helper_test extends \advanced_testcase {
+class helper_test extends \advanced_testcase {
 
     /**
      * Data provider for test_format_number().
      *
      * @return array of different country codes and phone numbers.
      */
-    public static function format_number_provider(): array {
+    public function format_number_provider(): array {
 
         return [
             'Phone number with local format' => [

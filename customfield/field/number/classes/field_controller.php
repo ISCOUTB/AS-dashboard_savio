@@ -113,7 +113,6 @@ class field_controller  extends \core_customfield\field_controller {
         $options = ['' => get_string('genericfield', 'customfield_number')];
         $options = array_merge($options, $autooptions);
         $mform->addElement('select', 'configdata[fieldtype]', get_string('fieldtype', 'customfield_number'), $options);
-        $mform->addHelpButton('configdata[fieldtype]', 'fieldtype', 'customfield_number');
     }
 
     /**
@@ -174,10 +173,6 @@ class field_controller  extends \core_customfield\field_controller {
      * @return string|float|null
      */
     public function prepare_field_for_display(mixed $value, ?context $context = null): string|null|float {
-        if ($provider = provider_base::instance($this)) {
-            return $provider->prepare_export_value($value, $context);
-        }
-
         if ($value === null) {
             return null;
         }
@@ -190,11 +185,16 @@ class field_controller  extends \core_customfield\field_controller {
             }
         } else {
             // Let's format the value.
-            $value = format_float((float)$value, $decimalplaces);
+            $provider = provider_base::instance($this);
+            if ($provider) {
+                $value = $provider->prepare_export_value($value, $context);
+            } else {
+                $value = format_float((float)$value, $decimalplaces);
 
-            // Apply the display format.
-            $format = $this->get_configdata_property('display') ?? '{value}';
-            $value = str_replace('{value}', $value, $format);
+                // Apply the display format.
+                $format = $this->get_configdata_property('display') ?? '{value}';
+                $value = str_replace('{value}', $value, $format);
+            }
         }
 
         return format_string($value, true, ['context' => $context ?? system::instance()]);

@@ -21,13 +21,13 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import Popover from './bootstrap/popover';
+import $ from 'jquery';
+import Popover from './popover';
 
 const SELECTORS = {
     FOOTERCONTAINER: '[data-region="footer-container-popover"]',
     FOOTERCONTENT: '[data-region="footer-content-popover"]',
-    FOOTERBUTTON: '[data-action="footer-popover"]',
-    FOOTERARROW: '[data-region="footer-container-popover"] .popover-arrow',
+    FOOTERBUTTON: '[data-action="footer-popover"]'
 };
 
 let footerIsShown = false;
@@ -35,9 +35,9 @@ let footerIsShown = false;
 export const init = () => {
     const container = document.querySelector(SELECTORS.FOOTERCONTAINER);
     const footerButton = document.querySelector(SELECTORS.FOOTERBUTTON);
-    const footerArrow = document.querySelector(SELECTORS.FOOTERARROW);
 
-    new Popover(footerButton, {
+    // All jQuery in this code can be replaced when MDL-71979 is integrated.
+    $(footerButton).popover({
         content: getFooterContent,
         container: container,
         html: true,
@@ -45,49 +45,49 @@ export const init = () => {
         customClass: 'footer',
         trigger: 'click',
         boundary: 'viewport',
-        modifiers: [
-            {
-                name: 'preventOverflow',
-                options: {
+        popperConfig: {
+            modifiers: {
+                preventOverflow: {
                     boundariesElement: 'viewport',
-                    padding: 48,
+                    padding: 48
                 },
-            },
-            {
-                name: 'arrow',
-                options: {
-                    element: footerArrow,
+                offset: {},
+                flip: {
+                    behavior: 'flip'
                 },
-            },
-        ]
+                arrow: {
+                    element: '.arrow'
+                },
+            }
+        }
     });
 
     document.addEventListener('click', e => {
         if (footerIsShown && !e.target.closest(SELECTORS.FOOTERCONTAINER)) {
-            Popover.getInstance(footerButton).hide();
+            $(footerButton).popover('hide');
         }
     },
     true);
 
     document.addEventListener('keydown', e => {
         if (footerIsShown && e.key === 'Escape') {
-            Popover.getInstance(footerButton).hide();
+            $(footerButton).popover('hide');
             footerButton.focus();
         }
     });
 
     document.addEventListener('focus', e => {
         if (footerIsShown && !e.target.closest(SELECTORS.FOOTERCONTAINER)) {
-            Popover.getInstance(footerButton).hide();
+            $(footerButton).popover('hide');
         }
     },
     true);
 
-    footerButton.addEventListener('show.bs.popover', () => {
+    $(footerButton).on('show.bs.popover', () => {
         footerIsShown = true;
     });
 
-    footerButton.addEventListener('hide.bs.popover', () => {
+    $(footerButton).on('hide.bs.popover', () => {
         footerIsShown = false;
     });
 };

@@ -36,27 +36,17 @@ require_once(__DIR__.'/../lib.php');
  * @copyright 2018 Catalyst IT Australia {@link http://www.catalyst-au.net}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class compressor_test extends \advanced_testcase {
-    /** @var null|\cachestore_redis */
-    protected ?cachestore_redis $store = null;
+class compressor_test extends \advanced_testcase {
 
-    #[\Override]
+    /**
+     * Test set up
+     */
     public function setUp(): void {
         if (!cachestore_redis::are_requirements_met() || !defined('TEST_CACHESTORE_REDIS_TESTSERVERS')) {
             $this->markTestSkipped('Could not test cachestore_redis. Requirements are not met.');
         }
 
         parent::setUp();
-    }
-
-    #[\Override]
-    protected function tearDown(): void {
-        parent::tearDown();
-
-        if ($this->store !== null) {
-            $this->store->purge();
-            $this->store = null;
-        }
     }
 
     /**
@@ -74,7 +64,6 @@ final class compressor_test extends \advanced_testcase {
         $config['serializer'] = $serializer;
         $store = new cachestore_redis('Test', $config);
         $store->initialise($definition);
-        $this->store = $store;
 
         return $store;
     }
@@ -116,7 +105,7 @@ final class compressor_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function provider_for_test_it_works_with_different_types(): array {
+    public function provider_for_test_it_works_with_different_types() {
         $object = new \stdClass();
         $object->field = 'value';
 
@@ -158,7 +147,7 @@ final class compressor_test extends \advanced_testcase {
     public function test_it_works_with_different_types_for_many(): void {
         $store = $this->create_store(cachestore_redis::COMPRESSOR_PHP_GZIP, \Redis::SERIALIZER_PHP);
 
-        $provider = self::provider_for_test_it_works_with_different_types();
+        $provider = $this->provider_for_test_it_works_with_different_types();
         $keys = [];
         $values = [];
         $expected = [];
@@ -177,7 +166,12 @@ final class compressor_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function provider_for_tests_setget(): array {
+    public function provider_for_tests_setget() {
+        if (!cachestore_redis::are_requirements_met()) {
+            // Even though we skip all tests in this case, this provider can still show warnings about non-existing class.
+            return [];
+        }
+
         $data = [
             ['none, none',
                 \Redis::SERIALIZER_NONE, cachestore_redis::COMPRESSOR_NONE,
@@ -234,7 +228,6 @@ final class compressor_test extends \advanced_testcase {
      * Test we can use get and set with all combinations.
      *
      * @dataProvider provider_for_tests_setget
-     * @requires extension Redis
      * @param string $name
      * @param int $serializer
      * @param int $compressor
@@ -259,7 +252,6 @@ final class compressor_test extends \advanced_testcase {
      * Test we can use get and set many with all combinations.
      *
      * @dataProvider provider_for_tests_setget
-     * @requires extension Redis
      * @param string $name
      * @param int $serializer
      * @param int $compressor

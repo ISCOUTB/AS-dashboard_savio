@@ -44,7 +44,7 @@ require_once(__DIR__ . '/../lib.php');
  *
  * @coversDefaultClass \cachestore_redis
  */
-final class cachestore_cluster_redis_test extends \advanced_testcase {
+class cachestore_cluster_redis_test extends \advanced_testcase {
     /**
      * Create a cache store for testing the Redis cluster.
      *

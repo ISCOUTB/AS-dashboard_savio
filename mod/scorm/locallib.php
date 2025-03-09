@@ -473,7 +473,7 @@ function scorm_insert_track($userid, $scormid, $scoid, $attemptornumber, $elemen
             if (!empty($tracktest)) {
                 if ($tracktest->value == "incomplete") {
                     $v = new stdClass();
-                    $v->id = $tracktest->valueid;
+                    $v->id = $track->valueid;
                     $v->value = "completed";
                     $DB->update_record('scorm_scoes_value', $v);
                 }
@@ -704,7 +704,7 @@ function scorm_get_sco_runtime($scormid, $scoid, $userid, $attempt=1) {
     global $DB;
 
     $params = array('userid' => $userid, 'scormid' => $scormid, 'attempt' => $attempt);
-    $sql = "SELECT MIN(timemodified) AS timemin, MAX(timemodified) AS timemax
+    $sql = "SELECT min(timemodified) as start, max(timemodified) as finish
               FROM {scorm_scoes_value} v
               JOIN {scorm_attempt} a on a.id = v.attemptid
               WHERE a.userid = :userid AND a.scormid = :scormid AND a.attempt = :attempt";
@@ -712,12 +712,9 @@ function scorm_get_sco_runtime($scormid, $scoid, $userid, $attempt=1) {
         $params['scoid'] = $scoid;
         $sql .= " AND v.scoid = :scoid";
     }
-
-    if ($timedata = $DB->get_record_sql($sql, $params)) {
-        return (object) [
-            'start' => $timedata->timemin,
-            'finish' => $timedata->timemax,
-        ];
+    $timedata = $DB->get_record_sql($sql, $params);
+    if (!empty($timedata)) {
+        return $timedata;
     } else {
         $timedata = new stdClass();
         $timedata->start = false;

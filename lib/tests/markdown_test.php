@@ -30,7 +30,7 @@ namespace core;
  * @copyright  2012 Petr Skoda {@link http://skodak.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class markdown_test extends \basic_testcase {
+class markdown_test extends \basic_testcase {
 
     public function test_paragraphs(): void {
         $text = "one\n\ntwo";

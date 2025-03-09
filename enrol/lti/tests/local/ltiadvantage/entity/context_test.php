@@ -24,7 +24,7 @@ namespace enrol_lti\local\ltiadvantage\entity;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \enrol_lti\local\ltiadvantage\entity\context
  */
-final class context_test extends \advanced_testcase {
+class context_test extends \advanced_testcase {
 
     /**
      * Test creation of the object instances.
@@ -52,7 +52,7 @@ final class context_test extends \advanced_testcase {
      * Data provider for testing object instantiation.
      * @return array[] the data for testing.
      */
-    public static function instantiation_data_provider(): array {
+    public function instantiation_data_provider(): array {
         return [
             'Creation of a course section context' => [
                 'args' => [

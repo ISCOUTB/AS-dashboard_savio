@@ -2,12 +2,12 @@
     color: $input-placeholder-color;
 }
 
-.form-select {
+.custom-select {
     -webkit-appearance: none;
     -moz-appearance: none;
 }
 
-.form-range {
+.custom-range {
     -webkit-appearance: none;
     -moz-appearance: none;
     &::-webkit-slider-thumb,
@@ -27,8 +27,6 @@ input[type="month"] {
         -moz-appearance: none;
     }
 }
-
-$card-columns-gap: 1.25rem !default;
 
 .card-columns {
     @include media-breakpoint-up(sm) {
@@ -58,8 +56,6 @@ $card-columns-gap: 1.25rem !default;
     -webkit-user-select: none;
     -ms-user-select: none;
 }
-
-$user-selects: all, auto, none !default;
 
 @each $value in $user-selects {
     .user-select-#{$value} {

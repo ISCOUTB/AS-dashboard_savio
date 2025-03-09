@@ -38,7 +38,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2020 Ferran Recio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class item_group_test extends advanced_testcase {
+class item_group_test extends advanced_testcase {
 
     /**
      * Test item creation.
@@ -143,7 +143,7 @@ final class item_group_test extends advanced_testcase {
      *
      * @return  array
      */
-    public static function invalid_data_provider(): array {
+    public function invalid_data_provider(): array {
         return [
             'Wrong objecttype' => [
                 'Invalid', true, true

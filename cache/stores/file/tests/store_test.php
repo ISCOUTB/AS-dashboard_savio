@@ -35,52 +35,13 @@ require_once($CFG->dirroot.'/cache/stores/file/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers \cachestore_file
  */
-final class store_test extends \cachestore_tests {
+class store_test extends \cachestore_tests {
     /**
      * Returns the file class name
      * @return string
      */
     protected function get_class_name() {
         return 'cachestore_file';
-    }
-
-    /**
-     * Provider for set/get tests with all combinations of serializer.
-     *
-     * @return array
-     */
-    public static function getset_serialization_test_provider(): array {
-        $data = [
-            [
-                'PHP serializer',
-                \cachestore_file::SERIALIZER_PHP,
-            ],
-        ];
-        if (function_exists('igbinary_serialize')) {
-            $data[] = [
-                'Igbinary serializer',
-                \cachestore_file::SERIALIZER_IGBINARY,
-            ];
-        }
-
-        return $data;
-    }
-
-    /**
-     * Test get and set function correctly with all combinations of serializer.
-     *
-     * @dataProvider getset_serialization_test_provider
-     * @param string $name
-     * @param string $serializer
-     */
-    public function test_getset_serialization(string $name, string $serializer): void {
-        $definition = definition::load_adhoc(store::MODE_APPLICATION, 'cachestore_file', 'phpunit_test');
-        $store = new \cachestore_file('Test', ['serializer' => $serializer]);
-        $store->initialise($definition);
-        $originalvalue = 'value12345';
-        $store->set('key', $originalvalue);
-        $unserializedvalue = $store->get('key');
-        self::assertSame($originalvalue, $unserializedvalue, "Invalid serialisation/unserialisation for: {$name}");
     }
 
     /**

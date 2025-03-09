@@ -482,23 +482,6 @@ function environment_check($version, $env_select) {
     $custom_results = environment_custom_checks($version, $env_select);
     $results = array_merge($results, $custom_results);
 
-    // Locate any installed plugins belonging to deleted plugin types and block the install/upgrade process until they are removed.
-    // Plugins on disk which aren't installed and which are either deprecated or deleted will be ignored by install/upgrade anyway,
-    // so are not checked here.
-    $pluginman = \core_plugin_manager::instance();
-    foreach (core_component::get_deleted_plugin_types() as $plugintype => $dir) {
-        foreach ($pluginman->get_installed_plugins($plugintype) as $name => $version) {
-            $plugin = $plugintype . '_' . $name;
-
-            $result = new environment_results('custom_check');
-            $result->setInfo('Deleted plugin detected');
-            $result->setFeedbackStr(['deletedplugintypesdetected', 'admin', $plugin]);
-            $result->setStatus(false);
-            $result->plugin = $plugin;
-            $results[] = $result;
-        }
-    }
-
     // Always use the plugin directory version of environment.xml,
     // add-on developers need to keep those up-to-date with future info.
     foreach (core_component::get_plugin_types() as $plugintype => $unused) {
@@ -1070,15 +1053,14 @@ function environment_check_database($version, $env_select) {
 
     $dbinfo = $DB->get_server_info();
     $current_version = normalize_version($dbinfo['version']);
+    $needed_version = $vendors[$current_vendor];
 
-    // Check we have a needed version.
-    if (empty($vendors[$current_vendor])) {
+/// Check we have a needed version
+    if (!$needed_version) {
         $result->setStatus(false);
         $result->setErrorCode(NO_DATABASE_VENDOR_VERSION_FOUND);
         return $result;
     }
-
-    $needed_version = $vendors[$current_vendor];
 
     // Check if the DB Vendor has been properly configured.
     // Hack: this is required when playing with MySQL and MariaDB since they share the same PHP module and base DB classes,

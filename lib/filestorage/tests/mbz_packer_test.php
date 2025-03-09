@@ -28,7 +28,7 @@ require_once($CFG->libdir . '/filestorage/file_progress.php');
  * @copyright 2013 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class mbz_packer_test extends \advanced_testcase {
+class mbz_packer_test extends \advanced_testcase {
 
     public function test_archive_with_both_options(): void {
         global $CFG;
@@ -89,7 +89,7 @@ final class mbz_packer_test extends \advanced_testcase {
         $this->assertEquals('frog', $out->get_content());
     }
 
-    public static function usezipbackups_provider(): array {
+    public function usezipbackups_provider() {
         return [
             'Use zips'  => [true],
             'Use tgz'   => [false],

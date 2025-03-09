@@ -30,7 +30,7 @@ use question_bank;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \qbank_exporttoxml\helper
  */
-final class helper_test extends \advanced_testcase {
+class helper_test extends \advanced_testcase {
 
     /**
      * Test the export single question url.
@@ -43,27 +43,32 @@ final class helper_test extends \advanced_testcase {
 
         // Create a course and an activity.
         $course = $generator->create_course();
-        $qbank = self::getDataGenerator()->create_module('qbank', ['course' => $course->id]);
-        $qbankcontext = \context_module::instance($qbank->cmid);
         $quiz = $generator->create_module('quiz', ['course' => $course->id]);
 
         // Create a question in each place.
         $questiongenerator = $generator->get_plugin_generator('core_question');
-        $qbankqcat = $questiongenerator->create_question_category(['contextid' => $qbankcontext->id]);
-        $qbankq = $questiongenerator->create_question('truefalse', null, ['category' => $qbankqcat->id]);
+        $courseqcat = $questiongenerator->create_question_category(['contextid' => context_course::instance($course->id)->id]);
+        $courseq = $questiongenerator->create_question('truefalse', null, ['category' => $courseqcat->id]);
         $quizqcat = $questiongenerator->create_question_category(['contextid' => context_module::instance($quiz->cmid)->id]);
         $quizq = $questiongenerator->create_question('truefalse', null, ['category' => $quizqcat->id]);
+        $systemqcat = $questiongenerator->create_question_category();
+        $systemq = $questiongenerator->create_question('truefalse', null, ['category' => $systemqcat->id]);
 
         // Verify some URLs.
         $this->assertEquals(new moodle_url('/question/bank/exporttoxml/exportone.php',
-                ['id' => $qbankq->id, 'cmid' => $qbank->cmid, 'sesskey' => sesskey()]),
+                ['id' => $courseq->id, 'courseid' => $course->id, 'sesskey' => sesskey()]),
                 helper::question_get_export_single_question_url(
-                        question_bank::load_question_data($qbankq->id)));
+                        question_bank::load_question_data($courseq->id)));
 
         $this->assertEquals(new moodle_url('/question/bank/exporttoxml/exportone.php',
                 ['id' => $quizq->id, 'cmid' => $quiz->cmid, 'sesskey' => sesskey()]),
                 helper::question_get_export_single_question_url(
                         question_bank::load_question($quizq->id)));
+
+        $this->assertEquals(new moodle_url('/question/bank/exporttoxml/exportone.php',
+                ['id' => $systemq->id, 'courseid' => SITEID, 'sesskey' => sesskey()]),
+                helper::question_get_export_single_question_url(
+                        question_bank::load_question($systemq->id)));
     }
 
 }

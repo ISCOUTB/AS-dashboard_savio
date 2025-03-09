@@ -14,19 +14,29 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace assignfeedback_comments\privacy;
-
-use mod_assign\tests\provider_testcase;
-
 /**
- * Unit tests for mod/assign/feedback/comments/classes/privacy/
+ * Unit tests for assignfeedback_comments.
  *
  * @package    assignfeedback_comments
  * @copyright  2018 Adrian Greeve <adrian@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers    \assignfeedback_comments\privacy\provider
  */
-final class provider_test extends provider_testcase {
+namespace assignfeedback_comments\privacy;
+
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once($CFG->dirroot . '/mod/assign/locallib.php');
+require_once($CFG->dirroot . '/mod/assign/tests/privacy/provider_test.php');
+
+/**
+ * Unit tests for mod/assign/feedback/comments/classes/privacy/
+ *
+ * @copyright  2018 Adrian Greeve <adrian@moodle.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class provider_test extends \mod_assign\privacy\provider_test {
+
     /**
      * Convenience function for creating feedback data.
      *

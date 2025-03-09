@@ -47,12 +47,23 @@ if ($badge->status != BADGE_STATUS_INACTIVE) {
 
         $json['name'] = $badge->name;
         $json['description'] = $badge->description;
-        $urlimage = moodle_url::make_pluginfile_url($context->id,
-            'badges', 'badgeimage', $badge->id, '/', 'f3')->out(false);
-        $json['image'] = [];
-        $json['image']['id'] = $urlimage;
-        if ($badge->imagecaption) {
-            $json['image']['caption'] = $badge->imagecaption;
+        if ($badge->imageauthorname ||
+                $badge->imageauthoremail ||
+                $badge->imageauthorurl ||
+                $badge->imagecaption) {
+            $urlimage = moodle_url::make_pluginfile_url($context->id,
+                'badges', 'badgeimage', $badge->id, '/', 'f3')->out(false);
+            $json['image'] = array();
+            $json['image']['id'] = $urlimage;
+            if ($badge->imageauthorname || $badge->imageauthoremail || $badge->imageauthorurl) {
+                $authorimage = new moodle_url('/badges/image_author_json.php', array('id' => $badge->id));
+                $json['image']['author'] = $authorimage->out(false);
+            }
+            if ($badge->imagecaption) {
+                $json['image']['caption'] = $badge->imagecaption;
+            }
+        } else {
+            $json['image'] = $urlimage;
         }
 
         $params = ['id' => $badge->id];
@@ -82,6 +93,12 @@ if ($badge->status != BADGE_STATUS_INACTIVE) {
                     'version' => $related->version, '@language' => $related->language);
             }
              $json['related'] = $relateds;
+        }
+
+        $endorsement = $badge->get_endorsement();
+        if (!empty($endorsement)) {
+            $endorsementurl = new moodle_url('/badges/endorsement_json.php', array('id' => $badge->id));
+            $json['endorsement'] = $endorsementurl->out(false);
         }
 
         $alignments = $badge->get_alignments();

@@ -25,22 +25,22 @@
     }
 }}
 <div class="ms-auto dropdown">
-    <button class="btn btn-link btn-icon coursemenubtn"
+    <button class="btn btn-link btn-icon icon-size-3 coursemenubtn"
         type="button"
-        data-bs-toggle="dropdown"
+        data-toggle="dropdown"
         aria-haspopup="true"
         aria-expanded="false">
         <i class="icon fa fa-ellipsis-v fa-fw m-0" title="{{#str}} aria:courseactions, block_myoverview {{/str}} {{{fullname}}}" aria-hidden="true"></i>
-        <span class="visually-hidden">{{#str}} aria:courseactions, block_myoverview {{/str}} {{{fullname}}}</span>
+        <span class="sr-only">{{#str}} aria:courseactions, block_myoverview {{/str}} {{{fullname}}}</span>
     </button>
-    <div class="dropdown-menu dropdown-menu-end">
+    <div class="dropdown-menu dropdown-menu-right">
         <a class="dropdown-item {{#isfavourite}}hidden{{/isfavourite}}" href="#"
             data-action="add-favourite"
             data-course-id="{{id}}"
             aria-controls="favorite-icon-{{ id }}-{{ uniqid }}"
             >
             {{#str}} addtofavourites, block_myoverview {{/str}}
-            <div class="visually-hidden">
+            <div class="sr-only">
                 {{#str}} aria:addtofavourites, block_myoverview {{/str}} {{{fullname}}}
             </div>
         </a>
@@ -50,7 +50,7 @@
             aria-controls="favorite-icon-{{ id }}-{{ uniqid }}"
             >
             {{#str}} removefromfavourites, block_myoverview {{/str}}
-            <div class="visually-hidden">
+            <div class="sr-only">
                 {{#str}} aria:removefromfavourites, block_myoverview {{/str}} {{{fullname}}}
             </div>
         </a>
@@ -60,7 +60,7 @@
             aria-controls="favorite-icon-{{ id }}-{{ uniqid }}"
             >
             {{#str}} show, block_myoverview {{/str}}
-            <div class="visually-hidden">
+            <div class="sr-only">
                 {{#str}} aria:showcourse, block_myoverview, {{fullname}} {{/str}}
             </div>
         </a>
@@ -70,7 +70,7 @@
             aria-controls="favorite-icon-{{ id }}-{{ uniqid }}"
             >
             {{#str}} hidecourse, block_myoverview {{/str}}
-            <div class="visually-hidden">
+            <div class="sr-only">
                 {{#str}} aria:hidecourse, block_myoverview, {{fullname}} {{/str}}
             </div>
         </a>

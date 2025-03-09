@@ -166,8 +166,6 @@ class behat_field_manager {
                 case 'radio':
                     return 'radio';
                     break;
-                case 'datetime-local':
-                    return 'datetime_local';
                 default:
                     // Here we return false because all text-based
                     // fields should be included in the first switch case.
@@ -338,12 +336,6 @@ class behat_field_manager {
     protected static function normalise_fieldtype(string $fieldtype): string {
         if ($fieldtype === 'tags') {
             return 'autocomplete';
-        }
-        if ($fieldtype === 'date_time_selector') {
-            return 'date_time';
-        }
-        if ($fieldtype === 'date_selector') {
-            return 'date';
         }
 
         return $fieldtype;

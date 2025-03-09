@@ -17,7 +17,7 @@ Feature: View activity completion information in the IMS content package activit
       | student1 | C1 | student        |
       | teacher1 | C1 | editingteacher |
 
-  Scenario: A student can complete a IMSCP activity by viewing it
+  Scenario: View automatic completion items
     Given the following "activities" exist:
       | activity | course | name          | completion | completionview | packagefilepath                             |
       | imscp    | C1     | Music history | 2          | 1              | mod/imscp/tests/pacakges/singescobbasic.zip |
@@ -26,7 +26,7 @@ Feature: View activity completion information in the IMS content package activit
     Then the "View" completion condition of "Music history" is displayed as "done"
 
   @javascript
-  Scenario: A student can manually mark the IMSCP activity as done but a teacher cannot
+  Scenario: Use manual completion
     Given the following "activities" exist:
       | activity | course | name          | completion | packagefilepath                            |
       | imscp    | C1     | Music history | 1          | mod/imscp/tests/packages/singescobasic.zip |

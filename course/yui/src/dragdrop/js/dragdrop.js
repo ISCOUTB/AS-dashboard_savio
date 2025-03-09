@@ -2,16 +2,8 @@
 /**
  * Drag and Drop for course sections and course modules.
  *
- * TODO: remove this module as part of MDL-83627.
- *
  * @module moodle-course-dragdrop
  */
-
-Y.log(
-    'YUI moodle-course-dragdrop is deprecated. Please, add support_components to your course format.',
-    'warn',
-    'moodle-course-coursebase'
-);
 
 var CSS = {
     ACTIONAREA: '.actions',

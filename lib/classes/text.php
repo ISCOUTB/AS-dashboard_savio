@@ -450,15 +450,27 @@ class core_text {
      * @return array with (html entity => utf-8) elements
      */
     protected static function get_entities_table() {
-        static $translationtable = null;
+        static $trans_tbl = null;
 
         // Generate/create $trans_tbl
-        if (!isset($translationtable)) {
-            $translationtable = get_html_translation_table(HTML_ENTITIES, ENT_COMPAT | ENT_HTML401, 'UTF-8');
-            $translationtable = array_flip($translationtable);
+        if (!isset($trans_tbl)) {
+            if (version_compare(phpversion(), '5.3.4') < 0) {
+                $trans_tbl = array();
+                foreach (get_html_translation_table(HTML_ENTITIES, ENT_COMPAT) as $val=>$key) {
+                    $trans_tbl[$key] = self::convert($val, 'ISO-8859-1', 'utf-8');
+                }
+
+            } else if (version_compare(phpversion(), '5.4.0') < 0) {
+                $trans_tbl = get_html_translation_table(HTML_ENTITIES, ENT_COMPAT, 'UTF-8');
+                $trans_tbl = array_flip($trans_tbl);
+
+            } else {
+                $trans_tbl = get_html_translation_table(HTML_ENTITIES, ENT_COMPAT | ENT_HTML401, 'UTF-8');
+                $trans_tbl = array_flip($trans_tbl);
+            }
         }
 
-        return $translationtable;
+        return $trans_tbl;
     }
 
     /**

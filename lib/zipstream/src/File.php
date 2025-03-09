@@ -95,7 +95,7 @@ class File
 
         if ($this->enableZeroHeader) {
             // No calculation required
-        } elseif ($this->isSimulation() && $forecastSize !== null) {
+        } elseif ($this->isSimulation() && $forecastSize) {
             $this->uncompressedSize = $forecastSize;
             $this->compressedSize = $forecastSize;
         } else {
@@ -107,14 +107,12 @@ class File
 
         $this->addFileHeader();
 
-        $detectedSize = $forecastSize ?? ($this->compressedSize > 0 ? $this->compressedSize : null);
+        $detectedSize = $forecastSize ?? $this->compressedSize;
 
         if (
             $this->isSimulation() &&
-            $detectedSize !== null
+            $detectedSize > 0
         ) {
-            $this->uncompressedSize = $detectedSize;
-            $this->compressedSize = $detectedSize;
             ($this->recordSentBytes)($detectedSize);
         } else {
             $this->readStream(send: true);
@@ -160,7 +158,7 @@ class File
         if ($this->compressionMethod !== CompressionMethod::STORE) {
             return null;
         }
-        if ($this->exactSize !== null) {
+        if ($this->exactSize) {
             return $this->exactSize;
         }
         $fstat = fstat($this->unpackStream());
@@ -186,7 +184,7 @@ class File
 
         $zip64Enabled = $footer !== '';
 
-        if ($zip64Enabled) {
+        if($zip64Enabled) {
             $this->version = Version::ZIP64;
         }
 
@@ -333,10 +331,6 @@ class File
 
             $data = fread($this->unpackStream(), $readLength);
 
-            if ($data === false) {
-                throw new ResourceActionException('fread', $this->unpackStream());
-            }
-
             hash_update($hash, $data);
 
             $this->uncompressedSize += strlen($data);
@@ -347,10 +341,6 @@ class File
                     $data,
                     feof($this->unpackStream()) ? ZLIB_FINISH : ZLIB_NO_FLUSH
                 );
-
-                if ($data === false) {
-                    throw new RuntimeException('deflate_add failed');
-                }
             }
 
             $this->compressedSize += strlen($data);
@@ -360,7 +350,7 @@ class File
             }
         }
 
-        if ($this->exactSize !== null && $this->uncompressedSize !== $this->exactSize) {
+        if ($this->exactSize && $this->uncompressedSize !== $this->exactSize) {
             throw new FileSizeIncorrectException(expectedSize: $this->exactSize, actualSize: $this->uncompressedSize);
         }
 
@@ -369,7 +359,7 @@ class File
 
     private function compressionInit(): ?DeflateContext
     {
-        switch ($this->compressionMethod) {
+        switch($this->compressionMethod) {
             case CompressionMethod::STORE:
                 // Noting to do
                 return null;
@@ -400,7 +390,7 @@ class File
 
         return CentralDirectoryFileHeader::generate(
             versionMadeBy: ZipStream::ZIP_VERSION_MADE_BY,
-            versionNeededToExtract: $this->version->value,
+            versionNeededToExtract:$this->version->value,
             generalPurposeBitFlag: $this->generalPurposeBitFlag,
             compressionMethod: $this->compressionMethod,
             lastModificationDateTime: $this->lastModificationDateTime,

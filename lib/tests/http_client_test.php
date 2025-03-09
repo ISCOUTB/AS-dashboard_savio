@@ -32,7 +32,7 @@ use GuzzleHttp\Psr7\Uri;
  *
  * @coversDefaultClass \core\http_client
  */
-final class http_client_test extends \advanced_testcase {
+class http_client_test extends \advanced_testcase {
 
     /**
      * Read the object attributes and return the configs for test.

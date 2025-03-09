@@ -59,7 +59,7 @@
     <div id="page" class="container-fluid">
         {{! Secured full header }}
 
-        <header id="page-header" class="row">
+        <div id="page-header" class="row">
             <div class="col-12 py-3">
                 <div class="page-context-header">
                     <div class="page-header-headings">
@@ -67,33 +67,30 @@
                     </div>
                 </div>
             </div>
-        </header>
+        </div>
 
-        <div id="page-content" class="d-flex {{#haspreblocks}} blocks-pre {{/haspreblocks}} {{#haspostblocks}} blocks-post {{/haspostblocks}}">
+        <div id="page-content" class="row {{#haspreblocks}} blocks-pre {{/haspreblocks}} {{#haspostblocks}} blocks-post {{/haspostblocks}}">
             <div id="region-main-box" class="region-main">
-                <div id="region-main">
+                <section id="region-main" aria-label="{{#str}}content{{/str}}">
                     <div class="card">
                         <div class="card-body">
                             {{{ output.course_content_header }}}
-                            {{#headercontent}}
-                                {{> core/activity_header }}
-                            {{/headercontent}}
                             {{{ output.main_content }}}
                             {{{ output.course_content_footer }}}
                         </div>
                     </div>
-                </div>
+                </section>
             </div>
             <div class="columnleft {{#haspreblocks}} has-blocks {{/haspreblocks}}">
-                <div data-region="blocks-column" class="d-print-none">
+                <section data-region="blocks-column" class="d-print-none" aria-label="{{#str}}blocks{{/str}}">
                     {{{ sidepreblocks }}}
-                </div>
+                </section>
             </div>
 
             <div class="columnright {{#haspostblocks}} has-blocks {{/haspostblocks}}">
-                <div data-region="blocks-column" class="d-print-none">
+                <section data-region="blocks-column" class="d-print-none" aria-label="{{#str}}blocks{{/str}}">
                     {{{ sidepostblocks }}}
-                </div>
+                </section>
             </div>
         </div>
     </div>

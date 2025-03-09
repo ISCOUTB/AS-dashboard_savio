@@ -102,9 +102,7 @@ function filter_tex_sanitize_formula(string $texexp): string {
     // First, mangle all denied words.
     $texexp = preg_replace_callback($denylist,
         function($matches) {
-            // Remove backslashes to make commands impotent.
-            $noslashes = str_replace('\\', '', $matches[0]);
-            return 'forbiddenkeyword_' . $noslashes;
+            return 'forbiddenkeyword_' . $matches[0];
         },
         $texexp
     );

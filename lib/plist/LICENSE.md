@@ -1,7 +1,5 @@
 # The MIT License
 
-Copyright © 2025 Moodle Ptd Ltd
-
 Copyright © 2018 Teclib'
 
 Copyright © 2009 Christian Kruse, Rodney Rehm

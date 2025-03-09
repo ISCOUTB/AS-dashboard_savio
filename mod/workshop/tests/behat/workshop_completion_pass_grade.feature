@@ -1,4 +1,4 @@
-@mod @mod_workshop @core_completion
+@mod @mod_workshop @core_completion @javascript
 Feature: Workshop submission and assessment with pass grade activity completion
 
   Background:
@@ -107,8 +107,7 @@ Feature: Workshop submission and assessment with pass grade activity completion
     And I press "Re-calculate grades"
     And I change phase in workshop "TestWorkshop" to "Closed"
 
-  @javascript
-  Scenario: As teacher, I can see the completion status of students in the workshop activity
+  Scenario: Add and assess submissions in workshop with javascript enabled
     And I am on the "Course1" course page logged in as student1
     And the "Receive a grade" completion condition of "TestWorkshop" is displayed as "done"
     And the "Receive a passing grade" completion condition of "TestWorkshop" is displayed as "failed"

@@ -34,7 +34,7 @@ global $CFG;
 
 require_once($CFG->dirroot . '/webservice/tests/helpers.php');
 
-final class external_test extends externallib_advanced_testcase {
+class external_test extends externallib_advanced_testcase {
     /**
      * Test update_categories
      */

@@ -26,7 +26,7 @@ use core_courseformat\formatactions;
  * @copyright  2016 Juan Leyva
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class modlib_test extends \advanced_testcase {
+class modlib_test extends \advanced_testcase {
     /**
      * Setup to ensure that fixtures are loaded.
      */

@@ -25,15 +25,13 @@ use core_competency\api;
  * @copyright 2015 Damyon Wiese
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class import_test extends \advanced_testcase {
+class import_test extends \advanced_testcase {
 
     public function test_import_framework(): void {
         $this->resetAfterTest(true);
         $this->setAdminUser();
 
-        $importer = new framework_importer(
-            file_get_contents(self::get_fixture_path(__NAMESPACE__, 'example.csv')),
-        );
+        $importer = new framework_importer(file_get_contents(__DIR__ . '/fixtures/example.csv'));
 
         $this->assertEquals('', $importer->get_error());
 

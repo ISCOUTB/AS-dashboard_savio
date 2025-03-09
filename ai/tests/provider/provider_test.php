@@ -39,27 +39,12 @@ use core_privacy\tests\request\content_writer;
  */
 final class provider_test extends \advanced_testcase {
 
-    /** @var \core_ai\manager */
-    private $manager;
-
-    /** @var \core_ai\provider */
-    private $provider;
-
     /**
      * Overriding setUp() function to always reset after tests.
      */
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
-
-        // Create the provider instance.
-        $this->manager = \core\di::get(\core_ai\manager::class);
-        $config = ['data' => 'goeshere'];
-        $this->provider = $this->manager->create_provider_instance(
-                classname: '\aiprovider_openai\provider',
-                name: 'dummy',
-                config: $config,
-        );
     }
 
     /**
@@ -101,15 +86,16 @@ final class provider_test extends \advanced_testcase {
             'finishreason' => 'stop',
             'prompttokens' => 9,
             'completiontokens' => 12,
-            'model' => 'gpt-4o',
         ];
         $actionresponse = new response_generate_text(
             success: true,
         );
         $actionresponse->set_response_data($body);
 
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $provider = new \aiprovider_openai\provider();
+        $manager = new manager();
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $method->invoke($manager, $provider, $action, $actionresponse);
 
         // Retrieve the user1's context ids.
         $contextids = provider::get_contexts_for_userid($user1->id);
@@ -132,15 +118,16 @@ final class provider_test extends \advanced_testcase {
         $body = [
             'revisedprompt' => 'This is a revised prompt',
             'sourceurl' => 'https://example.com/image.png',
-            'model' => 'dall-e-3',
         ];
         $actionresponse = new response_generate_image(
             success: true,
         );
         $actionresponse->set_response_data($body);
 
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $provider = new \aiprovider_openai\provider();
+        $manager = new manager();
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $method->invoke($manager, $provider, $action, $actionresponse);
 
         // Retrieve the user1's context ids.
         $contextids = provider::get_contexts_for_userid($user1->id);
@@ -170,15 +157,16 @@ final class provider_test extends \advanced_testcase {
             'finishreason' => 'stop',
             'prompttokens' => 9,
             'completiontokens' => 12,
-            'model' => 'gpt-4o',
         ];
         $actionresponse = new response_generate_text(
             success: true,
         );
         $actionresponse->set_response_data($body);
 
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $provider = new \aiprovider_openai\provider();
+        $manager = new manager();
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $method->invoke($manager, $provider, $action, $actionresponse);
 
         // Retrieve the user2's context ids.
         $contextids = provider::get_contexts_for_userid($user2->id);
@@ -242,15 +230,16 @@ final class provider_test extends \advanced_testcase {
             'finishreason' => 'stop',
             'prompttokens' => 9,
             'completiontokens' => 12,
-            'model' => 'gpt-4o',
         ];
         $actionresponse = new response_generate_text(
             success: true,
         );
         $actionresponse->set_response_data($body);
 
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $provider = new \aiprovider_openai\provider();
+        $manager = new manager();
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $method->invoke($manager, $provider, $action, $actionresponse);
 
         $clock->bump(2);
         $timecreated2 = $clock->time();
@@ -267,13 +256,12 @@ final class provider_test extends \advanced_testcase {
             'finishreason' => 'stop',
             'prompttokens' => 10,
             'completiontokens' => 15,
-            'model' => 'gpt-4o',
         ];
         $actionresponse = new response_generate_text(
             success: true,
         );
         $actionresponse->set_response_data($body);
-        $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $method->invoke($manager, $provider, $action, $actionresponse);
 
         // Retrieve the user's context ids.
         $contextlist = provider::get_contexts_for_userid($user->id);
@@ -300,7 +288,6 @@ final class provider_test extends \advanced_testcase {
                 $this->assertEquals('9', $data->prompttokens);
                 $this->assertEquals('12', $data->completiontoken);
                 $this->assertEquals(get_string('yes'), $data->success);
-                $this->assertEquals('gpt-4o', $data->model);
             }
 
             if ($context->instanceid == $course2context->instanceid) {
@@ -318,7 +305,6 @@ final class provider_test extends \advanced_testcase {
                 $this->assertEquals('10', $data->prompttokens);
                 $this->assertEquals('15', $data->completiontoken);
                 $this->assertEquals(get_string('yes'), $data->success);
-                $this->assertEquals('gpt-4o', $data->model);
             }
         }
     }
@@ -348,15 +334,16 @@ final class provider_test extends \advanced_testcase {
         $body = [
             'revisedprompt' => 'This is a revised prompt',
             'sourceurl' => 'https://example.com/image1.png',
-            'model' => 'dall-e-3',
         ];
         $actionresponse = new response_generate_image(
             success: true,
         );
         $actionresponse->set_response_data($body);
 
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $provider = new \aiprovider_openai\provider();
+        $manager = new manager();
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $method->invoke($manager, $provider, $action, $actionresponse);
 
         $clock->bump(2);
         $timecreated2 = $clock->time();
@@ -373,13 +360,12 @@ final class provider_test extends \advanced_testcase {
         $body = [
             'revisedprompt' => 'This is a revised prompt',
             'sourceurl' => 'https://example.com/image2.png',
-            'model' => 'dall-e-3',
         ];
         $actionresponse = new response_generate_image(
             success: true,
         );
         $actionresponse->set_response_data($body);
-        $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $method->invoke($manager, $provider, $action, $actionresponse);
 
         // Retrieve the user's context ids.
         $contextlist = provider::get_contexts_for_userid($user->id);
@@ -408,7 +394,6 @@ final class provider_test extends \advanced_testcase {
                 $this->assertEquals('vivid', $data->style);
                 $this->assertEquals('https://example.com/image1.png', $data->sourceurl);
                 $this->assertEquals(get_string('yes'), $data->success);
-                $this->assertEquals('dall-e-3', $data->model);
             }
 
             if ($context->instanceid == $course2context->instanceid) {
@@ -428,7 +413,6 @@ final class provider_test extends \advanced_testcase {
                 $this->assertEquals('vivid', $data->style);
                 $this->assertEquals('https://example.com/image2.png', $data->sourceurl);
                 $this->assertEquals(get_string('yes'), $data->success);
-                $this->assertEquals('dall-e-3', $data->model);
             }
         }
     }
@@ -458,15 +442,16 @@ final class provider_test extends \advanced_testcase {
             'finishreason' => 'stop',
             'prompttokens' => 9,
             'completiontokens' => 12,
-            'model' => 'gpt-4o',
         ];
         $actionresponse = new response_summarise_text(
             success: true,
         );
         $actionresponse->set_response_data($body);
 
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $provider = new \aiprovider_openai\provider();
+        $manager = new manager();
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $method->invoke($manager, $provider, $action, $actionresponse);
 
         $clock->bump(2);
         $timecreated2 = $clock->time();
@@ -483,13 +468,12 @@ final class provider_test extends \advanced_testcase {
             'finishreason' => 'stop',
             'prompttokens' => 10,
             'completiontokens' => 15,
-            'model' => 'gpt-4o',
         ];
         $actionresponse = new response_summarise_text(
             success: true,
         );
         $actionresponse->set_response_data($body);
-        $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $method->invoke($manager, $provider, $action, $actionresponse);
 
         // Retrieve the user's context ids.
         $contextlist = provider::get_contexts_for_userid($user->id);
@@ -516,7 +500,6 @@ final class provider_test extends \advanced_testcase {
                 $this->assertEquals('9', $data->prompttokens);
                 $this->assertEquals('12', $data->completiontoken);
                 $this->assertEquals(get_string('yes'), $data->success);
-                $this->assertEquals('gpt-4o', $data->model);
             }
 
             if ($context->instanceid == $course2context->instanceid) {
@@ -534,7 +517,6 @@ final class provider_test extends \advanced_testcase {
                 $this->assertEquals('10', $data->prompttokens);
                 $this->assertEquals('15', $data->completiontoken);
                 $this->assertEquals(get_string('yes'), $data->success);
-                $this->assertEquals('gpt-4o', $data->model);
             }
         }
     }
@@ -593,15 +575,16 @@ final class provider_test extends \advanced_testcase {
             'finishreason' => 'stop',
             'prompttokens' => 9,
             'completiontokens' => 12,
-            'model' => 'gpt-4o',
         ];
         $actionresponse = new response_generate_text(
             success: true,
         );
         $actionresponse->set_response_data($body);
 
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $storeresult1 = $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $provider = new \aiprovider_openai\provider();
+        $manager = new manager();
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $storeresult1 = $method->invoke($manager, $provider, $action, $actionresponse);
 
         $clock->bump(2);
         $action = new generate_text(
@@ -617,14 +600,13 @@ final class provider_test extends \advanced_testcase {
             'finishreason' => 'stop',
             'prompttokens' => 10,
             'completiontokens' => 15,
-            'model' => 'gpt-4o',
         ];
         $actionresponse = new response_generate_text(
             success: true,
         );
         $actionresponse->set_response_data($body);
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $storeresult2 = $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $storeresult2 = $method->invoke($manager, $provider, $action, $actionresponse);
 
         provider::delete_data_for_all_users_in_context($course1context);
 
@@ -669,15 +651,16 @@ final class provider_test extends \advanced_testcase {
         $body = [
             'revisedprompt' => 'This is a revised prompt',
             'sourceurl' => 'https://example.com/image1.png',
-            'model' => 'dall-e-3',
         ];
         $actionresponse = new response_generate_image(
             success: true,
         );
         $actionresponse->set_response_data($body);
 
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $storeresult1 = $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $provider = new \aiprovider_openai\provider();
+        $manager = new manager();
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $storeresult1 = $method->invoke($manager, $provider, $action, $actionresponse);
 
         $clock->bump(2);
         $action = new generate_image(
@@ -693,14 +676,13 @@ final class provider_test extends \advanced_testcase {
         $body = [
             'revisedprompt' => 'This is a revised prompt',
             'sourceurl' => 'https://example.com/image2.png',
-            'model' => 'dall-e-3',
         ];
         $actionresponse = new response_generate_image(
             success: true,
         );
         $actionresponse->set_response_data($body);
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $storeresult2 = $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $storeresult2 = $method->invoke($manager, $provider, $action, $actionresponse);
 
         provider::delete_data_for_all_users_in_context($course1context);
 
@@ -743,15 +725,16 @@ final class provider_test extends \advanced_testcase {
             'finishreason' => 'stop',
             'prompttokens' => 9,
             'completiontokens' => 12,
-            'model' => 'gpt-4o',
         ];
         $actionresponse = new response_summarise_text(
             success: true,
         );
         $actionresponse->set_response_data($body);
 
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $storeresult1 = $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $provider = new \aiprovider_openai\provider();
+        $manager = new manager();
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $storeresult1 = $method->invoke($manager, $provider, $action, $actionresponse);
 
         $clock->bump(2);
         $action = new summarise_text(
@@ -767,14 +750,13 @@ final class provider_test extends \advanced_testcase {
             'finishreason' => 'stop',
             'prompttokens' => 10,
             'completiontokens' => 15,
-            'model' => 'gpt-4o',
         ];
         $actionresponse = new response_summarise_text(
             success: true,
         );
         $actionresponse->set_response_data($body);
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $storeresult2 = $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $storeresult2 = $method->invoke($manager, $provider, $action, $actionresponse);
 
         provider::delete_data_for_all_users_in_context($course1context);
 
@@ -818,15 +800,16 @@ final class provider_test extends \advanced_testcase {
             'finishreason' => 'stop',
             'prompttokens' => 9,
             'completiontokens' => 12,
-            'model' => 'gpt-4o',
         ];
         $actionresponse = new response_generate_text(
             success: true,
         );
         $actionresponse->set_response_data($body);
 
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $storeresult1 = $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $provider = new \aiprovider_openai\provider();
+        $manager = new manager();
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $storeresult1 = $method->invoke($manager, $provider, $action, $actionresponse);
 
         $clock->bump(2);
         $action = new generate_text(
@@ -842,14 +825,13 @@ final class provider_test extends \advanced_testcase {
             'finishreason' => 'stop',
             'prompttokens' => 10,
             'completiontokens' => 15,
-            'model' => 'gpt-4o',
         ];
         $actionresponse = new response_generate_text(
             success: true,
         );
         $actionresponse->set_response_data($body);
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $storeresult2 = $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $storeresult2 = $method->invoke($manager, $provider, $action, $actionresponse);
 
         $contextlist = provider::get_contexts_for_userid($user1->id);
         $approvedcontextlist = new approved_contextlist($user1, 'core_ai', $contextlist->get_contextids());
@@ -895,15 +877,16 @@ final class provider_test extends \advanced_testcase {
         $body = [
             'revisedprompt' => 'This is a revised prompt',
             'sourceurl' => 'https://example.com/image1.png',
-            'model' => 'dall-e-3',
         ];
         $actionresponse = new response_generate_image(
             success: true,
         );
         $actionresponse->set_response_data($body);
 
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $storeresult1 = $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $provider = new \aiprovider_openai\provider();
+        $manager = new manager();
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $storeresult1 = $method->invoke($manager, $provider, $action, $actionresponse);
 
         $clock->bump(2);
         $action = new generate_image(
@@ -919,14 +902,13 @@ final class provider_test extends \advanced_testcase {
         $body = [
             'revisedprompt' => 'This is a revised prompt',
             'sourceurl' => 'https://example.com/image2.png',
-            'model' => 'dall-e-3',
         ];
         $actionresponse = new response_generate_image(
             success: true,
         );
         $actionresponse->set_response_data($body);
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $storeresult2 = $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $storeresult2 = $method->invoke($manager, $provider, $action, $actionresponse);
 
         $contextlist = provider::get_contexts_for_userid($user1->id);
         $approvedcontextlist = new approved_contextlist($user1, 'core_ai', $contextlist->get_contextids());
@@ -970,15 +952,16 @@ final class provider_test extends \advanced_testcase {
             'finishreason' => 'stop',
             'prompttokens' => 9,
             'completiontokens' => 12,
-            'model' => 'gpt-4o',
         ];
         $actionresponse = new response_summarise_text(
             success: true,
         );
         $actionresponse->set_response_data($body);
 
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $storeresult1 = $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $provider = new \aiprovider_openai\provider();
+        $manager = new manager();
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $storeresult1 = $method->invoke($manager, $provider, $action, $actionresponse);
 
         $clock->bump(2);
         $action = new summarise_text(
@@ -994,14 +977,13 @@ final class provider_test extends \advanced_testcase {
             'finishreason' => 'stop',
             'prompttokens' => 10,
             'completiontokens' => 15,
-            'model' => 'gpt-4o',
         ];
         $actionresponse = new response_summarise_text(
             success: true,
         );
         $actionresponse->set_response_data($body);
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $storeresult2 = $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $storeresult2 = $method->invoke($manager, $provider, $action, $actionresponse);
 
         $contextlist = provider::get_contexts_for_userid($user1->id);
         $approvedcontextlist = new approved_contextlist($user1, 'core_ai', $contextlist->get_contextids());
@@ -1056,7 +1038,6 @@ final class provider_test extends \advanced_testcase {
      * Test get_users_in_context() for generate text.
      */
     public function test_get_users_in_context_for_generate_text(): void {
-        global $DB;
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
         $course1 = $this->getDataGenerator()->create_course();
@@ -1078,15 +1059,16 @@ final class provider_test extends \advanced_testcase {
             'finishreason' => 'stop',
             'prompttokens' => 9,
             'completiontokens' => 12,
-            'model' => 'gpt-4o',
         ];
         $actionresponse = new response_generate_text(
             success: true,
         );
         $actionresponse->set_response_data($body);
 
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $provider = new \aiprovider_openai\provider();
+        $manager = new manager();
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $method->invoke($manager, $provider, $action, $actionresponse);
 
         $clock->bump(2);
         $action = new generate_text(
@@ -1102,14 +1084,13 @@ final class provider_test extends \advanced_testcase {
             'finishreason' => 'stop',
             'prompttokens' => 10,
             'completiontokens' => 15,
-            'model' => 'gpt-4o',
         ];
         $actionresponse = new response_generate_text(
             success: true,
         );
         $actionresponse->set_response_data($body);
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $method->invoke($manager, $provider, $action, $actionresponse);
 
         // The user list for course1context should return user1.
         $userlist = new \core_privacy\local\request\userlist($course1context, 'core_ai');
@@ -1151,15 +1132,16 @@ final class provider_test extends \advanced_testcase {
         $body = [
             'revisedprompt' => 'This is a revised prompt',
             'sourceurl' => 'https://example.com/image1.png',
-            'model' => 'dall-e-3',
         ];
         $actionresponse = new response_generate_image(
             success: true,
         );
         $actionresponse->set_response_data($body);
 
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $provider = new \aiprovider_openai\provider();
+        $manager = new manager();
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $method->invoke($manager, $provider, $action, $actionresponse);
 
         $clock->bump(2);
         $action = new generate_image(
@@ -1175,14 +1157,13 @@ final class provider_test extends \advanced_testcase {
         $body = [
             'revisedprompt' => 'This is a revised prompt',
             'sourceurl' => 'https://example.com/image2.png',
-            'model' => 'dall-e-3',
         ];
         $actionresponse = new response_generate_image(
             success: true,
         );
         $actionresponse->set_response_data($body);
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $method->invoke($manager, $provider, $action, $actionresponse);
 
         // The user list for course1context should return user1.
         $userlist = new \core_privacy\local\request\userlist($course1context, 'core_ai');
@@ -1203,6 +1184,7 @@ final class provider_test extends \advanced_testcase {
      * Test get_users_in_context() for summarise text.
      */
     public function test_get_users_in_context_for_summarise_text(): void {
+        global $DB;
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
         $course1 = $this->getDataGenerator()->create_course();
@@ -1224,15 +1206,16 @@ final class provider_test extends \advanced_testcase {
             'finishreason' => 'stop',
             'prompttokens' => 9,
             'completiontokens' => 12,
-            'model' => 'gpt-4o',
         ];
         $actionresponse = new response_summarise_text(
             success: true,
         );
         $actionresponse->set_response_data($body);
 
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $provider = new \aiprovider_openai\provider();
+        $manager = new manager();
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $method->invoke($manager, $provider, $action, $actionresponse);
 
         $clock->bump(2);
         $action = new summarise_text(
@@ -1248,14 +1231,13 @@ final class provider_test extends \advanced_testcase {
             'finishreason' => 'stop',
             'prompttokens' => 10,
             'completiontokens' => 15,
-            'model' => 'gpt-4o',
         ];
         $actionresponse = new response_summarise_text(
             success: true,
         );
         $actionresponse->set_response_data($body);
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $method->invoke($manager, $provider, $action, $actionresponse);
 
         // The user list for course1context should return user1.
         $userlist = new \core_privacy\local\request\userlist($course1context, 'core_ai');
@@ -1329,15 +1311,16 @@ final class provider_test extends \advanced_testcase {
             'finishreason' => 'stop',
             'prompttokens' => 9,
             'completiontokens' => 12,
-            'model' => 'gpt-4o',
         ];
         $actionresponse = new response_generate_text(
             success: true,
         );
         $actionresponse->set_response_data($body);
 
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $storeresult1 = $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $provider = new \aiprovider_openai\provider();
+        $manager = new manager();
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $storeresult1 = $method->invoke($manager, $provider, $action, $actionresponse);
 
         $clock->bump(2);
         $action = new generate_text(
@@ -1353,14 +1336,13 @@ final class provider_test extends \advanced_testcase {
             'finishreason' => 'stop',
             'prompttokens' => 10,
             'completiontokens' => 15,
-            'model' => 'gpt-4o',
         ];
         $actionresponse = new response_generate_text(
             success: true,
         );
         $actionresponse->set_response_data($body);
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $storeresult2 = $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $storeresult2 = $method->invoke($manager, $provider, $action, $actionresponse);
 
         $userlist = new \core_privacy\local\request\userlist($course1context, 'core_ai');
         provider::get_users_in_context($userlist);
@@ -1409,15 +1391,16 @@ final class provider_test extends \advanced_testcase {
         $body = [
             'revisedprompt' => 'This is a revised prompt',
             'sourceurl' => 'https://example.com/image1.png',
-            'model' => 'dall-e-3',
         ];
         $actionresponse = new response_generate_image(
             success: true,
         );
         $actionresponse->set_response_data($body);
 
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $storeresult1 = $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $provider = new \aiprovider_openai\provider();
+        $manager = new manager();
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $storeresult1 = $method->invoke($manager, $provider, $action, $actionresponse);
 
         $clock->bump(2);
         $action = new generate_image(
@@ -1433,14 +1416,13 @@ final class provider_test extends \advanced_testcase {
         $body = [
             'revisedprompt' => 'This is a revised prompt',
             'sourceurl' => 'https://example.com/image2.png',
-            'model' => 'dall-e-3',
         ];
         $actionresponse = new response_generate_image(
             success: true,
         );
         $actionresponse->set_response_data($body);
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $storeresult2 = $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $storeresult2 = $method->invoke($manager, $provider, $action, $actionresponse);
 
         $userlist = new \core_privacy\local\request\userlist($course1context, 'core_ai');
         provider::get_users_in_context($userlist);
@@ -1486,15 +1468,16 @@ final class provider_test extends \advanced_testcase {
             'finishreason' => 'stop',
             'prompttokens' => 9,
             'completiontokens' => 12,
-            'model' => 'gpt-4o',
         ];
         $actionresponse = new response_summarise_text(
             success: true,
         );
         $actionresponse->set_response_data($body);
 
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $storeresult1 = $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $provider = new \aiprovider_openai\provider();
+        $manager = new manager();
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $storeresult1 = $method->invoke($manager, $provider, $action, $actionresponse);
 
         $clock->bump(2);
         $action = new summarise_text(
@@ -1510,14 +1493,13 @@ final class provider_test extends \advanced_testcase {
             'finishreason' => 'stop',
             'prompttokens' => 10,
             'completiontokens' => 15,
-            'model' => 'gpt-4o',
         ];
         $actionresponse = new response_summarise_text(
             success: true,
         );
         $actionresponse->set_response_data($body);
-        $method = new \ReflectionMethod($this->manager, 'store_action_result');
-        $storeresult2 = $method->invoke($this->manager, $this->provider, $action, $actionresponse);
+        $method = new \ReflectionMethod($manager, 'store_action_result');
+        $storeresult2 = $method->invoke($manager, $provider, $action, $actionresponse);
 
         $userlist = new \core_privacy\local\request\userlist($course1context, 'core_ai');
         provider::get_users_in_context($userlist);
@@ -1544,51 +1526,8 @@ final class provider_test extends \advanced_testcase {
      * Test get_name.
      */
     public function test_get_name(): void {
-        $this->assertEquals('aiprovider_openai', $this->provider->get_name());
-    }
+        $provider = new \aiprovider_openai\provider();
 
-    /**
-     * Test the is_request_allowed method of the provider abstract class.
-     */
-    public function test_is_request_allowed(): void {
-        // Create action.
-        $action1 = new summarise_text(
-            contextid: 1,
-            userid: 1,
-            prompttext: 'This is a test prompt 1',
-        );
-        $action2 = new summarise_text(
-            contextid: 1,
-            userid: 2,
-            prompttext: 'This is a test prompt 1',
-        );
-
-        // Create the provider instance.
-        $config = [
-            'enableuserratelimit' => true,
-            'userratelimit' => 3,
-            'enableglobalratelimit' => true,
-            'globalratelimit' => 5,
-        ];
-        $provider = $this->manager->create_provider_instance(
-                classname: '\aiprovider_openai\provider',
-                name: 'dummy',
-                config: $config,
-        );
-        // Make 3 requests for the first user, all should be allowed.
-        for ($i = 0; $i < 3; $i++) {
-            $this->assertTrue($provider->is_request_allowed($action1));
-        }
-
-        // The 4th request should be denied.
-        $this->assertFalse($provider->is_request_allowed($action1)['success']);
-
-        // Make 2 requests for the second user, all should be allowed.
-        for ($i = 0; $i < 2; $i++) {
-            $this->assertTrue($provider->is_request_allowed($action2));
-        }
-
-        // THe final request should be denied.
-        $this->assertFalse($provider->is_request_allowed($action2)['success']);
+        $this->assertEquals(get_string('pluginname', 'aiprovider_openai'), $provider->get_name());
     }
 }

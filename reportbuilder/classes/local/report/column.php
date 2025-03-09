@@ -18,9 +18,8 @@ declare(strict_types=1);
 
 namespace core_reportbuilder\local\report;
 
-use core\exception\coding_exception;
-use core\lang_string;
-use core\output\help_icon;
+use coding_exception;
+use lang_string;
 use core_reportbuilder\local\helpers\{aggregation, database, join_trait};
 use core_reportbuilder\local\aggregation\base;
 use core_reportbuilder\local\models\column as column_model;
@@ -89,9 +88,6 @@ final class column {
 
     /** @var array $attributes */
     private $attributes = [];
-
-    /** @var help_icon|null $helpicon */
-    private $helpicon = null;
 
     /** @var bool $available Used to know if column is available to the current user or not */
     private $available = true;
@@ -363,7 +359,8 @@ final class column {
             $field = reset($fieldsalias);
 
             // If aggregating the column, generate SQL from column fields and use it to generate aggregation SQL.
-            $aggregationfieldsql = $this->get_field_aggregation_sql($fieldsaliassql);
+            $columnfieldsql = $this->aggregation::get_column_field_sql($fieldsaliassql);
+            $aggregationfieldsql = $this->aggregation::get_field_sql($columnfieldsql, $this->get_type());
 
             $fields = ["{$aggregationfieldsql} AS {$field['alias']}"];
         } else {
@@ -373,22 +370,6 @@ final class column {
         }
 
         return array_values($fields);
-    }
-
-    /**
-     * Return aggregated field SQL for the column
-     *
-     * @param string[] $sqlfields
-     * @return string
-     * @throws coding_exception
-     */
-    private function get_field_aggregation_sql(array $sqlfields): string {
-        if (empty($this->aggregation)) {
-            throw new coding_exception('Column aggregation is undefined');
-        }
-
-        $columnfieldsql = $this->aggregation::get_column_field_sql($sqlfields);
-        return $this->aggregation::get_field_sql($columnfieldsql, $this->get_type());
     }
 
     /**
@@ -440,28 +421,17 @@ final class column {
     public function get_groupby_sql(): array {
         global $DB;
 
-        // We can reference field aliases in GROUP BY only in MySQL/Postgres (MDL-78783).
-        $usealias = in_array($DB->get_dbfamily(), ['mysql', 'postgres']);
-
-        $fieldsalias = $this->get_fields_sql_alias();
-
-        // To ensure cross-platform support for column aggregation, where the aggregation should also be grouped, we need
-        // to generate SQL from column fields and use it to generate aggregation SQL.
-        if (!empty($this->aggregation) && $this->aggregation::column_groupby()) {
-            if ($usealias) {
-                $this->set_groupby_sql($this->get_column_alias());
-            } else {
-                $fieldsaliassql = array_column($fieldsalias, 'sql');
-                $this->set_groupby_sql($this->get_field_aggregation_sql($fieldsaliassql));
-            }
-        }
-
-        // Return defined value if it's been set.
+        // Return defined value if it's already been set during column definition.
         if (!empty($this->groupbysql)) {
             return [$this->groupbysql];
         }
 
+        $fieldsalias = $this->get_fields_sql_alias();
+
+        // Note that we can reference field aliases in GROUP BY only in MySQL/Postgres.
+        $usealias = in_array($DB->get_dbfamily(), ['mysql', 'postgres']);
         $columnname = $usealias ? 'alias' : 'sql';
+
         return array_column($fieldsalias, $columnname);
     }
 
@@ -567,7 +537,7 @@ final class column {
      * Sets the column as sortable
      *
      * @param bool $issortable
-     * @param array $sortfields Define the fields that should be used when the column is sorted. Must be a subset of the fields
+     * @param array $sortfields Define the fields that should be used when the column is sorted, typically a subset of the fields
      *      selected for the column, via {@see add_field}. If omitted then the first selected field is used
      * @return self
      */
@@ -608,11 +578,14 @@ final class column {
             }
 
             // Check whether sortfield refers to field SQL.
-            return str_ireplace(
-                array_column($fieldsalias, 'sql'),
-                array_column($fieldsalias, 'alias'),
-                $sortfield,
-            );
+            foreach ($fieldsalias as $field) {
+                if (strcasecmp($sortfield, $field['sql']) === 0) {
+                    $sortfield = $field['alias'];
+                    break;
+                }
+            }
+
+            return $sortfield;
         }, $this->sortfields);
     }
 
@@ -671,13 +644,12 @@ final class column {
      */
     public function format_value(array $row) {
         $values = $this->get_values($row);
+        $value = self::get_default_value($values, $this->get_type());
 
         // If column is being aggregated then defer formatting to them, otherwise loop through all column callbacks.
         if (!empty($this->aggregation)) {
-            $value = self::get_default_value($values, $this->aggregation::get_column_type($this->get_type()));
             $value = $this->aggregation::format_value($value, $values, $this->callbacks, $this->get_type());
         } else {
-            $value = self::get_default_value($values, $this->get_type());
             foreach ($this->callbacks as $callback) {
                 [$callable, $arguments] = $callback;
                 $value = ($callable)($value, (object) $values, $arguments, null);
@@ -705,26 +677,6 @@ final class column {
      */
     public function get_attributes(): array {
         return $this->attributes;
-    }
-
-    /**
-     * Set column help icon
-     *
-     * @param help_icon $helpicon
-     * @return self
-     */
-    public function set_help_icon(help_icon $helpicon): self {
-        $this->helpicon = $helpicon;
-        return $this;
-    }
-
-    /**
-     * Return column help icon
-     *
-     * @return help_icon|null
-     */
-    public function get_help_icon(): ?help_icon {
-        return $this->helpicon;
     }
 
     /**

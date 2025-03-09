@@ -26,7 +26,7 @@ use core_qrcode;
  * @author     <juan@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class qrcode_test extends \basic_testcase {
+class qrcode_test extends \basic_testcase {
 
     /**
      * Basic test to generate a QR code and check that the library is not broken.

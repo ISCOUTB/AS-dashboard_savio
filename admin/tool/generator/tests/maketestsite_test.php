@@ -35,7 +35,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2013 David Monllaó
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class maketestsite_test extends \advanced_testcase {
+class maketestsite_test extends \advanced_testcase {
 
     /**
      * Checks that site courses shortnames are properly generated.

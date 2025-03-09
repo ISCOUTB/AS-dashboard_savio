@@ -34,7 +34,7 @@ require_once($CFG->dirroot . '/rating/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \rating
  */
-final class rating_test extends \advanced_testcase {
+class rating_test extends \advanced_testcase {
 
     protected $syscontext;
     protected $neededcaps = array('view', 'viewall', 'viewany', 'rate');
@@ -279,7 +279,7 @@ final class rating_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function get_aggregate_string_provider(): array {
+    public function get_aggregate_string_provider() {
         return [
             'Non-numeric aggregate produces empty string' => [
                 RATING_AGGREGATE_NONE,

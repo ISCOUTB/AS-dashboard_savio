@@ -42,7 +42,7 @@ class groupmode implements named_templatable, renderable {
     protected $format;
 
     /** @var section_info the section object */
-    protected $section;
+    private $section;
 
     /** @var cm_info the course module instance */
     protected $mod;
@@ -158,17 +158,17 @@ class groupmode implements named_templatable, renderable {
         $choice->add_option(
             NOGROUPS,
             get_string('groupsnone', 'group'),
-            $this->get_option_data(null, 'cmNoGroups', 'cm_nogroups')
+            $this->get_option_data(null, 'cmNoGroups', $this->mod->id)
         );
         $choice->add_option(
             SEPARATEGROUPS,
             get_string('groupsseparate', 'group'),
-            $this->get_option_data('groupsseparate', 'cmSeparateGroups', 'cm_separategroups')
+            $this->get_option_data('groupsseparate', 'cmSeparateGroups', $this->mod->id)
         );
         $choice->add_option(
             VISIBLEGROUPS,
             get_string('groupsvisible', 'group'),
-            $this->get_option_data('groupsvisible', 'cmVisibleGroups', 'cm_visiblegroups')
+            $this->get_option_data('groupsvisible', 'cmVisibleGroups', $this->mod->id)
         );
         $choice->set_selected_value($this->mod->effectivegroupmode);
         return $choice;
@@ -177,26 +177,18 @@ class groupmode implements named_templatable, renderable {
     /**
      * Get the data for the option.
      * @param string|null $name the name of the option
-     * @param string $mutation the mutation name
-     * @param string $stateaction the state action name
+     * @param string $action the state action of the option
+     * @param int $id the id of the module
      * @return array
      */
-    private function get_option_data(?string $name, string $mutation, string $stateaction): array {
-        $format = $this->format;
-        $nonajaxurl = $format->get_update_url(
-            action: $stateaction,
-            ids: [$this->mod->id],
-            returnurl: $format->get_view_url($format->get_sectionnum(), ['navigation' => true]),
-        );
-
+    private function get_option_data(?string $name, string $action, int $id): array {
         return [
             'description' => ($name) ? get_string("groupmode_{$name}_help", 'group') : null,
             // The dropdown icons are decorative, so we don't need to provide alt text.
-            'icon' => $this->get_action_icon($mutation),
-            'url' => $nonajaxurl,
+            'icon' => $this->get_action_icon($action),
             'extras' => [
-                'data-id' => $this->mod->id,
-                'data-action' => $mutation,
+                'data-id' => $id,
+                'data-action' => $action,
             ]
         ];
     }

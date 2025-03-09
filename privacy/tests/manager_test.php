@@ -35,7 +35,7 @@ require_once($CFG->dirroot . '/privacy/tests/fixtures/provider_throwing_exceptio
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \core_privacy\manager
  */
-final class manager_test extends \advanced_testcase {
+class manager_test extends \advanced_testcase {
     /**
      * Test tearDown.
      */
@@ -139,7 +139,7 @@ final class manager_test extends \advanced_testcase {
      *
      * @return  array
      */
-    public static function component_is_compliant_provider(): array {
+    public function component_is_compliant_provider() {
         return [
             'An empty subsystem' => [
                 'core_countries',
@@ -295,7 +295,7 @@ final class manager_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function is_empty_subsystem_provider(): array {
+    public function is_empty_subsystem_provider() {
         return [
             'A subsystem which has no directory' => [
                 'core_langconfig',

@@ -33,7 +33,7 @@ use core_user\reportbuilder\datasource\users;
  * @copyright   2023 Paul Holden <paulh@moodle.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class system_report_data_exporter_test extends advanced_testcase {
+class system_report_data_exporter_test extends advanced_testcase {
 
     /**
      * Test exported data structure
@@ -71,7 +71,7 @@ final class system_report_data_exporter_test extends advanced_testcase {
 
         $this->assertStringContainsString('My second report', $name);
         $this->assertEquals(users::get_name(), $source);
-        $this->assertMatchesRegularExpression('/cat.*, .*dog/', $tags);
+        $this->assertEquals('cat, dog', $tags);
         $this->assertNotEmpty($timecreated);
         $this->assertNotEmpty($timemodified);
         $this->assertEquals('Admin User', $modifiedby);

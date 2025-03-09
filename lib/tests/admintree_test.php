@@ -41,7 +41,7 @@ require_once($CFG->libdir.'/adminlib.php');
  * @copyright   2013 David Mudrak <david@moodle.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class admintree_test extends \advanced_testcase {
+class admintree_test extends \advanced_testcase {
 
     /**
      * Adding nodes into the admin tree.

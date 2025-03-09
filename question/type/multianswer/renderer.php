@@ -219,12 +219,12 @@ abstract class qtype_multianswer_subq_renderer_base extends qtype_renderer {
             'role' => 'button',
             'tabindex' => 0,
             'class' => 'feedbacktrigger btn btn-link p-0',
-            'data-bs-toggle' => 'popover',
-            'data-bs-container' => 'body',
-            'data-bs-content' => $feedbackcontents,
-            'data-bs-placement' => 'right',
-            'data-bs-trigger' => 'hover focus',
-            'data-bs-html' => 'true',
+            'data-toggle' => 'popover',
+            'data-container' => 'body',
+            'data-content' => $feedbackcontents,
+            'data-placement' => 'right',
+            'data-trigger' => 'hover focus',
+            'data-html' => 'true',
         ]);
     }
 
@@ -532,7 +532,7 @@ class qtype_multianswer_multichoice_vertical_renderer extends qtype_multianswer_
     protected function all_choices_wrapper_start() {
         $wrapperstart = html_writer::start_tag('fieldset', array('class' => 'answer'));
         $legendtext = $this->get_answer_label('multichoicex', 'qtype_multianswer');
-        $wrapperstart .= html_writer::tag('legend', $legendtext, ['class' => 'visually-hidden']);
+        $wrapperstart .= html_writer::tag('legend', $legendtext, ['class' => 'sr-only']);
         return $wrapperstart;
     }
 
@@ -566,7 +566,7 @@ class qtype_multianswer_multichoice_horizontal_renderer
     protected function all_choices_wrapper_start() {
         $wrapperstart = html_writer::start_tag('fieldset', ['class' => 'answer']);
         $captiontext = $this->get_answer_label('multichoicex', 'qtype_multianswer');
-        $wrapperstart .= html_writer::tag('legend', $captiontext, ['class' => 'visually-hidden']);
+        $wrapperstart .= html_writer::tag('legend', $captiontext, ['class' => 'sr-only']);
         return $wrapperstart;
     }
 

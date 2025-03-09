@@ -164,7 +164,7 @@ abstract class qbehaviour_renderer extends plugin_renderer_base {
             $error = $qa->validate_manual_mark($currentmark);
             $errorclass = '';
             if ($error !== '') {
-                $errorclass = ' error alert-danger';
+                $erroclass = ' error';
                 $error = html_writer::tag('span', $error,
                         array('class' => 'error')) . html_writer::empty_tag('br');
             }

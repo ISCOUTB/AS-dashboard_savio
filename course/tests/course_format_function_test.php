@@ -31,7 +31,7 @@ require_once($CFG->dirroot . '/course/format/lib.php');
  * @author     Jason den Dulk
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class course_format_function_test extends \basic_testcase {
+class course_format_function_test extends \basic_testcase {
 
     /**
      * Tests clean_param_if_not_null function

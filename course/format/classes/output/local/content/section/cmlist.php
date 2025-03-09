@@ -55,7 +55,6 @@ class cmlist implements named_templatable, renderable {
     /** @var string the item output class name */
     protected $itemclass;
 
-    // TODO remove movehereclass as part of MDL-83530.
     /** @var optional move here output class */
     protected $movehereclass;
 
@@ -93,12 +92,12 @@ class cmlist implements named_templatable, renderable {
         $data = new stdClass();
         $data->cms = [];
 
-        // TODO remove showmovehere and the if clause as part of MDL-83530.
+        // By default, non-ajax controls are disabled but in some places like the frontpage
+        // it is necessary to display them. This is a temporal solution while JS is still
+        // optional for course editing.
         $showmovehere = ismoving($course->id);
+
         if ($showmovehere) {
-            // By default, non-ajax controls are disabled but in some places like the frontpage
-            // it is necessary to display them. This is a temporal solution while JS is still
-            // optional for course editing.
             $data->hascms = true;
             $data->showmovehere = true;
             $data->strmovefull = strip_tags(get_string("movefull", "", "'$user->activitycopyname'"));
@@ -113,12 +112,11 @@ class cmlist implements named_templatable, renderable {
 
         foreach ($modinfo->sections[$section->section] as $modnumber) {
             $mod = $modinfo->cms[$modnumber];
-            // TODO remove this if as part of MDL-83530.
+            // If the old non-ajax move is necessary, we do not print the selected cm.
             if ($showmovehere && $USER->activitycopy == $mod->id) {
-                // If the old non-ajax move is necessary, we do not print the selected cm.
                 continue;
             }
-            if ($mod->is_visible_on_course_page() && $mod->is_of_type_that_can_display()) {
+            if ($mod->is_visible_on_course_page()) {
                 $item = new $this->itemclass($format, $section, $mod, $this->displayoptions);
                 $data->cms[] = (object)[
                     'cmitem' => $item->export_for_template($output),

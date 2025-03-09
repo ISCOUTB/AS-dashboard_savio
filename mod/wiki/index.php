@@ -75,7 +75,7 @@ $strname = get_string("name");
 $table = new html_table();
 
 if ($usesections) {
-    $strsectionname = course_get_format($course)->get_generic_section_name();
+    $strsectionname = get_string('sectionname', 'format_' . $course->format);
     $table->head = array($strsectionname, $strname);
 } else {
     $table->head = array($strname);

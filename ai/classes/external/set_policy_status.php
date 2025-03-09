@@ -32,7 +32,7 @@ class set_policy_status extends external_api {
     /**
      * Set policy parameters.
      *
-     * @since  Moodel 5.0
+     * @since  Moodle 4.5
      * @return external_function_parameters
      */
     public static function execute_parameters(): external_function_parameters {
@@ -48,7 +48,7 @@ class set_policy_status extends external_api {
     /**
      * Set a users AI policy acceptance.
      *
-     * @since  Moodel 5.0
+     * @since  Moodle 4.5
      * @param int $contextid The context ID.
      * @return array The generated content.
      */
@@ -75,7 +75,7 @@ class set_policy_status extends external_api {
     /**
      * Generate content return value.
      *
-     * @since  Moodel 5.0
+     * @since  Moodle 4.5
      * @return external_function_parameters
      */
     public static function execute_returns(): external_function_parameters {

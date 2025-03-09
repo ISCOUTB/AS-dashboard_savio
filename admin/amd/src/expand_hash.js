@@ -23,7 +23,7 @@
  */
 
 const SELECTORS = {
-    COLLAPSE_ELEMENTS: '[data-bs-toggle="collapse"]',
+    COLLAPSE_ELEMENTS: '[data-toggle="collapse"]',
     FOCUSTHENEXPAND_ELEMENTS: '.focus-expand',
 };
 

@@ -5,7 +5,8 @@ Feature: Subsection does not have completion.
   I need to use subsection activity without completion
 
   Background:
-    Given the following "users" exist:
+    Given I enable "subsection" "mod" plugin
+    And the following "users" exist:
       | username | firstname  | lastname  | email                 |
       | teacher1 | Teacher    | 1         | teacher1@example.com  |
     And the following "courses" exist:

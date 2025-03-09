@@ -86,7 +86,20 @@ $PAGE->activityheader->set_attrs([
     'description' => ''
 ]);
 $PAGE->add_body_class('limitedwidth');
-$PAGE->requires->js_call_amd('mod_feedback/edit', 'init', [$cm->id]);
+
+//Adding the javascript module for the items dragdrop.
+if (count($feedbackitems) > 1) {
+    $PAGE->requires->strings_for_js([
+        'pluginname',
+        'move_item',
+        'position',
+    ], 'feedback');
+    $PAGE->requires->yui_module(
+        'moodle-mod_feedback-dragdrop',
+        'M.mod_feedback.init_dragdrop',
+        [['cmid' => $cm->id]]
+    );
+}
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('edit_items', 'mod_feedback'), 3);
@@ -96,6 +109,8 @@ $renderer = $PAGE->get_renderer('mod_feedback');
 echo $renderer->main_action_bar($actionbar);
 $form = new mod_feedback_complete_form(mod_feedback_complete_form::MODE_EDIT,
         $feedbackstructure, 'feedback_edit_form');
+echo '<div id="feedback_dragarea">'; // The container for the dragging area.
 $form->display();
+echo '</div>';
 
 echo $OUTPUT->footer();

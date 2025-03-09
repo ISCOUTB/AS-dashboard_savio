@@ -26,7 +26,7 @@ namespace core;
  * @covers ::ajax_capture_output
  * @covers ::ajax_check_captured_output
  */
-final class ajaxlib_test extends \advanced_testcase {
+class ajaxlib_test extends \advanced_testcase {
     /** @var string Original error log */
     protected $oldlog;
 
@@ -116,9 +116,9 @@ final class ajaxlib_test extends \advanced_testcase {
     }
 
     public function test_output_capture_error_debug_all(): void {
-        // In error conditions, and with DEBUG_ALL set, we should throw an exceptions.
+        // In error conditions, and with DEBUG_ALL set, we should not receive any output or throw any exceptions.
         set_debugging(DEBUG_ALL);
-        $this->helper_test_dirty_output(true);
+        $this->helper_test_dirty_output();
     }
 
     public function test_output_capture_error_debugdeveloper(): void {

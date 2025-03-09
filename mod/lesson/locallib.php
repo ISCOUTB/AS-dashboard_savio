@@ -3763,6 +3763,8 @@ abstract class lesson_base {
         return !empty($this->properties->{$key});
     }
 
+    //NOTE: E_STRICT does not allow to change function signature!
+
     /**
      * If implemented should create a new instance, save it in the DB and return it
      */

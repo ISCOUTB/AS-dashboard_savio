@@ -23,13 +23,13 @@ namespace repository_dropbox;
  * @copyright   Andrew Nicols <andrew@nicols.co.uk>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class api_test extends \advanced_testcase {
+class api_test extends \advanced_testcase {
     /**
      * Data provider for has_additional_results.
      *
      * @return array
      */
-    public static function has_additional_results_provider(): array {
+    public function has_additional_results_provider() {
         return [
             'No more results' => [
                 (object) [
@@ -88,7 +88,7 @@ final class api_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function check_and_handle_api_errors_provider(): array {
+    public function check_and_handle_api_errors_provider() {
         return [
             '200 http_code' => [
                 ['http_code' => 200],
@@ -179,7 +179,7 @@ final class api_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function supports_thumbnail_provider(): array {
+    public function supports_thumbnail_provider() {
         $tests = [
             'Only files support thumbnails' => [
                 (object) ['.tag' => 'folder'],
@@ -403,37 +403,25 @@ final class api_test extends \advanced_testcase {
 
         $endpoint = 'testEndpoint';
 
-        $requestinvocations = $this->exactly(3);
-        $mock->expects($requestinvocations)
+        // We can't detect if fetch_dropbox_data was called twice because
+        // we can'
+        $mock->expects($this->exactly(3))
             ->method('request')
-            ->willReturnCallback(function () use ($requestinvocations): string {
-                return match (self::getInvocationCount($requestinvocations)) {
-                    1 => json_encode(['has_more' => true, 'cursor' => 'Example', 'matches' => ['foo', 'bar']]),
-                    2 => json_encode(['has_more' => true, 'cursor' => 'Example', 'matches' => ['baz']]),
-                    3 => json_encode(['has_more' => false, 'cursor' => '', 'matches' => ['bum']]),
-                    default => $this->fail('Unexpected call to the call() method.'),
-                };
-            });
+            ->will($this->onConsecutiveCalls(
+                json_encode(['has_more' => true, 'cursor' => 'Example', 'matches' => ['foo', 'bar']]),
+                json_encode(['has_more' => true, 'cursor' => 'Example', 'matches' => ['baz']]),
+                json_encode(['has_more' => false, 'cursor' => '', 'matches' => ['bum']])
+            ));
 
         // We automatically adjust for the /continue endpoint.
-        $apiinvocations = $this->exactly(3);
-        $mock->expects($apiinvocations)
+        $mock->expects($this->exactly(3))
             ->method('get_api_endpoint')
-            ->willReturnCallback(function ($endpoint) use ($apiinvocations): string {
-                switch (self::getInvocationCount($apiinvocations)) {
-                    case 1:
-                        $this->assertEquals('testEndpoint', $endpoint);
-                        return 'https://example.com/api/2/testEndpoint';
-                    case 2:
-                        $this->assertEquals('testEndpoint/continue', $endpoint);
-                        return 'https://example.com/api/2/testEndpoint/continue';
-                    case 3:
-                        $this->assertEquals('testEndpoint/continue', $endpoint);
-                        return 'https://example.com/api/2/testEndpoint/continue';
-                    default:
-                        $this->fail('Unexpected call to the get_api_endpoint() method.');
-                }
-            });
+            ->withConsecutive(['testEndpoint'], ['testEndpoint/continue'], ['testEndpoint/continue'])
+            ->willReturn($this->onConsecutiveCalls(
+                'https://example.com/api/2/testEndpoint',
+                'https://example.com/api/2/testEndpoint/continue',
+                'https://example.com/api/2/testEndpoint/continue'
+            ));
 
         // Make the call.
         $rc = new \ReflectionClass(\repository_dropbox\dropbox::class);
@@ -480,21 +468,12 @@ final class api_test extends \advanced_testcase {
         $mock->expects($this->never())
             ->method('get_api_endpoint');
 
-        $headerinvocations = $this->exactly(2);
-        $mock->expects($headerinvocations)
+        $mock->expects($this->exactly(2))
             ->method('setHeader')
-            ->willReturnCallback(function ($header) use ($data, $headerinvocations): void {
-                switch (self::getInvocationCount($headerinvocations)) {
-                    case 1:
-                        $this->assertEquals('Content-Type: ', $header);
-                        break;
-                    case 2:
-                        $this->assertEquals('Dropbox-API-Arg: ' . json_encode($data), $header);
-                        break;
-                    default:
-                        $this->fail('Unexpected call to the setHeader() method.');
-                }
-            });
+            ->withConsecutive(
+                [$this->equalTo('Content-Type: ')],
+                [$this->equalTo('Dropbox-API-Arg: ' . json_encode($data))]
+            );
 
         // Only one request should be made, and it should forcibly be a POST.
         $mock->expects($this->once())
@@ -567,23 +546,21 @@ final class api_test extends \advanced_testcase {
         $sharelink = 'https://example.com/share/link';
 
         // Mock fetch_dropbox_data to return an existing file.
-        $fetchinvocations = $this->exactly(2);
-        $mock->expects($fetchinvocations)
+        $mock->expects($this->exactly(2))
             ->method('fetch_dropbox_data')
-            ->willReturnCallback(function ($path, $values) use ($fetchinvocations, $id, $file): object {
-                switch (self::getInvocationCount($fetchinvocations)) {
-                    case 1:
-                        $this->assertEquals('sharing/list_shared_links', $path);
-                        $this->assertEquals(['path' => $id], $values);
-                        return (object) ['links' => []];
-                    case 2:
-                        $this->assertEquals('sharing/create_shared_link_with_settings', $path);
-                        $this->assertEquals(['path' => $id, 'settings' => ['requested_visibility' => 'public']], $values);
-                        return $file;
-                    default:
-                        $this->fail('Unexpected call to the fetch_dropbox_data() method.');
-                }
-            });
+            ->withConsecutive(
+                [$this->equalTo('sharing/list_shared_links'), $this->equalTo(['path' => $id])],
+                [$this->equalTo('sharing/create_shared_link_with_settings'), $this->equalTo([
+                    'path' => $id,
+                    'settings' => [
+                        'requested_visibility' => 'public',
+                    ]
+                ])]
+            )
+            ->will($this->onConsecutiveCalls(
+                (object) ['links' => []],
+                $file
+            ));
 
         $mock->expects($this->once())
             ->method('normalize_file_share_info')
@@ -610,18 +587,19 @@ final class api_test extends \advanced_testcase {
         // Mock fetch_dropbox_data to return an existing file.
         $mock->expects($this->exactly(2))
             ->method('fetch_dropbox_data')
-            ->willReturnCallback(function ($path, $values) use ($id): ?object {
-                switch ($path) {
-                    case 'sharing/list_shared_links':
-                        $this->assertEquals(['path' => $id], $values);
-                        return (object) ['links' => []];
-                    case 'sharing/create_shared_link_with_settings':
-                        $this->assertEquals(['path' => $id, 'settings' => ['requested_visibility' => 'public']], $values);
-                        return null;
-                    default:
-                        $this->fail('Unexpected call to the fetch_dropbox_data() method.');
-                }
-            });
+            ->withConsecutive(
+                [$this->equalTo('sharing/list_shared_links'), $this->equalTo(['path' => $id])],
+                [$this->equalTo('sharing/create_shared_link_with_settings'), $this->equalTo([
+                    'path' => $id,
+                    'settings' => [
+                        'requested_visibility' => 'public',
+                    ]
+                ])]
+            )
+            ->will($this->onConsecutiveCalls(
+                (object) ['links' => []],
+                null
+            ));
 
         $mock->expects($this->never())
             ->method('normalize_file_share_info');

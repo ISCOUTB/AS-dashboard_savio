@@ -134,4 +134,5 @@ Feature: Workshop submission and assessment
     And I am on the TestWorkshop "workshop activity" page logged in as student1
     Then I should see "Your submission with assessments"
 
-  Scenario: As a teacher I can assess submissions in workshop
+  @javascript
+  Scenario: Add and assess submissions in workshop with javascript enabled

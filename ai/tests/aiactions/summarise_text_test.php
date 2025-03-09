@@ -70,7 +70,6 @@ final class summarise_text_test extends \advanced_testcase {
             'finishreason' => 'stop',
             'prompttokens' => 9,
             'completiontokens' => 12,
-            'model' => 'gpt-4o',
         ];
         $actionresponse = new response_summarise_text(
             success: true,

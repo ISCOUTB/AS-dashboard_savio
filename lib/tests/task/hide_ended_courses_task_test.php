@@ -16,7 +16,9 @@
 
 namespace core\task;
 
-use core\tests\courses_tasks_testcase;
+defined('MOODLE_INTERNAL') || die;
+
+require_once(__DIR__ . '/show_started_courses_task_test.php');
 
 /**
  * Class containing unit tests for the hide ended courses task.
@@ -28,11 +30,12 @@ use core\tests\courses_tasks_testcase;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \core\task\hide_ended_courses_task
  */
-final class hide_ended_courses_task_test extends courses_tasks_testcase {
+class hide_ended_courses_task_test extends \core\task\show_started_courses_task_test {
+
     /**
      * Test hide_ended_courses cron task.
      *
-     * @dataProvider hide_end_courses_provider
+     * @dataProvider get_courses_provider
      * @covers ::execute
      *
      * @param int $nextweekvisible Number of courses with the end date set to next week to be created.
@@ -112,24 +115,5 @@ final class hide_ended_courses_task_test extends courses_tasks_testcase {
             $this->assertInstanceOf('\\core\\event\\course_ended', $event);
             $this->assertArrayHasKey($event->courseid, array_flip($expected));
         }
-    }
-
-    /**
-     * Data provider for test_hide_ended_courses.
-     *
-     * @return array
-     */
-    public static function hide_end_courses_provider(): array {
-        return array_map(
-            function ($args): array {
-                return [
-                    'nextweekvisible' => $args['lastweekcount'],
-                    'yesterdayvisible' => $args['yesterdaycount'],
-                    'tomorrowvisible' => $args['tomorrowcount'],
-                    'createhidden' => $args['createvisible'] ?? true,
-                ];
-            },
-            self::get_courses_provider()
-        );
     }
 }

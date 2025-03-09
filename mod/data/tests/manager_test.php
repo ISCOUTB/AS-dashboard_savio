@@ -30,7 +30,7 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \mod_data\manager
  */
-final class manager_test extends \advanced_testcase {
+class manager_test extends \advanced_testcase {
 
     /**
      * Test for static create methods.
@@ -482,7 +482,7 @@ final class manager_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function can_view_preset_provider(): array {
+    public function can_view_preset_provider(): array {
         return [
             // User presets.
             'Teacher owned preset without user id param' => [
@@ -737,35 +737,35 @@ final class manager_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function reset_template_provider(): array {
+    public function reset_template_provider(): array {
         return [
             // User presets.
             'listtemplate' => [
-                'templatetoreset' => 'listtemplate',
+                'templatename' => 'listtemplate',
                 'expected' => ['listtemplate', 'listtemplateheader', 'listtemplatefooter'],
             ],
             'singletemplate' => [
-                'templatetoreset' => 'singletemplate',
+                'templatename' => 'singletemplate',
                 'expected' => ['singletemplate'],
             ],
             'asearchtemplate' => [
-                'templatetoreset' => 'asearchtemplate',
+                'templatename' => 'asearchtemplate',
                 'expected' => ['asearchtemplate'],
             ],
             'addtemplate' => [
-                'templatetoreset' => 'addtemplate',
+                'templatename' => 'addtemplate',
                 'expected' => ['addtemplate'],
             ],
             'rsstemplate' => [
-                'templatetoreset' => 'rsstemplate',
+                'templatename' => 'rsstemplate',
                 'expected' => ['rsstemplate', 'rsstitletemplate'],
             ],
             'csstemplate' => [
-                'templatetoreset' => 'csstemplate',
+                'templatename' => 'csstemplate',
                 'expected' => ['csstemplate'],
             ],
             'jstemplate' => [
-                'templatetoreset' => 'jstemplate',
+                'templatename' => 'jstemplate',
                 'expected' => ['jstemplate'],
             ],
         ];

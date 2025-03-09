@@ -36,7 +36,7 @@ use question_engine;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \question_engine
  */
-final class question_engine_test extends advanced_testcase {
+class question_engine_test extends advanced_testcase {
 
     /**
      * Load required libraries.
@@ -89,7 +89,7 @@ final class question_engine_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function get_behaviour_unused_display_options_provider(): array {
+    public function get_behaviour_unused_display_options_provider(): array {
         return [
             'interactive' => [
                 'interactive',
@@ -127,7 +127,7 @@ final class question_engine_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function can_questions_finish_during_the_attempt_provider(): array {
+    public function can_questions_finish_during_the_attempt_provider(): array {
         return [
             ['deferredfeedback', false],
             ['interactive', true],
@@ -151,7 +151,7 @@ final class question_engine_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function sort_behaviours_provider(): array {
+    public function sort_behaviours_provider(): array {
         $in = [
             'b1' => 'Behave 1',
             'b2' => 'Behave 2',
@@ -209,12 +209,12 @@ final class question_engine_test extends advanced_testcase {
      * @dataProvider is_manual_grade_in_range_provider
      * @covers \question_engine::is_manual_grade_in_range
      * @param array $post The values to add to $_POST
-     * @param array $range The params to pass to is_manual_grade_in_range
+     * @param array $params The params to pass to is_manual_grade_in_range
      * @param bool $expected
      */
-    public function test_is_manual_grade_in_range(array $post, array $range, bool $expected): void {
+    public function test_is_manual_grade_in_range(array $post, array $params, bool $expected): void {
         $_POST[] = $post;
-        $this->assertEquals($expected, question_engine::is_manual_grade_in_range(...$range));
+        $this->assertEquals($expected, question_engine::is_manual_grade_in_range(...$params));
     }
 
     /**
@@ -222,7 +222,7 @@ final class question_engine_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function is_manual_grade_in_range_provider(): array {
+    public function is_manual_grade_in_range_provider(): array {
         return [
             'In range' => [
                 'post' => [
@@ -309,7 +309,7 @@ final class question_engine_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function render_question_number_provider(): array {
+    public function render_question_number_provider(): array {
         return [
             'Test with number is i character' => [
                 'i',

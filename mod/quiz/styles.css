@@ -150,14 +150,6 @@
     background: url([[pix:quiz|navflagged]]) no-repeat top right;
 }
 
-.qnbutton.flagged .thispageholder {
-    background: transparent url([[pix:quiz|flag-on]]) 15px 0 no-repeat;
-}
-
-.qnbutton.invalidanswer .trafficlight {
-    background-image: url([[pix:quiz|warningtriangle]]) !important; /* stylelint-disable-line declaration-no-important */
-}
-
 .path-mod-quiz .qnbutton.blocked,
 .path-mod-quiz .qnbutton.notyetanswered,
 .path-mod-quiz .qnbutton.requiresgrading,
@@ -743,7 +735,6 @@ table.quizreviewsummary td.cell {
 
 #page-mod-quiz-edit ul.slots li.section li.activity .activityinstance {
     display: flex;
-    flex-wrap: wrap;
     flex: 1 1 auto;
     min-height: 1.7em;
     padding-right: 2px;
@@ -813,8 +804,6 @@ table.quizreviewsummary td.cell {
     white-space: nowrap;
     background: #e6e6e6;
     padding: 0.1em 0;
-    display: flex;
-    align-items: baseline;
 }
 
 #page-mod-quiz-edit .mod_quiz_edit_forms {

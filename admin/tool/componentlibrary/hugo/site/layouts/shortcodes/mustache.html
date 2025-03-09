@@ -14,7 +14,7 @@
         <div class="nav nav-tabs" id="nav-tab" role="tablist">
             <a class="nav-item nav-link active"
                 id="nav-rendered{{- .Position.LineNumber -}}-tab"
-                data-bs-toggle="tab"
+                data-toggle="tab"
                 href="#nav-rendered{{- .Position.LineNumber -}}"
                 role="tab" aria-controls="nav-rendered{{- .Position.LineNumber -}}" aria-selected="true"
             >
@@ -22,14 +22,14 @@
             </a>
             <a class="nav-item nav-link"
                 id="nav-template{{- .Position.LineNumber -}}-tab"
-                data-bs-toggle="tab"
+                data-toggle="tab"
                 href="#nav-template{{- .Position.LineNumber -}}" role="tab" aria-controls="nav-template{{- .Position.LineNumber -}}" aria-selected="false"
             >
                 Template
             </a>
             <a class="nav-item nav-link"
                 id="nav-variables{{- .Position.LineNumber -}}-tab"
-                data-bs-toggle="tab"
+                data-toggle="tab"
                 href="#nav-variables{{- .Position.LineNumber -}}" role="tab" aria-controls="nav-variables{{- .Position.LineNumber -}}" aria-selected="false"
             >
                 Variables
@@ -41,7 +41,7 @@
             <div data-region="mustacherendered" class="{{ with .Get "class" }}{{ . }}{{ end }}">
                 <div class="d-flex justify-content-center my-5">
                     <div class="spinner-grow text-secondary" role="status">
-                        <span class="visually-hidden">Loading...</span>
+                        <span class="sr-only">Loading...</span>
                     </div>
                 </div>
             </div>

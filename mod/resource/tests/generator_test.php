@@ -25,7 +25,7 @@ namespace mod_resource;
  * @copyright 2013 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class generator_test extends \advanced_testcase {
+class generator_test extends \advanced_testcase {
 
     public function test_generator(): void {
         global $DB, $SITE;

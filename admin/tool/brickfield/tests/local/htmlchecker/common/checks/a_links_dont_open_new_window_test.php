@@ -31,7 +31,7 @@ require_once('all_checks.php');
 /**
  * Class a_links_dont_open_new_window_testcase
  */
-final class a_links_dont_open_new_window_test extends all_checks {
+class a_links_dont_open_new_window_test extends all_checks {
     /** @var string Check type */
     protected $checktype = 'a_links_dont_open_new_window';
 

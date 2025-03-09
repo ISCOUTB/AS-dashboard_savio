@@ -800,6 +800,7 @@ function quiz_update_open_attempts(array $conditions) {
     * Each database handles updates with inner joins differently:
     *  - mysql does not allow a FROM clause
     *  - postgres and mssql allow FROM but handle table aliases differently
+    *  - oracle requires a subquery
     *
     * Different code for each database.
     */
@@ -826,7 +827,15 @@ function quiz_update_open_attempts(array $conditions) {
                         JOIN ( $quizausersql ) quizauser ON quizauser.id = quiza.id
                        WHERE $attemptselect";
     } else {
-        throw new \core\exception\coding_exception("Unsupported database family: {$dbfamily}");
+        // oracle, sqlite and others
+        $updatesql = "UPDATE {quiz_attempts} quiza
+                         SET timecheckstate = (
+                           SELECT $timecheckstatesql
+                             FROM {quiz} quiz, ( $quizausersql ) quizauser
+                            WHERE quiz.id = quiza.quiz
+                              AND quizauser.id = quiza.id
+                         )
+                         WHERE $attemptselect";
     }
 
     $DB->execute($updatesql, $params);
@@ -1382,21 +1391,23 @@ function quiz_send_notification_messages($course, $quiz, $attempt, $context, $cm
     $a = new stdClass();
     // Course info.
     $a->courseid        = $course->id;
-    $a->coursename      = format_string($course->fullname, true, ['context' => $context]);
-    $a->courseshortname = format_string($course->shortname, true, ['context' => $context]);
+    $a->coursename      = $course->fullname;
+    $a->courseshortname = $course->shortname;
     // Quiz info.
-    $a->quizname        = format_string($quiz->name, true, ['context' => $context]);
+    $a->quizname        = $quiz->name;
     $a->quizreporturl   = $CFG->wwwroot . '/mod/quiz/report.php?id=' . $cm->id;
-    $a->quizreportlink  = '<a href="' . $a->quizreporturl . '">' . $a->quizname . ' report</a>';
+    $a->quizreportlink  = '<a href="' . $a->quizreporturl . '">' .
+            format_string($quiz->name) . ' report</a>';
     $a->quizurl         = $CFG->wwwroot . '/mod/quiz/view.php?id=' . $cm->id;
-    $a->quizlink        = '<a href="' . $a->quizurl . '">' . $a->quizname . '</a>';
+    $a->quizlink        = '<a href="' . $a->quizurl . '">' . format_string($quiz->name) . '</a>';
     $a->quizid          = $quiz->id;
     $a->quizcmid        = $cm->id;
     // Attempt info.
     $a->submissiontime  = userdate($attempt->timefinish);
     $a->timetaken       = format_time($attempt->timefinish - $attempt->timestart);
     $a->quizreviewurl   = $CFG->wwwroot . '/mod/quiz/review.php?attempt=' . $attempt->id;
-    $a->quizreviewlink  = '<a href="' . $a->quizreviewurl . '">' . $a->quizname . ' review</a>';
+    $a->quizreviewlink  = '<a href="' . $a->quizreviewurl . '">' .
+            format_string($quiz->name) . ' review</a>';
     $a->attemptid       = $attempt->id;
     // Student who sat the quiz info.
     $a->studentidnumber = $submitter->idnumber;
@@ -1626,11 +1637,10 @@ function quiz_get_js_module() {
  * @param bool $showidnumber If true, show the question's idnumber, if any. False by default.
  * @param core_tag_tag[]|bool $showtags if array passed, show those tags. Else, if true, get and show tags,
  *       else, don't show tags (which is the default).
- * @param bool $displaytaglink Indicates whether the tag should be displayed as a link.
  * @return string HTML fragment.
  */
 function quiz_question_tostring($question, $showicon = false, $showquestiontext = true,
-        $showidnumber = false, $showtags = false, $displaytaglink = true) {
+        $showidnumber = false, $showtags = false) {
     global $OUTPUT;
     $result = '';
 
@@ -1657,7 +1667,7 @@ function quiz_question_tostring($question, $showicon = false, $showquestiontext 
         $tags = [];
     }
     if ($tags) {
-        $result .= $OUTPUT->tag_list($tags, null, 'd-inline', 0, null, true, $displaytaglink);
+        $result .= $OUTPUT->tag_list($tags, null, 'd-inline', 0, null, true);
     }
 
     // Question text.

@@ -100,26 +100,6 @@ class behat_general extends behat_base {
     }
 
     /**
-     * Checks, that current page PATH matches regular expression
-     *
-     * Example: Then the url should match "/course/index\.php"
-     * Example: Then the url should match "/mod/forum/view\.php\?id=[0-9]+"
-     * Example: And the url should match "^http://moodle\.org"
-     *
-     * @Then /^the url should match (?P<pattern>"(?:[^"]|\\")*")$/
-     * @param string $pattern The pattern that must match to the current url.
-     */
-    public function the_url_should_match($pattern) {
-        $url = $this->getSession()->getCurrentUrl();
-
-        if (preg_match($pattern, $url) === 1) {
-            return;
-        }
-
-        throw new ExpectationException(sprintf('The url "%s" should match with %s', $url, $pattern), $this->getSession());
-    }
-
-    /**
      * Reloads the current page.
      *
      * @Given /^I reload the page$/
@@ -997,12 +977,13 @@ class behat_general extends behat_base {
         [$preselector, $prelocator] = $this->transform_selector($preselectortype, $preelement);
         [$postselector, $postlocator] = $this->transform_selector($postselectortype, $postelement);
 
-        $prexpath = $this->prepare_xpath_for_javascript(
-            $this->find($preselector, $prelocator, false, $containernode)->getXpath()
-        );
-        $postxpath = $this->prepare_xpath_for_javascript(
-            $this->find($postselector, $postlocator, false, $containernode)->getXpath()
-        );
+        $newlines = [
+            "\r\n",
+            "\r",
+            "\n",
+        ];
+        $prexpath = str_replace($newlines, ' ', $this->find($preselector, $prelocator, false, $containernode)->getXpath());
+        $postxpath = str_replace($newlines, ' ', $this->find($postselector, $postlocator, false, $containernode)->getXpath());
 
         if ($this->running_javascript()) {
             // The xpath to do this was running really slowly on certain Chrome versions so we are using
@@ -2156,7 +2137,7 @@ EOF;
     }
 
     /**
-     * Checks if database family used is using one of the specified, else skip. (mysql, postgres, mssql, etc.)
+     * Checks if database family used is using one of the specified, else skip. (mysql, postgres, mssql, oracle, etc.)
      *
      * @Given /^database family used is one of the following:$/
      * @param TableNode $databasefamilies list of database.
@@ -2448,7 +2429,7 @@ EOF;
         }
 
         // Make the provided editor the default one in $CFG->texteditors by
-        // moving it to the first [editor],tiny,textarea on the list.
+        // moving it to the first [editor],atto,tiny,textarea on the list.
         $list = explode(',', $CFG->texteditors);
         array_unshift($list, $editor);
         $list = array_unique($list);
@@ -2668,7 +2649,7 @@ EOF;
      * Good for clicking links on tables where links have repeated text in diiferent rows.
      *
      * Example:
-     * - I click on the "Settings" link in the row containing "Text editor placement"
+     * - I click on the "Settings" link in the row containing "HTML Text Editor Placement"
      *
      * @Given /^I click on the "(?P<linktext>(?:[^"]|\\")*)" link in the table row containing "(?P<rowtext>(?:[^"]|\\")*)"$/
      * @param string $linktext
@@ -2726,35 +2707,5 @@ EOF;
         if (strpos($row->getText(), $text) !== false) {
             throw new Exception("Text '{$text}' found in the row containing '{$rowtext}'");
         }
-    }
-
-    /**
-     * Sets the current time for the remainder of this Behat test.
-     *
-     * This is not supported everywhere in Moodle: if code uses \core\clock through DI then
-     * it will work, but if it just calls time() it will still get the real time.
-     *
-     * @Given the time is frozen at :datetime
-     * @param string $datetime Date and time in a format that strtotime understands
-     */
-    public function the_time_is_frozen_at(string $datetime): void {
-        global $CFG;
-        require_once($CFG->libdir . '/testing/classes/frozen_clock.php');
-
-        $timestamp = strtotime($datetime);
-        // The config variable is used to set up a frozen clock in each Behat web request.
-        set_config('behat_frozen_clock', $timestamp);
-        // Simply setting a frozen clock in DI should work for future steps in Behat CLI process.
-        \core\di::set(\core\clock::class, new \frozen_clock($timestamp));
-    }
-
-    /**
-     * Stops freezing time so that it goes back to real time.
-     *
-     * @Given the time is no longer frozen
-     */
-    public function the_time_is_no_longer_frozen(): void {
-        unset_config('behat_frozen_clock');
-        \core\di::set(\core\clock::class, new \core\system_clock());
     }
 }

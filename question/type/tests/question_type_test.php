@@ -33,7 +33,7 @@ require_once($CFG->dirroot . '/question/type/questiontypebase.php');
  *
  * @covers \question_type
  */
-final class question_type_test extends \advanced_testcase {
+class question_type_test extends \advanced_testcase {
     public function test_save_question_name(): void {
         $this->resetAfterTest();
 

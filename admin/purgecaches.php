@@ -42,11 +42,7 @@ if ($data = $form->get_data()) {
         purge_caches();
         $message = get_string('purgecachesfinished', 'admin');
     } else {
-        // When passing selected options, ensure each is cast to boolean for strict comparison.
-        purge_caches(array_map(
-            fn($option) => (bool) $option,
-            $data->purgeselectedoptions,
-        ));
+        purge_caches($data->purgeselectedoptions);
         $message = get_string('purgeselectedcachesfinished', 'admin');
     }
 

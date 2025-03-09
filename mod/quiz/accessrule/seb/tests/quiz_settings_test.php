@@ -31,7 +31,7 @@ require_once(__DIR__ . '/test_helper_trait.php');
  * @copyright 2020 Catalyst IT
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class quiz_settings_test extends \advanced_testcase {
+class quiz_settings_test extends \advanced_testcase {
     use \quizaccess_seb_test_helper_trait;
 
     /** @var context_module $context Test context. */
@@ -499,7 +499,7 @@ final class quiz_settings_test extends \advanced_testcase {
         $this->save_settings_with_optional_template($quizsettings, settings_provider::USE_SEB_TEMPLATE, $templateid);
 
         // Case for USE_SEB_UPLOAD_CONFIG, ensure template id reverts to 0.
-        $xml = file_get_contents(self::get_fixture_path(__NAMESPACE__, 'unencrypted.seb'));
+        $xml = file_get_contents(__DIR__ . '/fixtures/unencrypted.seb');
         $this->create_module_test_file($xml, $this->quiz->cmid);
         $this->save_settings_with_optional_template($quizsettings, settings_provider::USE_SEB_UPLOAD_CONFIG);
         $quizsettings = seb_quiz_settings::get_record(['quizid' => $this->quiz->id]);
@@ -531,7 +531,7 @@ final class quiz_settings_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function bad_browser_exam_key_provider(): array {
+    public function bad_browser_exam_key_provider(): array {
         return [
             'Short string' => ['fdsf434r',
                     'A key should be a 64-character hex string.'],
@@ -547,7 +547,7 @@ final class quiz_settings_test extends \advanced_testcase {
      *
      * @return array Test data.
      */
-    public static function filter_rules_provider(): array {
+    public function filter_rules_provider(): array {
         return [
             'enabled simple expessions' => [
                 (object) [
@@ -709,7 +709,7 @@ final class quiz_settings_test extends \advanced_testcase {
         $this->assertNull($quizsettings->get_config());
 
         $quizsettings->set('requiresafeexambrowser', settings_provider::USE_SEB_UPLOAD_CONFIG);
-        $xml = file_get_contents(self::get_fixture_path(__NAMESPACE__, 'unencrypted.seb'));
+        $xml = file_get_contents(__DIR__ . '/fixtures/unencrypted.seb');
         $this->create_module_test_file($xml, $this->quiz->cmid);
         $quizsettings->save();
         $quizsettings = seb_quiz_settings::get_record(['quizid' => $this->quiz->id]);

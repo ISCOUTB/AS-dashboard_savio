@@ -26,13 +26,13 @@ use tool_moodlenet\local\url;
  * @copyright  2020 Jake Dallimore <jrhdallimore@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class url_test extends \advanced_testcase {
+class url_test extends \advanced_testcase {
 
     /**
      * Test the parsing to host + path components.
      *
      * @dataProvider url_provider
-     * @param string $url The full URL string
+     * @param string $urlstring The full URL string
      * @param string $host the expected host component of the URL.
      * @param string $path the expected path component of the URL.
      * @param bool $exception whether or not an exception is expected during construction.
@@ -55,40 +55,40 @@ final class url_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function url_provider(): array {
+    public function url_provider() {
         return [
             'No path' => [
-                'urlstring' => 'https://example.moodle.net',
+                'url' => 'https://example.moodle.net',
                 'host' => 'example.moodle.net',
                 'path' => null,
                 'exception' => false,
             ],
             'Slash path' => [
-                'urlstring' => 'https://example.moodle.net/',
+                'url' => 'https://example.moodle.net/',
                 'host' => 'example.moodle.net',
                 'path' => '/',
                 'exception' => false,
             ],
             'Path includes file and extension' => [
-                'urlstring' => 'https://example.moodle.net/uploads/123456789/pic.png',
+                'url' => 'https://example.moodle.net/uploads/123456789/pic.png',
                 'host' => 'example.moodle.net',
                 'path' => '/uploads/123456789/pic.png',
                 'exception' => false,
             ],
             'Path includes file, extension and params' => [
-                'urlstring' => 'https://example.moodle.net/uploads/123456789/pic.png?option=1&option2=test',
+                'url' => 'https://example.moodle.net/uploads/123456789/pic.png?option=1&option2=test',
                 'host' => 'example.moodle.net',
                 'path' => '/uploads/123456789/pic.png',
                 'exception' => false,
             ],
             'Malformed - invalid' => [
-                'urlstring' => 'invalid',
+                'url' => 'invalid',
                 'host' => null,
                 'path' => null,
                 'exception' => true,
             ],
             'Direct, non-encoded utf8 - invalid' => [
-                'urlstring' => 'http://москва.рф/services/',
+                'url' => 'http://москва.рф/services/',
                 'host' => 'москва.рф',
                 'path' => '/services/',
                 'exception' => true,

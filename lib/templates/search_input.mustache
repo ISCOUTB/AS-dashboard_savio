@@ -51,6 +51,9 @@
         <input type="hidden" name="{{ name }}" value="{{ value }}">
     {{/hiddenfields}}
     <div class="input-group">
+        <label for="searchinput-{{uniqid}}">
+            <span class="sr-only">{{{ searchstring }}}</span>
+        </label>
         <input type="text"
            id="searchinput-{{uniqid}}"
            class="form-control"
@@ -61,16 +64,15 @@
            autocomplete="off"
            value="{{ query }}"
         >
-        <label for="searchinput-{{uniqid}}">
-            <span class="visually-hidden">{{{ searchstring }}}</span>
-        </label>
-        <button type="submit"
-            class="btn {{^btnclass}}btn-submit{{/btnclass}} {{ btnclass }} search-icon"
-            {{#buttonattributes}}{{ key }}="{{ value }}" {{/buttonattributes}}
-        >
-            {{#pix}} a/search, core {{/pix}}
-            <span class="visually-hidden">{{ searchstring }}</span>
-        </button>
+        <div class="input-group-append">
+            <button type="submit"
+                class="btn {{^btnclass}}btn-submit{{/btnclass}} {{ btnclass }} search-icon"
+                {{#buttonattributes}}{{ key }}="{{ value }}" {{/buttonattributes}}
+            >
+                {{#pix}} a/search, core {{/pix}}
+                <span class="sr-only">{{ searchstring }}</span>
+            </button>
+        </div>
 
     </div>
     {{#otherfields}}

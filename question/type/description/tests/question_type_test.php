@@ -35,7 +35,7 @@ require_once($CFG->dirroot . '/question/type/description/edit_description_form.p
  * @copyright  2013 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class question_type_test extends \advanced_testcase {
+class question_type_test extends \advanced_testcase {
     protected $qtype;
 
     protected function setUp(): void {

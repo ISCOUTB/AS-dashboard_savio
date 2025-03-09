@@ -33,8 +33,8 @@ use html_writer;
 use section_info;
 use context_course;
 use editsection_form;
-use core\exception\moodle_exception;
-use core\exception\coding_exception;
+use moodle_exception;
+use coding_exception;
 use moodle_url;
 use lang_string;
 use core_external\external_api;
@@ -284,20 +284,6 @@ abstract class base {
     }
 
     /**
-     * Prune a course state cache for all open sessions.
-     *
-     * Most course edits does not require to invalidate the cache for all users
-     * because the cache relies on the course cacherev value. However, there are
-     * actions like editing the groups that do not change the course cacherev.
-     *
-     * @param \stdClass $course
-     * @return void
-     */
-    public static function invalidate_all_session_caches_for_course(stdClass $course): void {
-        \cache_helper::invalidate_by_event('changesincoursestate', [$course->id]);
-    }
-
-    /**
      * Returns the format name used by this course
      *
      * @return string
@@ -385,37 +371,6 @@ abstract class base {
             $this->modinfo = course_modinfo::instance($this->courseid, $USER->id);
         }
         return $this->modinfo;
-    }
-
-    /**
-     * Return a format state updates instance.
-     */
-    public function get_stateupdates_instance(): \core_courseformat\stateupdates {
-        $defaultupdatesclass = 'core_courseformat\\stateupdates';
-        $updatesclass = 'format_' . $this->format . '\\courseformat\\stateupdates';
-        if (!class_exists($updatesclass)) {
-            $updatesclass = $defaultupdatesclass;
-        }
-
-        $updates = new $updatesclass($this);
-        if (!is_a($updates, $defaultupdatesclass)) {
-            throw new coding_exception("The \"$updatesclass\" class must extend \"$defaultupdatesclass\"");
-        }
-
-        return $updates;
-    }
-
-    /**
-     * Return a format state actions instance.
-     * @return \core_courseformat\stateactions
-     */
-    public function get_stateactions_instance(): \core_courseformat\stateactions {
-        // Get the actions class from the course format.
-        $actionsclass = 'format_'. $this->format.'\\courseformat\\stateactions';
-        if (!class_exists($actionsclass)) {
-            $actionsclass = 'core_courseformat\\stateactions';
-        }
-        return new $actionsclass();
     }
 
     /**
@@ -597,18 +552,6 @@ abstract class base {
     }
 
     /**
-     * Returns the generic name for sections in this course format.
-     *
-     * @return string
-     */
-    public function get_generic_section_name() {
-        if (get_string_manager()->string_exists('sectionname', 'format_' . $this->format)) {
-            return get_string('sectionname', 'format_' . $this->format);
-        }
-        return get_string('section');
-    }
-
-    /**
      * Returns the name for the highlighted section.
      *
      * @return string The name for the highlighted section based on the given course format.
@@ -655,16 +598,26 @@ abstract class base {
     }
 
     /**
+     * Set if the current format instance will show multiple sections or an individual one.
+     *
+     * Some formats has the hability to swith from one section to multiple sections per page.
+     *
+     * @param int $singlesection zero for all sections or a section number
      * @deprecated Since 4.4. Use set_sectionnum instead.
+     * @todo MDL-80116 This will be deleted in Moodle 4.8.
      */
-    #[\core\attribute\deprecated(
-        replacement: 'base::set_sectionnum',
-        since: '5.0',
-        mdl: 'MDL-80248',
-        final: true,
-    )]
-    public function set_section_number(): void {
-        \core\deprecation::emit_deprecation_if_present([self::class, __FUNCTION__]);
+    public function set_section_number(int $singlesection): void {
+
+        debugging(
+            'The method core_courseformat\base::set_section_number() has been deprecated, please use set_sectionnum() instead.',
+            DEBUG_DEVELOPER
+        );
+
+        if ($singlesection === 0) {
+            // Convert zero to null, to guarantee all the sections are displayed.
+            $singlesection = null;
+        }
+        $this->set_sectionnum($singlesection);
     }
 
     /**
@@ -703,16 +656,29 @@ abstract class base {
     }
 
     /**
+     * Set if the current format instance will show multiple sections or an individual one.
+     *
+     * Some formats has the hability to swith from one section to multiple sections per page,
+     * output components will use this method to know if the current display is a single or
+     * multiple sections.
+     *
+     * @return int zero for all sections or the sectin number
      * @deprecated Since 4.4. Use get_sectionnum instead.
+     * @todo MDL-80116 This will be deleted in Moodle 4.8.
      */
-    #[\core\attribute\deprecated(
-        replacement: 'base::get_sectionnum',
-        since: '5.0',
-        mdl: 'MDL-80248',
-        final: true,
-    )]
-    public function get_section_number(): void {
-        \core\deprecation::emit_deprecation_if_present([self::class, __FUNCTION__]);
+    public function get_section_number(): int {
+
+        debugging(
+            'The method core_courseformat\base::get_section_number() has been deprecated, please use get_sectionnum() instead.',
+            DEBUG_DEVELOPER
+        );
+
+        if ($this->singlesection === null) {
+            // Convert null to zero, to guarantee all the sections are displayed.
+            return 0;
+        }
+
+        return $this->singlesection;
     }
 
     /**
@@ -894,7 +860,7 @@ abstract class base {
      * of the view script, it is not enough to change just this function. Do not forget
      * to add proper redirection.
      *
-     * @param int|stdClass|section_info|null $section Section object from database or just field course_sections.section
+     * @param int|stdClass|section_info $section Section object from database or just field course_sections.section
      *     if null the course view page is returned
      * @param array $options options for view URL. At the moment core uses:
      *     'navigation' (bool) if true and section not empty, the function returns section page; otherwise, it returns course page.
@@ -934,87 +900,36 @@ abstract class base {
     }
 
     /**
-     * The URL to update the course format.
-     *
-     * If no section is specified, the update will redirect to the general course page.
-     *
-     * @param string $action action name the reactive action
-     * @param array $ids list of ids to update
-     * @param int|null $targetsectionid optional target section id
-     * @param int|null $targetcmid optional target cm id
-     * @param moodle_url|null $returnurl optional custom return url
-     * @return moodle_url
-     */
-    public function get_update_url(
-        string $action,
-        array $ids = [],
-        ?int $targetsectionid = null,
-        ?int $targetcmid = null,
-        ?moodle_url $returnurl = null
-    ): moodle_url {
-        $params = [
-            'courseid' => $this->get_courseid(),
-            'sesskey' => sesskey(),
-            'action' => $action,
-        ];
-
-        if (count($ids) === 1) {
-            $params['id'] = reset($ids);
-        } else {
-            foreach ($ids as $key => $id) {
-                $params["ids[]"] = $id;
-            }
-        }
-
-        if ($targetsectionid) {
-            $params['sectionid'] = $targetsectionid;
-        }
-        if ($targetcmid) {
-            $params['cmid'] = $targetcmid;
-        }
-        if ($returnurl) {
-            $params['returnurl'] = $returnurl->out_as_local_url();
-        }
-        return new moodle_url('/course/format/update.php', $params);
-    }
-
-    /**
      * Return the old non-ajax activity action url.
      *
      * BrowserKit behats tests cannot trigger javascript events,
      * so we must translate to an old non-ajax url while non-ajax
      * course editing is still supported.
      *
-     * @deprecated since Moodle 5.0
-     * @todo Remove this method in Moodle 6.0 (MDL-83530).
-     *
      * @param string $action action name the reactive action
      * @param cm_info $cm course module
      * @return moodle_url
      */
-    #[\core\attribute\deprecated(
-        replacement: 'core_courseformat\base::get_update_url',
-        since: '5.0',
-        mdl: 'MDL-82767',
-    )]
     public function get_non_ajax_cm_action_url(string $action, cm_info $cm): moodle_url {
         $nonajaxactions = [
-            'cmDelete' => 'cm_delete',
-            'cmDuplicate' => 'cm_duplicate',
-            'cmHide' => 'cm_hide',
-            'cmShow' => 'cm_show',
-            'cmStealth' => 'cm_stealth',
+            'cmDelete' => 'delete',
+            'cmDuplicate' => 'duplicate',
+            'cmHide' => 'hide',
+            'cmShow' => 'show',
+            'cmStealth' => 'stealth',
         ];
         if (!isset($nonajaxactions[$action])) {
             throw new coding_exception('Unknown activity action: ' . $action);
         }
-        \core\deprecation::emit_deprecation_if_present([$this, __FUNCTION__]);
         $nonajaxaction = $nonajaxactions[$action];
-        return $this->get_update_url(
-            action: $nonajaxaction,
-            ids: [$cm->id],
-            returnurl: $this->get_view_url($this->get_sectionnum(), ['navigation' => true]),
+        $nonajaxurl = new moodle_url(
+            '/course/mod.php',
+            ['sesskey' => sesskey(), $nonajaxaction => $cm->id]
         );
+        if (!is_null($this->get_sectionid())) {
+            $nonajaxurl->param('sr', $this->get_sectionnum());
+        }
+        return $nonajaxurl;
     }
 
     /**
@@ -2183,12 +2098,6 @@ abstract class base {
         if (array_key_exists($originalsection->section, $modinfo->sections)) {
             foreach ($modinfo->sections[$originalsection->section] as $modnumber) {
                 $originalcm = $modinfo->cms[$modnumber];
-                // We don't want to duplicate any modules with the FEATURE_CAN_DISPLAY set to false.
-                // These mod types are always in section 0 so safe to say we are currently duplicating that section,
-                // and we don't want to inadvertantly duplicate mods we can't see.
-                if (!$originalcm->is_of_type_that_can_display()) {
-                    continue;
-                }
                 if (!$originalcm->deletioninprogress) {
                     duplicate_module($course, $originalcm, $newsection->id, false);
                 }

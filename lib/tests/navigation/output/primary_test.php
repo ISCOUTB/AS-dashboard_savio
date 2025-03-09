@@ -26,7 +26,7 @@ use ReflectionMethod;
  * @copyright   2021 onwards Peter Dias
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class primary_test extends \advanced_testcase {
+class primary_test extends \advanced_testcase {
     /**
      * Basic setup to make sure the nav objects gets generated without any issues.
      */
@@ -114,7 +114,7 @@ final class primary_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function primary_export_provider(): array {
+    public function primary_export_provider(): array {
         return [
             "Export the menu data when: custom menu exists; multiple langs installed; user is not logged in." => [
                 true, true, '', ['mobileprimarynav', 'moremenu', 'lang', 'user']
@@ -190,7 +190,7 @@ final class primary_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function custom_menu_provider(): array {
+    public function custom_menu_provider(): array {
         return [
             'Simple custom menu' => [
                 "Course search|/course/search.php

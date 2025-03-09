@@ -30,6 +30,9 @@
  * @return bool result
  */
 function xmldb_tiny_premium_upgrade($oldversion) {
+    // Automatically generated Moodle v4.1.0 release upgrade line.
+    // Put any upgrade step following this.
+
     // Automatically generated Moodle v4.2.0 release upgrade line.
     // Put any upgrade step following this.
 
@@ -47,9 +50,6 @@ function xmldb_tiny_premium_upgrade($oldversion) {
 
         upgrade_plugin_savepoint(true, 2024042201, 'tiny', 'premium');
     }
-
-    // Automatically generated Moodle v4.5.0 release upgrade line.
-    // Put any upgrade step following this.
 
     return true;
 }

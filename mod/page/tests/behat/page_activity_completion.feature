@@ -18,7 +18,7 @@ Feature: View activity completion information in the Page resource
       | student1 | C1 | student        |
       | teacher1 | C1 | editingteacher |
 
-  Scenario: A teacher can view a page resource automatic completion items
+  Scenario: View automatic completion items as teacher
     Given the following "activity" exists:
       | activity       | page                     |
       | course         | C1                       |
@@ -30,7 +30,7 @@ Feature: View activity completion information in the Page resource
     When I am on the "Music history" "page activity" page logged in as teacher1
     Then "Music history" should have the "View" completion condition
 
-  Scenario: A student can complete a page resource by viewing it
+  Scenario: View automatic completion items as student
     Given the following "activity" exists:
       | activity       | page                     |
       | course         | C1                       |
@@ -43,7 +43,7 @@ Feature: View activity completion information in the Page resource
     Then the "View" completion condition of "Music history" is displayed as "done"
 
   @javascript
-  Scenario: A teacher cannot manually mark the page activity as done
+  Scenario: Use manual completion as teacher
     Given the following "activity" exists:
       | activity   | page                     |
       | course     | C1                       |
@@ -56,7 +56,7 @@ Feature: View activity completion information in the Page resource
     Then the manual completion button for "Music history" should be disabled
 
   @javascript
-  Scenario: A student can manually mark the page activity as done
+  Scenario: Use manual completion as student
     Given the following "activity" exists:
       | activity   | page                     |
       | course     | C1                       |

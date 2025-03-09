@@ -1589,16 +1589,32 @@ class graph {
           ImageArc($this->image, $u, $v, $size, $size, 0, 360, $this->colour[$colour]);
           break;
         case 'diamond':
-          ImageFilledPolygon($this->image, [$u, $v - $half, $u + $half, $v, $u, $v + $half, $u - $half, $v], $this->colour[$colour]);
+          if (version_compare(PHP_VERSION, '8.0.0', '>=')) {
+            ImageFilledPolygon($this->image, array($u, $v - $half, $u + $half, $v, $u, $v + $half, $u - $half, $v), $this->colour[$colour]);
+          } else {
+            ImageFilledPolygon($this->image, array($u, $v - $half, $u + $half, $v, $u, $v + $half, $u - $half, $v), 4, $this->colour[$colour]);
+          }
           break;
         case 'diamond-open':
-          ImagePolygon($this->image, [$u, $v - $half, $u + $half, $v, $u, $v + $half, $u - $half, $v], $this->colour[$colour]);
+          if (version_compare(PHP_VERSION, '8.0.0', '>=')) {
+            ImagePolygon($this->image, array($u, $v - $half, $u + $half, $v, $u, $v + $half, $u - $half, $v), $this->colour[$colour]);
+          } else {
+            ImagePolygon($this->image, array($u, $v - $half, $u + $half, $v, $u, $v + $half, $u - $half, $v), 4, $this->colour[$colour]);
+          }
           break;
         case 'triangle':
-          ImageFilledPolygon($this->image, [$u, $v - $half, $u + $half, $v + $half, $u - $half, $v + $half], $this->colour[$colour]);
+          if (version_compare(PHP_VERSION, '8.0.0', '>=')) {
+            ImageFilledPolygon($this->image, array($u, $v - $half, $u + $half, $v + $half, $u - $half, $v + $half), $this->colour[$colour]);
+          } else {
+            ImageFilledPolygon($this->image, array($u, $v - $half, $u + $half, $v + $half, $u - $half, $v + $half), 3, $this->colour[$colour]);
+          }
           break;
         case 'triangle-open':
-          ImagePolygon($this->image, [$u, $v - $half, $u + $half, $v + $half, $u - $half, $v + $half], $this->colour[$colour]);
+          if (version_compare(PHP_VERSION, '8.0.0', '>=')) {
+            ImagePolygon($this->image, array($u, $v - $half, $u + $half, $v + $half, $u - $half, $v + $half), $this->colour[$colour]);
+          } else {
+            ImagePolygon($this->image, array($u, $v - $half, $u + $half, $v + $half, $u - $half, $v + $half), 3, $this->colour[$colour]);
+          }
           break;
         case 'dot':
           ImageSetPixel($this->image, $u, $v, $this->colour[$colour]);
@@ -1692,8 +1708,13 @@ class graph {
         switch ($type) {
           case 'fill':
             // draw it this way 'cos the FilledPolygon routine seems a bit buggy.
-            ImageFilledPolygon($this->image, [$u_start, $v_start, $u_end, $v_end, $u_end, $zero, $u_start, $zero], $this->colour[$colour]);
-            ImagePolygon($this->image, [$u_start, $v_start, $u_end, $v_end, $u_end, $zero, $u_start, $zero], $this->colour[$colour]);
+            if (version_compare(PHP_VERSION, '8.0.0', '>=')) {
+              ImageFilledPolygon($this->image, array($u_start, $v_start, $u_end, $v_end, $u_end, $zero, $u_start, $zero), $this->colour[$colour]);
+              ImagePolygon($this->image, array($u_start, $v_start, $u_end, $v_end, $u_end, $zero, $u_start, $zero), $this->colour[$colour]);
+            } else {
+              ImageFilledPolygon($this->image, array($u_start, $v_start, $u_end, $v_end, $u_end, $zero, $u_start, $zero), 4, $this->colour[$colour]);
+              ImagePolygon($this->image, array($u_start, $v_start, $u_end, $v_end, $u_end, $zero, $u_start, $zero), 4, $this->colour[$colour]);
+            }
             break;
           case 'open':
             ImageLine($this->image, $u_start, $v_start, $u_end, $v_end, $this->colour[$colour]);
@@ -1712,10 +1733,18 @@ class graph {
         if ($this->parameter['inner_border'] != 'none') $bottom -= 1; // 1 pixel above bottom if border is to be drawn.
         switch ($type) {
           case 'fill':
-            ImageFilledPolygon($this->image, [$u_start, $v_start, $u_end, $v_end, $u_end, $bottom, $u_start, $bottom], $this->colour[$colour]);
+          if (version_compare(PHP_VERSION, '8.0.0', '>=')) {
+              ImageFilledPolygon($this->image, array($u_start, $v_start, $u_end, $v_end, $u_end, $bottom, $u_start, $bottom), $this->colour[$colour]);
+            } else {
+              ImageFilledPolygon($this->image, array($u_start, $v_start, $u_end, $v_end, $u_end, $bottom, $u_start, $bottom), 4, $this->colour[$colour]);
+            }
            break;
-          case 'open':
-            ImagePolygon($this->image, [$u_start, $v_start, $u_end, $v_end, $u_end, $bottom, $u_start, $bottom], $this->colour[$colour]);
+            case 'open':
+            if (version_compare(PHP_VERSION, '8.0.0', '>=')) {
+              ImagePolygon($this->image, array($u_start, $v_start, $u_end, $v_end, $u_end, $bottom, $u_start, $bottom), $this->colour[$colour]);
+            } else {
+              ImagePolygon($this->image, array($u_start, $v_start, $u_end, $v_end, $u_end, $bottom, $u_start, $bottom), 4, $this->colour[$colour]);
+            }
             break;
         }
       }
@@ -1802,28 +1831,38 @@ class graph {
           ImageFilledRectangle($this->image, $x-$half, $y, $x+$half, $y+1, $this->colour[$colour]);
           break;
         case 'slash':
-          ImageFilledPolygon(
-            $this->image,
-            [
+          if (version_compare(PHP_VERSION, '8.0.0', '>=')) {
+            ImageFilledPolygon($this->image, array(
               $x + $half, $y - $half,
               $x + $half + 1, $y - $half,
               $x - $half + 1, $y + $half,
-              $x - $half, $y + $half,
-            ],
-            $this->colour[$colour]
-          );
+              $x - $half, $y + $half
+            ), $this->colour[$colour]);
+          } else {
+            ImageFilledPolygon($this->image, array(
+              $x + $half, $y - $half,
+              $x + $half + 1, $y - $half,
+              $x - $half + 1, $y + $half,
+              $x - $half, $y + $half
+            ), 4, $this->colour[$colour]);
+          }
           break;
         case 'backslash':
-          ImageFilledPolygon(
-            $this->image,
-            [
+          if (version_compare(PHP_VERSION, '8.0.0', '>=')) {
+            ImageFilledPolygon($this->image, array(
               $x - $half, $y - $half,
               $x - $half + 1, $y - $half,
               $x + $half + 1, $y + $half,
-              $x + $half, $y + $half,
-            ],
-            $this->colour[$colour]
-          );
+              $x + $half, $y + $half
+            ), $this->colour[$colour]);
+          } else {
+            ImageFilledPolygon($this->image, array(
+              $x - $half, $y-$half,
+              $x - $half + 1, $y - $half,
+              $x + $half + 1, $y + $half,
+              $x + $half, $y + $half
+            ), 4, $this->colour[$colour]);
+          }
           break;
         default:
           @eval($type); // user can create own brush script.

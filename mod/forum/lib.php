@@ -371,8 +371,6 @@ function forum_supports($feature) {
         case FEATURE_PLAGIARISM:              return true;
         case FEATURE_ADVANCED_GRADING:        return true;
         case FEATURE_MOD_PURPOSE:             return MOD_PURPOSE_COLLABORATION;
-        case FEATURE_CAN_UNINSTALL:
-            return false;
 
         default: return null;
     }
@@ -1704,9 +1702,6 @@ function forum_get_discussions($cm, $forumsort="", $fullpost=true, $unused=-1, $
     if (empty($forumsort)) {
         $forumsort = forum_get_default_sort_order();
     }
-    if (!str_contains($forumsort, 'id')) {
-        $forumsort .= ', d.id DESC';
-    }
     if (empty($fullpost)) {
         $postdata = "p.id, p.subject, p.modified, p.discussion, p.userid, p.created";
     } else {
@@ -1742,7 +1737,7 @@ function forum_get_discussions($cm, $forumsort="", $fullpost=true, $unused=-1, $
                    $umtable
              WHERE d.forum = ? AND p.parent = 0
                    $timelimit $groupselect $updatedsincesql
-          ORDER BY $forumsort";
+          ORDER BY $forumsort, d.id DESC";
 
     return $DB->get_records_sql($sql, $params, $limitfrom, $limitnum);
 }
@@ -2150,7 +2145,7 @@ function forum_get_course_forum($courseid, $type) {
         echo $OUTPUT->notification("Could not add a new course module to the course '" . $courseid . "'");
         return false;
     }
-    $sectionid = course_add_cm_to_section($courseid, $mod->coursemodule, 0, null, 'forum');
+    $sectionid = course_add_cm_to_section($courseid, $mod->coursemodule, 0);
     return $DB->get_record("forum", array("id" => "$forum->id"));
 }
 
@@ -2586,14 +2581,7 @@ function forum_print_attachments($post, $cm, $type) {
         foreach ($files as $file) {
             $filename = $file->get_filename();
             $mimetype = $file->get_mimetype();
-            $iconimage = $OUTPUT->pix_icon(file_file_icon($file),
-                    get_mimetype_description($file),
-                    'moodle',
-                    [
-                            'class' => 'icon',
-                            'style' => 'max-width: 24px; max-height: 24px; vertical-align: middle;',
-                    ]
-            );
+            $iconimage = $OUTPUT->pix_icon(file_file_icon($file), get_mimetype_description($file), 'moodle', array('class' => 'icon'));
             $path = file_encode_url($CFG->wwwroot.'/pluginfile.php', '/'.$context->id.'/mod_forum/attachment/'.$post->id.'/'.$filename);
 
             if ($type == 'html') {
@@ -4836,7 +4824,7 @@ function forum_discussion_update_last_post($discussionid) {
     $sql = "SELECT id, userid, modified
               FROM {forum_posts}
              WHERE discussion=?
-             ORDER BY modified DESC, id DESC";
+             ORDER BY modified DESC";
 
 // Lets go find the last post
     if (($lastposts = $DB->get_records_sql($sql, array($discussionid), 0, 1))) {
@@ -5932,7 +5920,7 @@ function forum_get_posts_by_user($user, array $courses, $musthaveaccess = false,
 
     // Prepare SQL to both count and search.
     // We alias user.id to useridx because we forum_posts already has a userid field and not aliasing this would break
-    // mssql.
+    // oracle and mssql.
     $userfieldsapi = \core_user\fields::for_userpic();
     $userfields = $userfieldsapi->get_sql('u', false, '', 'useridx', false)->selects;
     $countsql = 'SELECT COUNT(*) ';

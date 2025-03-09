@@ -32,8 +32,8 @@
 {{< mod_forum/forum_discussion_nested_v2_first_post }}
     {{$subject}}
         <h3
-            {{#isdeleted}}class="h6 fw-bold"{{/isdeleted}}
-            {{^isdeleted}}class="visually-hidden"{{/isdeleted}}
+            {{#isdeleted}}class="h6 font-weight-bold"{{/isdeleted}}
+            {{^isdeleted}}class="sr-only"{{/isdeleted}}
             data-region-content="forum-post-core-subject"
         >{{{subject}}}</h3>
     {{/subject}}
@@ -43,7 +43,7 @@
                 {{#capabilities.reply}}
                     <div class="d-flex mt-1">
                         <button
-                            class="fw-bold btn btn-link px-0"
+                            class="font-weight-bold btn btn-link px-0"
                             data-href="{{{urls.reply}}}"
                             data-post-id="{{id}}"
                             data-action="create-inpage-reply"

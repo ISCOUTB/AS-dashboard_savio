@@ -70,7 +70,7 @@ class report_helper {
 
             }
             $selectmenu = new \core\output\select_menu('reporttype', $menuarray, $activeurl);
-            $selectmenu->set_label(get_string('reporttype'), ['class' => 'visually-hidden']);
+            $selectmenu->set_label(get_string('reporttype'), ['class' => 'sr-only']);
             $options = \html_writer::tag(
                 'div',
                 $OUTPUT->render_from_template('core/tertiary_navigation_selector', $selectmenu->export_for_template($OUTPUT)),
@@ -119,17 +119,18 @@ class report_helper {
         $course = get_course($courseid);
         $groupmode = groups_get_course_groupmode($course);
         $groupid = $filterparams->groupid ?? 0;
-        $context = context_course::instance($courseid);
-        if ($groupid || ($groupmode == SEPARATEGROUPS && !has_capability('moodle/site:accessallgroups', $context))) {
+        if ($groupmode == SEPARATEGROUPS || $groupid) {
+            $context = context_course::instance($courseid);
             if ($groupid) {
                 $cgroups = [(int) $groupid];
             } else {
-                $cgroups = groups_get_all_groups($courseid, $USER->id);
+                $cgroups = groups_get_all_groups(
+                    $courseid,
+                    has_capability('moodle/site:accessallgroups', $context) ? 0 : $USER->id
+                );
                 $cgroups = array_keys($cgroups);
-                // If you are not in any groups you can still view users without group. This may
-                // perform poorly because it will list all users in the entire system who do not
-                // belong to a group on this course.
-                if (empty($cgroups)) {
+                // If that's the case, limit the users to be in the groups only, defined by the filter.
+                if (has_capability('moodle/site:accessallgroups', $context) || empty($cgroups)) {
                     $cgroups[] = USERSWITHOUTGROUP;
                 }
             }
@@ -156,7 +157,6 @@ class report_helper {
         } else {
             $joins[] = "userid = :userid";
             $params['userid'] = $filterparams->userid;
-            $useridfilter[$filterparams->userid] = true;
         }
 
         return [

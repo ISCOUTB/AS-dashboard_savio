@@ -28,13 +28,14 @@ use mod_data\local\importer\preset_importer;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \mod_data\local\importer\preset_importer
  */
-final class preset_importer_test extends \advanced_testcase {
+class preset_importer_test extends \advanced_testcase {
+
     /**
      * Data provider for build providers for test_needs_mapping and test_set_affected_fields.
      *
      * @return array[]
      */
-    public static function preset_importer_provider(): array {
+    public function preset_importer_provider(): array {
         // Image gallery preset is: ['title' => 'text', 'description' => 'textarea', 'image' => 'picture'];
 
         $titlefield = new \stdClass();
@@ -106,17 +107,17 @@ final class preset_importer_test extends \advanced_testcase {
      *
      * @return array[]
      */
-    public static function needs_mapping_provider(): array {
-        $basedprovider = static::preset_importer_provider();
+    public function needs_mapping_provider(): array {
+        $basedprovider = $this->preset_importer_provider();
 
-        $basedprovider['Empty database / Empty importer']['expectedresult'] = false;
-        $basedprovider['Empty database / Importer with fields']['expectedresult'] = false;
-        $basedprovider['Database with fields / Empty importer']['expectedresult'] = true;
-        $basedprovider['Same fields']['expectedresult'] = false;
-        $basedprovider['Fields to create']['expectedresult'] = true;
-        $basedprovider['Fields to remove']['expectedresult'] = true;
-        $basedprovider['Fields to update']['expectedresult'] = true;
-        $basedprovider['Fields to create, remove and update']['expectedresult'] = true;
+        $basedprovider['Empty database / Empty importer']['needsmapping'] = false;
+        $basedprovider['Empty database / Importer with fields']['needsmapping'] = false;
+        $basedprovider['Database with fields / Empty importer']['needsmapping'] = true;
+        $basedprovider['Same fields']['needsmapping'] = false;
+        $basedprovider['Fields to create']['needsmapping'] = true;
+        $basedprovider['Fields to remove']['needsmapping'] = true;
+        $basedprovider['Fields to update']['needsmapping'] = true;
+        $basedprovider['Fields to create, remove and update']['needsmapping'] = true;
 
         return $basedprovider;
     }
@@ -181,8 +182,8 @@ final class preset_importer_test extends \advanced_testcase {
      *
      * @return array[]
      */
-    public static function set_affected_provider(): array {
-        $basedprovider = static::preset_importer_provider();
+    public function set_affected_provider(): array {
+        $basedprovider = $this->preset_importer_provider();
 
         $basedprovider['Empty database / Empty importer']['fieldstocreate'] = 0;
         $basedprovider['Empty database / Empty importer']['fieldstoremove'] = 0;
@@ -304,7 +305,6 @@ final class preset_importer_test extends \advanced_testcase {
     ): void {
         global $USER;
 
-        // xdebug_break();
         $this->resetAfterTest();
         $this->setAdminUser();
         $plugingenerator = $this->getDataGenerator()->get_plugin_generator('mod_data');
@@ -353,7 +353,7 @@ final class preset_importer_test extends \advanced_testcase {
      *
      * @return array[]
      */
-    public static function get_field_names_provider(): array {
+    public function get_field_names_provider(): array {
         return [
             'Empty list' => [
                 'fields' => [],

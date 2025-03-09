@@ -30,7 +30,7 @@ use coding_exception;
  * @copyright 2019 Andrew Nicols <andrew@nicols.co.uk>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class gradeitems_test extends advanced_testcase {
+class gradeitems_test extends advanced_testcase {
 
     /**
      * Ensure that the mappings are present and correct.
@@ -77,7 +77,7 @@ final class gradeitems_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function is_advancedgrading_itemname_provider(): array {
+    public function is_advancedgrading_itemname_provider(): array {
         return [
             'rating is not advanced' => [
                 'rating',

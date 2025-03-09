@@ -32,7 +32,7 @@ require_once($CFG->dirroot.'/backup/util/settings/tests/settings_test.php');
  * @copyright 2021 Université Rennes 2 {@link https://www.univ-rennes2.fr}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class base_setting_ui_test extends \advanced_testcase {
+class base_setting_ui_test extends \advanced_testcase {
     /**
      * Tests set_label().
      *

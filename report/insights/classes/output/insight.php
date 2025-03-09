@@ -190,7 +190,7 @@ class insight implements \renderable, \templatable {
                 'name' => 'toggle-all-' . $predictedvalue,
                 'classes' => 'hidden',
                 'label' => get_string('selectall'),
-                'labelclasses' => 'visually-hidden',
+                'labelclasses' => 'sr-only',
                 'checked' => false,
             ]);
             $data->hiddencheckboxtoggleall = $output->render($toggleall);

@@ -32,7 +32,7 @@ require_once($CFG->dirroot . '/rating/lib.php');
  * @copyright  2013 Frédéric Massart
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class lib_test extends \advanced_testcase {
+class lib_test extends \advanced_testcase {
 
     public function setUp(): void {
         parent::setUp();
@@ -3271,7 +3271,7 @@ final class lib_test extends \advanced_testcase {
      *
      * @return  array
      */
-    public static function forum_discussion_is_locked_provider(): array {
+    public function forum_discussion_is_locked_provider() {
         return [
             'Unlocked: lockdiscussionafter is false' => [
                 ['lockdiscussionafter' => false],
@@ -3325,7 +3325,7 @@ final class lib_test extends \advanced_testcase {
      *
      * @return  array
      */
-    public static function forum_is_cutoff_date_reached_provider(): array {
+    public function forum_is_cutoff_date_reached_provider() {
         $now = time();
         return [
             'cutoffdate is unset' => [
@@ -3373,7 +3373,7 @@ final class lib_test extends \advanced_testcase {
      *
      * @return  array
      */
-    public static function forum_is_due_date_reached_provider(): array {
+    public function forum_is_due_date_reached_provider() {
         $now = time();
         return [
             'duedate is unset' => [
@@ -4120,7 +4120,7 @@ final class lib_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function forum_check_throttling_early_returns_provider(): array {
+    public function forum_check_throttling_early_returns_provider() {
         return [
             'Empty blockafter' => [(object)['id' => 1, 'course' => SITEID, 'blockafter' => 0]],
             'Empty blockperiod' => [(object)['id' => 1, 'course' => SITEID, 'blockafter' => DAYSECS, 'blockperiod' => 0]],
@@ -4143,7 +4143,7 @@ final class lib_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function forum_check_throttling_early_exceptions_provider(): array {
+    public function forum_check_throttling_early_exceptions_provider() {
         return [
             'Non-object forum' => ['a'],
             'Forum ID not set' => [(object)['id' => false]],

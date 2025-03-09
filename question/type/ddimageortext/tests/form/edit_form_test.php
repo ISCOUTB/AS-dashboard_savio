@@ -32,7 +32,7 @@ require_once($CFG->dirroot . '/question/type/ddimageortext/edit_ddimageortext_fo
  * @copyright  2019 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class edit_form_test extends \advanced_testcase {
+class edit_form_test extends \advanced_testcase {
     /**
      * Helper method.
      *
@@ -44,13 +44,11 @@ final class edit_form_test extends \advanced_testcase {
         $this->setAdminUser();
         $this->resetAfterTest();
 
-        $course = self::getDataGenerator()->create_course();
-        $qbank = self::getDataGenerator()->create_module('qbank', ['course' => $course->id]);
-        $bankcontext = \context_module::instance($qbank->cmid);
-        $category = question_get_default_category($bankcontext->id, true);
+        $syscontext = \context_system::instance();
+        $category = question_make_default_categories(array($syscontext));
         $fakequestion = new \stdClass();
         $fakequestion->qtype = 'ddimageortext';
-        $fakequestion->contextid = $bankcontext->id;
+        $fakequestion->contextid = $syscontext->id;
         $fakequestion->createdby = 2;
         $fakequestion->category = $category->id;
         $fakequestion->questiontext = 'Test question';
@@ -62,7 +60,7 @@ final class edit_form_test extends \advanced_testcase {
         $fakequestion->inputs = null;
 
         $form = new qtype_ddimageortext_edit_form(new \moodle_url('/'), $fakequestion, $category,
-                new \core_question\local\bank\question_edit_contexts($bankcontext));
+                new \core_question\local\bank\question_edit_contexts($syscontext));
 
         return [$form, $category];
     }

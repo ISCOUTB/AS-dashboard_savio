@@ -168,7 +168,7 @@ class action_menu implements renderable, templatable {
             'aria-labelledby' => 'action-menu-toggle-' . $this->instance,
             'role' => 'menu',
         ];
-        $this->dropdownalignment = 'dropdown-menu-end';
+        $this->dropdownalignment = 'dropdown-menu-right';
         foreach ($actions as $action) {
             $this->add($action);
         }
@@ -197,7 +197,7 @@ class action_menu implements renderable, templatable {
     /**
      * Classes for the trigger menu
      */
-    const DEFAULT_KEBAB_TRIGGER_CLASSES = 'btn btn-icon d-flex no-caret';
+    const DEFAULT_KEBAB_TRIGGER_CLASSES = 'btn btn-icon d-flex align-items-center justify-content-center no-caret';
 
     /**
      * Setup trigger as in the kebab menu.
@@ -386,11 +386,24 @@ class action_menu implements renderable, templatable {
     }
 
     /**
-     * @deprecated since Moodle 4.0, use action_menu::set_menu_left().
+     * Sets the alignment of the dialogue in relation to button used to toggle it.
+     *
+     * @deprecated since Moodle 4.0
+     *
+     * @param int $dialogue One of action_menu::TL, action_menu::TR, action_menu::BL, action_menu::BR.
+     * @param int $button One of action_menu::TL, action_menu::TR, action_menu::BL, action_menu::BR.
      */
-    #[\core\attribute\deprecated('action_menu::set_menu_left', since: '4.0', mdl: 'MDL-72466', final: true)]
-    public function set_alignment(): void {
-        \core\deprecation::emit_deprecation_if_present([self::class, __FUNCTION__]);
+    public function set_alignment($dialogue, $button) {
+        debugging('The method action_menu::set_alignment() is deprecated, use action_menu::set_menu_left()', DEBUG_DEVELOPER);
+        if (isset($this->attributessecondary['data-align'])) {
+            // We've already got one set, lets remove the old class so as to avoid troubles.
+            $class = $this->attributessecondary['class'];
+            $search = 'align-' . $this->attributessecondary['data-align'];
+            $this->attributessecondary['class'] = str_replace($search, '', $class);
+        }
+        $align = $this->get_align_string($dialogue) . '-' . $this->get_align_string($button);
+        $this->attributessecondary['data-align'] = $align;
+        $this->attributessecondary['class'] .= ' align-' . $align;
     }
 
     /**
@@ -419,15 +432,24 @@ class action_menu implements renderable, templatable {
      *
      */
     public function set_menu_left() {
-        $this->dropdownalignment = 'dropdown-menu-start';
+        $this->dropdownalignment = 'dropdown-menu-left';
     }
 
     /**
-     * @deprecated since Moodle 4.3, use set_boundary() method instead.
+     * Sets a constraint for the dialogue.
+     *
+     * The constraint is applied when the dialogue is shown and limits the display of the dialogue to within the
+     * element the constraint identifies.
+     *
+     * This is required whenever the action menu is displayed inside any CSS element with the .no-overflow class
+     * (flexible_table and any of it's child classes are a likely candidate).
+     *
+     * @deprecated since Moodle 4.3
+     * @param string $ancestorselector A snippet of CSS used to identify the ancestor to contrain the dialogue to.
      */
-    #[\core\attribute\deprecated('action_menu::set_boundary', since: '4.3', mdl: 'MDL-77375', final: true)]
-    public function set_constraint(): void {
-        \core\deprecation::emit_deprecation_if_present([self::class, __FUNCTION__]);
+    public function set_constraint($ancestorselector) {
+        debugging('The method set_constraint() is deprecated. Please use the set_boundary() method instead.', DEBUG_DEVELOPER);
+        $this->set_boundary('window');
     }
 
     /**
@@ -447,11 +469,14 @@ class action_menu implements renderable, templatable {
     }
 
     /**
-     * @deprecated since Moodle 3.2, use a list of action_icon instead.
+     * If you call this method the action menu will be displayed but will not be enhanced.
+     *
+     * By not displaying the menu enhanced all items will be displayed in a single row.
+     *
+     * @deprecated since Moodle 3.2
      */
-    #[\core\attribute\deprecated('Use a list of action_icons instead', since: '3.2', mdl: 'MDL-55904', final: true)]
     public function do_not_enhance() {
-        \core\deprecation::emit_deprecation_if_present([self::class, __FUNCTION__]);
+        debugging('The method action_menu::do_not_enhance() is deprecated, use a list of action_icon instead.', DEBUG_DEVELOPER);
     }
 
     /**

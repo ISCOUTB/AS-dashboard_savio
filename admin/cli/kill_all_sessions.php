@@ -50,6 +50,6 @@ Example:
     exit(0);
 }
 
-\core\session\manager::destroy_all();
+\core\session\manager::kill_all_sessions();
 
 exit(0);

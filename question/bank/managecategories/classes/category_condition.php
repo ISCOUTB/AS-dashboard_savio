@@ -32,9 +32,6 @@ class category_condition extends condition {
     /** @var \stdClass The course record. */
     protected $course;
 
-    /** @var \stdClass The course_modules record. */
-    protected \stdClass $cm;
-
     /** @var \stdClass The category record. */
     protected $category;
 
@@ -60,11 +57,8 @@ class category_condition extends condition {
             return;
         }
         $this->cat = $qbank->get_pagevars('cat');
-        $this->contexts = array_filter($qbank->contexts->having_one_edit_tab_cap($qbank->get_pagevars('tabname')),
-            static fn($context) => $context->contextlevel === CONTEXT_MODULE
-        );
+        $this->contexts = $qbank->contexts->having_one_edit_tab_cap($qbank->get_pagevars('tabname'));
         $this->course = $qbank->course;
-        $this->cm = $qbank->cm;
 
         [$categoryid, $contextid] = self::validate_category_param($this->cat);
         if (is_null($categoryid)) {
@@ -74,12 +68,7 @@ class category_condition extends condition {
         $this->category = self::get_category_record($categoryid, $contextid);
 
         parent::__construct($qbank);
-        if (isset($this->filter['filteroptions']['includesubcategories'])) {
-            set_user_preference('qbank_managecategories_includesubcategories_filter_default',
-                $this->filter['filteroptions']['includesubcategories']);
-        }
-        $this->includesubcategories = $this->filter['filteroptions']['includesubcategories'] ??
-            get_user_preferences('qbank_managecategories_includesubcategories_filter_default', false);
+        $this->includesubcategories = $this->filter['filteroptions']['includesubcategories'] ?? false;
     }
 
     /**
@@ -89,7 +78,7 @@ class category_condition extends condition {
      */
     public function get_default_category(): \stdClass {
         if (empty($this->category)) {
-            return question_get_default_category(\context_module::instance($this->cm->id)->id, true);
+            return question_get_default_category(\context_course::instance($this->course->id)->id);
         }
 
         return $this->category;
@@ -120,7 +109,7 @@ class category_condition extends condition {
         $catmenu = helper::question_category_options($this->contexts, true, 0,
                 true, -1, false);
         $displaydata['categoryselect'] = \html_writer::select($catmenu, 'category', $this->cat, [],
-                ['class' => 'searchoptions form-select', 'id' => 'id_selectacategory']);
+                array('class' => 'searchoptions custom-select', 'id' => 'id_selectacategory'));
         $displaydata['categorydesc'] = '';
         if ($this->category) {
             $displaydata['categorydesc'] = $this->print_category_info($this->category);
@@ -162,7 +151,7 @@ class category_condition extends condition {
         $catmenu = question_category_options($contexts, true, 0, true, -1, false);
         echo \html_writer::label(get_string('selectacategory', 'question'), 'id_selectacategory', true, ["class" => "me-1"]);
         echo \html_writer::select($catmenu, 'category', $current, [],
-                ['class' => 'searchoptions form-select', 'id' => 'id_selectacategory']);
+                array('class' => 'searchoptions custom-select', 'id' => 'id_selectacategory'));
         echo \html_writer::end_div() . "\n";
     }
 
@@ -342,35 +331,4 @@ class category_condition extends condition {
     public function is_required(): bool {
         return true;
     }
-
-    #[\Override]
-    public function filter_invalid_values(array $filterconditions): array {
-
-        global $DB;
-
-        $defaultcatid = explode(',', $filterconditions['cat'])[0];
-
-        [$insql, $inparams] = $DB->get_in_or_equal($filterconditions['filter']['category']['values']);
-        $categories = $DB->get_records_select('question_categories', "id {$insql}",
-            $inparams, null, 'id');
-        $categoryids = array_keys($categories);
-
-        foreach ($filterconditions['filter']['category']['values'] as $key => $catid) {
-
-            // Check that the category still exists, and if not, remove it from the conditions.
-            if (!in_array($catid, $categoryids)) {
-                unset($filterconditions['filter']['category']['values'][$key]);
-            }
-
-        }
-
-        // If we now don't have any valid categories, use the default loaded from the page.
-        if (count($filterconditions['filter']['category']['values']) === 0) {
-            $filterconditions['filter']['category']['values'] = [$defaultcatid];
-        }
-
-        return $filterconditions;
-
-    }
-
 }

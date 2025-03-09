@@ -31,7 +31,7 @@ use contenttype_testable\contenttype as contenttype;
  * @coversDefaultClass \core_contentbank\contenttype
  *
  */
-final class contenttype_test extends \advanced_testcase {
+class contenttype_test extends \advanced_testcase {
 
     /** @var int Identifier for the manager role. */
     protected $managerroleid;
@@ -240,7 +240,7 @@ final class contenttype_test extends \advanced_testcase {
      *
      * @return  array
      */
-    public static function upload_content_provider(): array {
+    public function upload_content_provider() {
         return [
             'With record' => [true],
             'Without record' => [false],
@@ -449,7 +449,7 @@ final class contenttype_test extends \advanced_testcase {
      *
      * @return  array
      */
-    public static function rename_content_provider(): array {
+    public function rename_content_provider() {
         return [
             'Standard name' => ['New name', 'New name', true],
             'Name with digits' => ['Today is 17/04/2017', 'Today is 17/04/2017', true],

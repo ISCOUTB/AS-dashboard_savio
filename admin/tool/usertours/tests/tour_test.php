@@ -24,7 +24,7 @@ namespace tool_usertours;
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers    \tool_usertours\tour
  */
-final class tour_test extends \advanced_testcase {
+class tour_test extends \advanced_testcase {
     /**
      * @var moodle_database
      */
@@ -527,30 +527,14 @@ final class tour_test extends \advanced_testcase {
         // Mock the database.
         $DB = $this->mock_database();
 
-        $deleteinvocations = $this->exactly(3);
-        $DB->expects($deleteinvocations)
+        $DB->expects($this->exactly(3))
             ->method('delete_records')
-            ->willReturnCallback(function ($table, $conditions) use ($deleteinvocations, $id) {
-                switch (self::getInvocationCount($deleteinvocations)) {
-                    case 1:
-                        $this->assertEquals('tool_usertours_tours', $table);
-                        $this->assertEquals(['id' => $id], $conditions);
-                        return null;
-                        break;
-                    case 2:
-                        $this->assertEquals('user_preferences', $table);
-                        $this->assertEquals(['name' => tour::TOUR_LAST_COMPLETED_BY_USER . $id], $conditions);
-                        return null;
-                        break;
-                    case 3:
-                        $this->assertEquals('user_preferences', $table);
-                        $this->assertEquals(['name' => tour::TOUR_REQUESTED_BY_USER . $id], $conditions);
-                        return null;
-                        break;
-                    default:
-                        $this->fail('Unexpected call to delete_records');
-                }
-            });
+            ->withConsecutive(
+                [$this->equalTo('tool_usertours_tours'), $this->equalTo(['id' => $id])],
+                [$this->equalTo('user_preferences'), $this->equalTo(['name' => tour::TOUR_LAST_COMPLETED_BY_USER . $id])],
+                [$this->equalTo('user_preferences'), $this->equalTo(['name' => tour::TOUR_REQUESTED_BY_USER . $id])]
+            )
+            ->willReturn(null);
 
         $DB->expects($this->once())
             ->method('get_records')
@@ -570,7 +554,7 @@ final class tour_test extends \advanced_testcase {
         for ($i = 4; $i >= 0; $i--) {
             $id = rand($i * 10, ($i * 10) + 9);
             $mockdata[] = (object) ['id' => $id];
-            $expectations[] = [4 - $i, ['id' => $id]];
+            $expectations[] = [$this->equalTo('tool_usertours_steps'), $this->equalTo('sortorder'), 4 - $i, ['id' => $id]];
         }
 
         // Mock the database.
@@ -579,19 +563,9 @@ final class tour_test extends \advanced_testcase {
             ->method('get_records')
             ->willReturn($mockdata);
 
-        $setfieldinvocations = $this->exactly(5);
-        $DB->expects($setfieldinvocations)
-            ->method('set_field')
-            ->willReturnCallback(function ($table, $field, $value, $conditions) use (
-                $setfieldinvocations,
-                $expectations,
-            ): void {
-                $expectation = $expectations[self::getInvocationCount($setfieldinvocations) - 1];
-                $this->assertEquals('tool_usertours_steps', $table);
-                $this->assertEquals('sortorder', $field);
-                $this->assertEquals($expectation[0], $value);
-                $this->assertEquals($expectation[1], $conditions);
-            });
+        $setfield = $DB->expects($this->exactly(5))
+            ->method('set_field');
+        call_user_func_array([$setfield, 'withConsecutive'], $expectations);
 
         $tour->reset_step_sortorder();
     }
@@ -790,12 +764,9 @@ final class tour_test extends \advanced_testcase {
             ->getMock();
 
         if ($getconfig) {
-            $getinvocations = $this->exactly(count($getconfig));
-            $tour->expects($getinvocations)
+            $tour->expects($this->exactly(count($getconfig)))
                 ->method('get_config')
-                ->willReturnCallback(function () use ($getinvocations, $getconfig) {
-                    return $getconfig[self::getInvocationCount($getinvocations) - 1];
-                });
+                ->will(call_user_func_array([$this, 'onConsecutiveCalls'], $getconfig));
         }
 
         if ($setconfig) {

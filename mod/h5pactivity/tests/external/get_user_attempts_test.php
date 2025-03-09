@@ -42,7 +42,7 @@ use externallib_advanced_testcase;
  * @copyright  2020 Ilya Tregubov <ilya@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class get_user_attempts_test extends externallib_advanced_testcase {
+class get_user_attempts_test extends externallib_advanced_testcase {
 
     /**
      * Test the behaviour of get_user_attempts getting more than one user at once.
@@ -80,7 +80,6 @@ final class get_user_attempts_test extends externallib_advanced_testcase {
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_h5pactivity');
 
         $attemptcount = 1;
-        $totalattempts = 0;
         foreach ($users as $key => $user) {
             if (($key == 'noattempts') || ($key == 'noenrolled') || ($key == 'editingteacher')) {
                 $countattempts[$user->id] = 0;
@@ -88,7 +87,6 @@ final class get_user_attempts_test extends externallib_advanced_testcase {
                 $params = ['cmid' => $cm->id, 'userid' => $user->id];
                 for ($i = 1; $i <= $attemptcount; $i++) {
                     $generator->create_content($activity, $params);
-                    $totalattempts++;
                 }
                 $countattempts[$user->id] = $attemptcount;
                 $attemptcount++;
@@ -109,7 +107,6 @@ final class get_user_attempts_test extends externallib_advanced_testcase {
             $result
         );
 
-        $this->assertEquals($totalattempts, $result['totalattempts']);
         $this->assertCount(count($warnings), $result['warnings']);
         // Teacher is excluded.
         $this->assertCount(count($resultusers), $result['usersattempts']);
@@ -148,7 +145,7 @@ final class get_user_attempts_test extends externallib_advanced_testcase {
      *
      * @return  array
      */
-    public static function execute_multipleusers_data(): array {
+    public function execute_multipleusers_data(): array {
         return [
             // Teacher checks.
             'Teacher checking students with attempts' => [
@@ -191,7 +188,7 @@ final class get_user_attempts_test extends externallib_advanced_testcase {
      *
      * @return array[]
      */
-    public static function execute_with_sortorder(): array {
+    public function execute_with_sortorder(): array {
         return [
             'Sort by id' => ['id', ['user01', 'user02']],
             'Sort by id desc' => ['id desc', ['user02', 'user01']],

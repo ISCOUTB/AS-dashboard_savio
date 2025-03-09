@@ -142,9 +142,26 @@ body:not(.jsenabled) .langmenu:hover > .dropdown-menu,
     }
 }
 
-// Fixes an issue on Safari when the .form-select is inside a .card class.
-.form-select {
+// Fixes an issue on Safari when the .custom-select is inside a .card class.
+.custom-select {
     word-wrap: normal;
+}
+
+/* Add commented out carousel transistions back in.
+ *
+ * The Css prefixer used in Moodle breaks on @supports syntax, See MDL-61515.
+ */
+.carousel-item-next.carousel-item-left,
+.carousel-item-prev.carousel-item-right {
+    transform: translateX(0);
+}
+.carousel-item-next,
+.active.carousel-item-right {
+    transform: translateX(100%);
+}
+.carousel-item-prev,
+.active.carousel-item-left {
+    transform: translateX(-100%);
 }
 
 /**
@@ -169,7 +186,7 @@ $allow-reset-style: true !default;
                 }
 
                 .card-body {
-                    @include media-breakpoint-down(md) {
+                    @include media-breakpoint-down(sm) {
                         padding-left: 0;
                         padding-right: 0;
                     }
@@ -208,12 +225,12 @@ $allow-reset-style: true !default;
                     &.has-blocks {
                         width: calc(100% - #{$blocks-plus-gutter});
 
-                        @include media-breakpoint-down(xl) {
+                        @include media-breakpoint-down(lg) {
                             width: 100%;
                         }
                     }
 
-                    @include media-breakpoint-down(md) {
+                    @include media-breakpoint-down(sm) {
                         padding-left: 0;
                         padding-right: 0;
                     }
@@ -223,7 +240,7 @@ $allow-reset-style: true !default;
                     margin-left: auto;
                 }
 
-                @include media-breakpoint-down(xl) {
+                @include media-breakpoint-down(lg) {
                     display: flex;
                     flex-direction: column;
                 }

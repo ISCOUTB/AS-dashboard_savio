@@ -16,8 +16,8 @@
 
 namespace qbank_bulkmove;
 
+use core_question\local\bank\bulk_action_base;
 use core_question\local\bank\plugin_features_base;
-use core_question\local\bank\view;
 
 /**
  * Class plugin_feature is the entrypoint for the features.
@@ -28,20 +28,9 @@ use core_question\local\bank\view;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class plugin_feature extends plugin_features_base {
-
-    /**
-     * Initialise the bulk action.
-     * @param view $qbank
-     * @return bulk_move_action[]
-     */
-    public function get_bulk_actions(view $qbank): array {
-        // Don't return bulkmove if we are on the question history page.
-        if ($qbank->is_listing_specific_versions()) {
-            return [];
-        } else {
-            return [
-                new bulk_move_action($qbank),
-            ];
-        }
+    public function get_bulk_actions(): array {
+        return [
+            new bulk_move_action(),
+        ];
     }
 }

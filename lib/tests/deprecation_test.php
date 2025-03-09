@@ -30,7 +30,7 @@ use core\attribute\deprecated_with_reference;
  * @covers \core\attribute\deprecated_with_reference
  * @covers \core\deprecation
  */
-final class deprecation_test extends \advanced_testcase {
+class deprecation_test extends \advanced_testcase {
     /**
      * @dataProvider emit_provider
      */

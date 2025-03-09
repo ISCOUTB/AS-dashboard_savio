@@ -22,18 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define([
-    'factor_webauthn/utils',
-    'core/prefetch',
-    'core/str',
-    'core/toast',
-], function(
-    utils,
-    Prefetch,
-    Str,
-    Toast,
-) {
-
+define(['factor_webauthn/utils', 'core/log'], function(utils, Log) {
     /**
      * Register the security key.
      *
@@ -58,16 +47,11 @@ define([
                 attestationObject: cred.response.attestationObject ?
                     utils.arrayBufferToBase64(cred.response.attestationObject) : null,
             };
-
-            const registerSuccess = await Str.getString('registersuccess', 'factor_webauthn');
-            await Toast.add(registerSuccess, {type: 'success'});
-
             document.getElementById('id_response_input').value = JSON.stringify(authenticatorResponse);
             // Enable the submit button so that we can proceed.
             document.getElementById('id_submitbutton').disabled = false;
         } catch (e) {
-            const registerError = await Str.getString('registererror', 'factor_webauthn', e.message);
-            await Toast.add(registerError, {type: 'warning'});
+            Log.debug('The request timed out or you have canceled the request. Please try again later.');
         }
     }
 
@@ -75,14 +59,8 @@ define([
         init: function(createArgs) {
             // Disable the submit button until we have registered a security key.
             document.getElementById('id_submitbutton').disabled = true;
-
-            Prefetch.prefetchStrings('factor_webauthn', [
-                'registersuccess',
-                'registererror',
-            ]);
-
-            // Register event listeners.
             createArgs = JSON.parse(createArgs);
+            // Register event listeners.
             document.getElementById('factor_webauthn-register').addEventListener('click', function() {
                 registerSecurityKey(createArgs);
             });

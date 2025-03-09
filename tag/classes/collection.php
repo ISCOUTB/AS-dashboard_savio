@@ -224,7 +224,7 @@ class core_tag_collection {
         $defaulttagcollid = self::get_default();
         $allowedfields = array('name', 'searchable', 'customurl');
         if ($tagcoll->id == $defaulttagcollid) {
-            $allowedfields = array('name', 'searchable');
+            $allowedfields = array('name');
         }
 
         $updatedata = array();
@@ -359,15 +359,9 @@ class core_tag_collection {
 
         $fromclause = 'FROM {tag_instance} ti JOIN {tag} tg ON tg.id = ti.tagid';
         $whereclause = 'WHERE ti.itemtype <> \'tag\'';
-
-        // Get tags from all searchable tag collections, if $tagcollid is specifid, limit only to this collection.
-        $tagcollids = array_keys(self::get_collections(true));
-        if ($tagcollid) {
-            $tagcollids = array_intersect($tagcollids, [$tagcollid]);
-        }
-        list($sql, $params) = $DB->get_in_or_equal($tagcollids, SQL_PARAMS_QM, 'param', true, -1);
+        list($sql, $params) = $DB->get_in_or_equal($tagcollid ? array($tagcollid) :
+            array_keys(self::get_collections(true)));
         $whereclause .= ' AND tg.tagcollid ' . $sql;
-
         if ($isstandard) {
             $whereclause .= ' AND tg.isstandard = 1';
         }

@@ -7,7 +7,7 @@ namespace libphonenumber;
 /**
  * Phone Number Description
  * @interal
- * @phpstan-type PhoneNumberDescArray array{pattern?:string,example?:string,posLength?:int[],posLengthLocal?:int[]}
+ * @phpstan-type PhoneNumberDescArray array{NationalNumberPattern?:string,ExampleNumber?:string,PossibleLength?:int[],PossibleLengthLocalOnly?:int[]}
  */
 class PhoneNumberDesc
 {
@@ -167,49 +167,48 @@ class PhoneNumberDesc
     }
 
     /**
-     * @internal
      * @return PhoneNumberDescArray
      */
     public function toArray(): array
     {
         $data = [];
         if ($this->hasNationalNumberPattern()) {
-            $data['pattern'] = $this->getNationalNumberPattern();
+            $data['NationalNumberPattern'] = $this->getNationalNumberPattern();
         }
         if ($this->hasExampleNumber()) {
-            $data['example'] = $this->getExampleNumber();
+            $data['ExampleNumber'] = $this->getExampleNumber();
         }
 
         $possibleLength = $this->getPossibleLength();
         if (!empty($possibleLength)) {
-            $data['posLength'] = $possibleLength;
+            $data['PossibleLength'] = $possibleLength;
         }
 
         $possibleLengthLocalOnly = $this->getPossibleLengthLocalOnly();
         if (!empty($possibleLengthLocalOnly)) {
-            $data['posLengthLocal'] = $possibleLengthLocalOnly;
+            $data['PossibleLengthLocalOnly'] = $possibleLengthLocalOnly;
         }
 
         return $data;
     }
 
     /**
-     * @internal
      * @param PhoneNumberDescArray $input
+     * @return $this
      */
     public function fromArray(array $input): static
     {
-        if (isset($input['pattern']) && $input['pattern'] !== '') {
-            $this->setNationalNumberPattern($input['pattern']);
+        if (isset($input['NationalNumberPattern']) && $input['NationalNumberPattern'] !== '') {
+            $this->setNationalNumberPattern($input['NationalNumberPattern']);
         }
-        if (isset($input['example']) && $input['example'] !== '') {
-            $this->setExampleNumber($input['example']);
+        if (isset($input['ExampleNumber']) && $input['ExampleNumber'] !== '') {
+            $this->setExampleNumber($input['ExampleNumber']);
         }
-        if (isset($input['posLength'])) {
-            $this->setPossibleLength($input['posLength']);
+        if (isset($input['PossibleLength'])) {
+            $this->setPossibleLength($input['PossibleLength']);
         }
-        if (isset($input['posLengthLocal'])) {
-            $this->setPossibleLengthLocalOnly($input['posLengthLocal']);
+        if (isset($input['PossibleLengthLocalOnly'])) {
+            $this->setPossibleLengthLocalOnly($input['PossibleLengthLocalOnly']);
         }
 
         return $this;

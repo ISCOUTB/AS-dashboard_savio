@@ -64,15 +64,19 @@ class delete_action extends question_action_base {
         $this->strdelete = get_string('delete');
         $this->strrestore = get_string('restore');
         $this->deletequestionurl = new \moodle_url('/question/bank/deletequestion/delete.php');
-        $this->returnparams['cmid'] = $this->qbank->cm->id;
-
+        if (!empty($this->qbank->cm->id)) {
+            $this->returnparams['cmid'] = $this->qbank->cm->id;
+        }
+        if (!empty($this->qbank->course->id)) {
+            $this->returnparams['courseid'] = $this->qbank->course->id;
+        }
         if (!empty($this->qbank->returnurl)) {
             $this->returnparams['returnurl'] = $this->qbank->returnurl;
         }
     }
 
     public function get_menu_position(): int {
-        return 2000;
+        return 400;
     }
 
     protected function get_url_icon_and_label(\stdClass $question): array {
@@ -92,25 +96,11 @@ class delete_action extends question_action_base {
                     'q' . $question->id => 1,
                     'sesskey' => sesskey());
             $deleteparams = array_merge($deleteparams, $this->returnparams);
-            if (!$this->qbank->is_listing_specific_versions()) {
+            if ($this->qbank->base_url()->get_param('deleteall')) {
                 $deleteparams['deleteall'] = 1;
             }
             $url = new \moodle_url($this->deletequestionurl, $deleteparams);
             return [$url, 't/delete', $this->strdelete];
         }
-    }
-
-    /**
-     * Override method to get url and label for delete action to add the text-danger class.
-     *
-     * @param \stdClass $question
-     * @return \action_menu_link|null
-     */
-    public function get_action_menu_link(\stdClass $question): ?\action_menu_link {
-        $deletelink = parent::get_action_menu_link($question);
-        if ($deletelink !== null) {
-            $deletelink->add_class('text-danger');
-        }
-        return $deletelink;
     }
 }

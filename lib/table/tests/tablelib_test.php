@@ -33,7 +33,7 @@ require_once($CFG->libdir . '/tests/fixtures/testable_flexible_table.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers \flexible_table
  */
-final class tablelib_test extends \advanced_testcase {
+class tablelib_test extends \advanced_testcase {
     protected function generate_columns($cols) {
         $columns = array();
         foreach (range(0, $cols - 1) as $j) {
@@ -363,7 +363,7 @@ final class tablelib_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function fullname_column_provider(): array {
+    public function fullname_column_provider() {
         return [
             ['language'],
             ['alternatename lastname'],
@@ -782,7 +782,7 @@ final class tablelib_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function initials_provider(): array {
+    public function initials_provider(): array {
         return [
             [null, null, null],
             ['A', null, 'A'],

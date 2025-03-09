@@ -25,6 +25,7 @@ Feature: Test tertiary navigation as various users
       | language       | ca                               |
       | description    | Testing course badge description |
       | image          | badges/tests/behat/badge.png     |
+      | imageauthorurl | http://author.example.com        |
       | imagecaption   | Test caption image               |
     # Create a site badge.
     And the following "core_badges > Badge" exists:
@@ -34,6 +35,7 @@ Feature: Test tertiary navigation as various users
       | language       | ca                               |
       | description    | Testing site badge description   |
       | image          | badges/tests/behat/badge.png     |
+      | imageauthorurl | http://author.example.com        |
       | imagecaption   | Test caption image               |
     And the following "core_badges > Criterias" exist:
       | badge                | role           |
@@ -59,7 +61,7 @@ Feature: Test tertiary navigation as various users
       | user       | createbutton     | activetab |
       | admin      | should exist     | More      |
       | teacher    | should exist     | More      |
-      | nonediting | should not exist | More      |
+      | nonediting | should not exist | Badges    |
 
   Scenario: Check navigation as a student
     Given I am on the "C1" "Course" page logged in as "student1"

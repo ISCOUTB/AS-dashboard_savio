@@ -36,7 +36,7 @@ require_once($CFG->dirroot . '/backup/moodle2/backup_course_task.class.php');
  * @copyright  2013 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class backup_encode_content_test extends \basic_testcase {
+class backup_encode_content_test extends \basic_testcase {
 
     /**
      * Test the encode_content_links method for course.
@@ -52,7 +52,6 @@ final class backup_encode_content_test extends \basic_testcase {
         $encoded = backup_course_task::encode_content_links(
             $httproot . '/course/view.php?id=123, ' .
             $httpsroot . '/course/view.php?id=123, ' .
-            $httpsroot . '/course/section.php?id=123, ' .
             $httpsroot . '/grade/index.php?id=123, ' .
             $httpsroot . '/grade/report/index.php?id=123, ' .
             $httpsroot . '/badges/index.php?type=2&id=123, ' .
@@ -60,8 +59,7 @@ final class backup_encode_content_test extends \basic_testcase {
             $httpsroot . '/pluginfile.php/123 and ' .
             urlencode($httpsroot . '/pluginfile.php/123') . '.'
         );
-        $this->assertEquals('$@COURSEVIEWBYID*123@$, $@COURSEVIEWBYID*123@$, ' .
-                '$@COURSESECTIONBYID*123@$, $@GRADEINDEXBYID*123@$, ' .
+        $this->assertEquals('$@COURSEVIEWBYID*123@$, $@COURSEVIEWBYID*123@$, $@GRADEINDEXBYID*123@$, ' .
                 '$@GRADEREPORTINDEXBYID*123@$, $@BADGESVIEWBYID*123@$, $@USERINDEXVIEWBYID*123@$, ' .
                 '$@PLUGINFILEBYCONTEXT*123@$ and $@PLUGINFILEBYCONTEXTURLENCODED*123@$.', $encoded);
 
@@ -70,7 +68,6 @@ final class backup_encode_content_test extends \basic_testcase {
         $encoded = backup_course_task::encode_content_links(
             $httproot . '/course/view.php?id=123, ' .
             $httpsroot . '/course/view.php?id=123, ' .
-            $httproot . '/course/section.php?id=123, ' .
             $httproot . '/grade/index.php?id=123, ' .
             $httproot . '/grade/report/index.php?id=123, ' .
             $httproot . '/badges/index.php?type=2&id=123, ' .
@@ -78,8 +75,7 @@ final class backup_encode_content_test extends \basic_testcase {
             $httproot . '/pluginfile.php/123 and ' .
             urlencode($httproot . '/pluginfile.php/123') . '.'
         );
-        $this->assertEquals('$@COURSEVIEWBYID*123@$, $@COURSEVIEWBYID*123@$, ' .
-                '$@COURSESECTIONBYID*123@$, $@GRADEINDEXBYID*123@$, ' .
+        $this->assertEquals('$@COURSEVIEWBYID*123@$, $@COURSEVIEWBYID*123@$, $@GRADEINDEXBYID*123@$, ' .
                 '$@GRADEREPORTINDEXBYID*123@$, $@BADGESVIEWBYID*123@$, $@USERINDEXVIEWBYID*123@$, ' .
                 '$@PLUGINFILEBYCONTEXT*123@$ and $@PLUGINFILEBYCONTEXTURLENCODED*123@$.', $encoded);
         $CFG->wwwroot = $oldroot;

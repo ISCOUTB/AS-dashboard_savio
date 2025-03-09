@@ -38,7 +38,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2012 Petr Skoda {@link http://skodak.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class lib_test extends \advanced_testcase {
+class lib_test extends \advanced_testcase {
     /**
      * Test enrol migration function used when uninstalling enrol plugins.
      */
@@ -586,7 +586,7 @@ final class lib_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function default_enrolment_instance_data_provider(): array {
+    public function default_enrolment_instance_data_provider(): array {
         $studentroles = get_archetype_roles('student');
         $studentrole = array_shift($studentroles);
 
@@ -603,7 +603,7 @@ final class lib_test extends \advanced_testcase {
                     'notifyall' => 0,
                     'expirythreshold' => 12 * HOURSECS,
                 ],
-                'globalsettings' => (object) [
+                'global settings' => (object) [
                     'status' => ENROL_INSTANCE_ENABLED,
                     'roleid' => $studentrole->id,
                     'enrolperiod' => 0,
@@ -620,7 +620,7 @@ final class lib_test extends \advanced_testcase {
                     'notifyall' => 0,
                     'expirythreshold' => DAYSECS,
                 ],
-                'globalsettings' => (object) [
+                'global settings' => (object) [
                     'status' => ENROL_INSTANCE_ENABLED,
                     'roleid' => $studentrole->id,
                     'enrolperiod' => 72 * HOURSECS,
@@ -637,7 +637,7 @@ final class lib_test extends \advanced_testcase {
                     'notifyall' => 1,
                     'expirythreshold' => 0
                 ],
-                'globalsettings' => (object) [
+                'global settings' => (object) [
                     'status' => ENROL_INSTANCE_DISABLED,
                     'roleid' => $teacherrole->id,
                     'enrolperiod' => 0,
@@ -700,7 +700,7 @@ final class lib_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function update_enrolment_instance_data_provider(): array {
+    public function update_enrolment_instance_data_provider(): array {
         $studentroles = get_archetype_roles('student');
         $studentrole = array_shift($studentroles);
 
@@ -717,7 +717,7 @@ final class lib_test extends \advanced_testcase {
                     'notifyall' => 0,
                     'expirythreshold' => 2 * DAYSECS,
                 ],
-                'updatedata' => (object) [
+                'update data' => (object) [
                     'status' => ENROL_INSTANCE_DISABLED,
                     'roleid' => $studentrole->id,
                     'enrolperiod' => 30 * DAYSECS,
@@ -734,7 +734,7 @@ final class lib_test extends \advanced_testcase {
                     'notifyall' => 0,
                     'expirythreshold' => 0,
                 ],
-                'updatedata' => (object) [
+                'update data' => (object) [
                     'status' => ENROL_INSTANCE_ENABLED,
                     'roleid' => $teacherrole->id,
                     'enrolperiod' => 0,
@@ -751,7 +751,7 @@ final class lib_test extends \advanced_testcase {
                     'notifyall' => 1,
                     'expirythreshold' => 2 * DAYSECS,
                 ],
-                'updatedata' => (object) [
+                'update data' => (object) [
                     'status' => ENROL_INSTANCE_ENABLED,
                     'roleid' => $studentrole->id,
                     'enrolperiod' => 30 * DAYSECS,
@@ -803,8 +803,6 @@ final class lib_test extends \advanced_testcase {
             'fullname' => 'Course 1 & 2',
             'shortname' => 'C1',
         ]);
-        $courseurl = course_get_url($course)->out();
-
         // Create users.
         $student = $this->getDataGenerator()->create_user();
         $teacher1 = $this->getDataGenerator()->create_user();
@@ -890,7 +888,7 @@ final class lib_test extends \advanced_testcase {
             instance: $maninstance,
             userid: $student->id,
             sendoption: ENROL_SEND_EMAIL_FROM_NOREPLY,
-            message: 'Welcome to <a href="{$a->courselink}">{$a->coursename}</a>',
+            message: 'Your email address: {$a->email}, your first name: {$a->firstname}, your last name: {$a->lastname}',
         );
         $messages = $messagesink->get_messages_by_component_and_type(
             'moodle',
@@ -903,8 +901,9 @@ final class lib_test extends \advanced_testcase {
         $this->assertEquals($noreplyuser->id, $message->useridfrom);
         $this->assertStringContainsString($course->fullname, $message->subject);
         $this->assertEquals(
-            "Welcome to <a href=\"{$courseurl}\">" . htmlentities($course->fullname) . "</a>",
-            $message->fullmessagehtml,
+            'Your email address: ' . $student->email . ', your first name: ' . $student->firstname . ', your last name: ' .
+            $student->lastname,
+            $message->fullmessage,
         );
         // Clear sink.
         $messagesink->clear();

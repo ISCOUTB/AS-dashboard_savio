@@ -16,8 +16,6 @@
 
 namespace core;
 
-use core_phpunit\exception\test_exception;
-
 /**
  * Test advanced_testcase extra features.
  *
@@ -27,7 +25,7 @@ use core_phpunit\exception\test_exception;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \advanced_testcase
  */
-final class advanced_test extends \advanced_testcase {
+class advanced_test extends \advanced_testcase {
     public static function setUpBeforeClass(): void {
         global $CFG;
         require_once(__DIR__ . '/fixtures/adhoc_test_task.php');
@@ -218,29 +216,28 @@ final class advanced_test extends \advanced_testcase {
         // Database change.
         $this->assertEquals(1, $DB->get_field('user', 'confirmed', array('id'=>2)));
         $DB->set_field('user', 'confirmed', 0, array('id'=>2));
-
         try {
             self::resetAllData(true);
-        } catch (test_exception $e) {
-            $this->assertStringContainsString('unexpected database modification', $e->getMessage());
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('PHPUnit\Framework\Error\Warning', $e);
         }
-
         $this->assertEquals(1, $DB->get_field('user', 'confirmed', array('id'=>2)));
+
         // Config change.
         $CFG->xx = 'yy';
         unset($CFG->admin);
         $CFG->rolesactive = 0;
-
         try {
             self::resetAllData(true);
-        } catch (test_exception $e) {
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('PHPUnit\Framework\Error\Warning', $e);
             $this->assertStringContainsString('xx', $e->getMessage());
             $this->assertStringContainsString('admin', $e->getMessage());
             $this->assertStringContainsString('rolesactive', $e->getMessage());
-            $this->assertFalse(isset($CFG->xx));
-            $this->assertTrue(isset($CFG->admin));
-            $this->assertEquals(1, $CFG->rolesactive);
         }
+        $this->assertFalse(isset($CFG->xx));
+        $this->assertTrue(isset($CFG->admin));
+        $this->assertEquals(1, $CFG->rolesactive);
 
         // _GET change.
         $_GET['__somethingthatwillnotnormallybepresent__'] = 'yy';
@@ -272,57 +269,28 @@ final class advanced_test extends \advanced_testcase {
         $SITE->id = 10;
         $COURSE = new \stdClass();
         $COURSE->id = 7;
-
         try {
             self::resetAllData(true);
-        } catch (test_exception $e) {
-            $this->assertStringContainsString('unexpected change of $COURSE', $e->getMessage());
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('PHPUnit\Framework\Error\Warning', $e);
+            $this->assertEquals(1, $SITE->id);
+            $this->assertSame($SITE, $COURSE);
+            $this->assertSame($SITE, $COURSE);
         }
-
-        $this->assertEquals(1, $SITE->id);
-        $this->assertSame($SITE, $COURSE);
-        $this->assertSame($SITE, $COURSE);
 
         // USER change.
         $this->setUser(2);
-
         try {
             self::resetAllData(true);
-        } catch (test_exception $e) {
-            $this->assertStringContainsString('unexpected change of $USER', $e->getMessage());
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('PHPUnit\Framework\Error\Warning', $e);
+            $this->assertEquals(0, $USER->id);
         }
-
-        $this->assertEquals(0, $USER->id);
-
     }
 
     public function test_getDataGenerator(): void {
         $generator = $this->getDataGenerator();
         $this->assertInstanceOf('testing_data_generator', $generator);
-    }
-
-    /**
-     * Some basic tests for the getExternalTestFileUrl() method.
-     */
-    public function test_external_file_url(): void {
-        $url = self::getExternalTestFileUrl('testfile.txt');
-        // There should only be a // after the protocol.
-        $this->assertCount(2, explode('//', $url));
-
-        if (defined('TEST_EXTERNAL_FILES_HTTP_URL')) {
-            $this->assertStringContainsString(TEST_EXTERNAL_FILES_HTTP_URL, $url);
-        } else {
-            $this->assertStringContainsString('http://download.moodle.org/unittest', $url);
-        }
-
-        $url = self::getExternalTestFileUrl('testfile.txt', true);
-        $this->assertCount(2, explode('//', $url));
-
-        if (defined('TEST_EXTERNAL_FILES_HTTPS_URL')) {
-            $this->assertStringContainsString(TEST_EXTERNAL_FILES_HTTPS_URL, $url);
-        } else {
-            $this->assertStringContainsString('https://download.moodle.org/unittest', $url);
-        }
     }
 
     public function test_database_mock1(): void {
@@ -627,12 +595,7 @@ final class advanced_test extends \advanced_testcase {
         $this->assertSame('99', $CFG->timezone);
         $this->assertSame('Europe/Prague', date_default_timezone_get());
 
-        // Catch warning for invalid 'xxx' timezone.
-        set_error_handler(function ($errno, $errstr): void {
-            $this->assertStringContainsString('Unknown or bad timezone', $errstr);
-        }, E_WARNING);
         $this->setTimezone('xxx', 'Europe/Prague');
-        restore_error_handler();
         $this->assertSame('xxx', $CFG->timezone);
         $this->assertSame('Europe/Prague', date_default_timezone_get());
 
@@ -640,18 +603,22 @@ final class advanced_test extends \advanced_testcase {
         $this->assertSame('Australia/Perth', $CFG->timezone);
         $this->assertSame('Australia/Perth', date_default_timezone_get());
 
-        // Catch warnings for other invalid cases.
-        $invalidtimezones = ['', 'xxxx', null];
-        foreach ($invalidtimezones as $invalidtz) {
-            set_error_handler(function ($errno, $errstr): void {
-                $this->assertStringContainsString('Unknown or bad timezone', $errstr);
-            }, E_WARNING);
-            try {
-                $this->setTimezone('Pacific/Auckland', $invalidtz);
-            } catch (\Throwable $e) {
-                $this->assertInstanceOf('PHPUnit\Framework\Error\Warning', $e);
-            }
-            restore_error_handler();
+        try {
+            $this->setTimezone('Pacific/Auckland', '');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('PHPUnit\Framework\Error\Warning', $e);
+        }
+
+        try {
+            $this->setTimezone('Pacific/Auckland', 'xxxx');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('PHPUnit\Framework\Error\Warning', $e);
+        }
+
+        try {
+            $this->setTimezone('Pacific/Auckland', null);
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('PHPUnit\Framework\Error\Warning', $e);
         }
 
     }
@@ -675,8 +642,8 @@ final class advanced_test extends \advanced_testcase {
 
         try {
             self::resetAllData(true);
-        } catch (test_exception $e) {
-            $this->assertStringContainsString('unexpected change of locale', $e->getMessage());
+        } catch (\Exception $e) {
+            $this->assertInstanceOf('PHPUnit\Framework\Error\Warning', $e);
         }
 
         if ($CFG->ostype === 'WINDOWS') {

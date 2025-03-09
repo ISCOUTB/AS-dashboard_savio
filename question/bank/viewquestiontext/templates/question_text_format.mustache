@@ -38,15 +38,17 @@
     <input type="hidden" name="sesskey" value="{{sesskey}}">
     <input type="hidden" name="returnurl" value="{{returnurl}}">
     <div class="input-group">
-        <label class="input-group-text" for="question-text-format">
-            {{label}}
+        <label class="input-group-prepend" for="question-text-format">
+            <span class="input-group-text">{{label}}</span>
         </label>
-        <select class="form-select" name="format" id="question-text-format">
+        <select class="form-control" name="format" id="question-text-format">
         {{#options}}
             <option value="{{value}}"{{#selected}} selected{{/selected}}>{{label}}</option>
         {{/options}}
         </select>
-        <button class="btn btn-outline-secondary">{{#str}} save {{/str}}</button>
+        <div class="input-group-append">
+            <button class="btn btn-outline-dark mb-2">{{#str}} save {{/str}}</button>
+        </div>
     </div>
 </form>
 {{#js}}

@@ -66,6 +66,20 @@ $capabilities = array(
         )
     ),
 
+    'mod/data:comment' => array(
+
+        'riskbitmask' => RISK_SPAM,
+
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'student' => CAP_ALLOW,
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        )
+    ),
+
     'mod/data:rate' => array(
 
         'captype' => 'write',
@@ -128,6 +142,19 @@ $capabilities = array(
     ),
 
     'mod/data:manageentries' => array(
+
+        'riskbitmask' => RISK_SPAM,
+
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        )
+    ),
+
+    'mod/data:managecomments' => array(
 
         'riskbitmask' => RISK_SPAM,
 
@@ -238,7 +265,4 @@ $capabilities = array(
     )
 );
 
-$deprecatedcapabilities = [
-    'mod/data:comment' => ['message' => 'This capability should not be used anymore.'],
-    'mod/data:managecomments' => ['message' => 'This capability should not be used anymore.'],
-];
+

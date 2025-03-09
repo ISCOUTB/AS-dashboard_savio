@@ -61,8 +61,6 @@ class manager {
                 continue;
             }
 
-            $options['pluginname'] = $pluginname;
-
             if (!$classname::is_enabled($context, $options, $fpoptions, $editor)) {
                 // This plugin has disabled itself for some reason.
                 // This is typical for media plugins where there is no file storage.

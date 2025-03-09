@@ -24,7 +24,7 @@ import * as Repository from 'gradereport_grader/collapse/repository';
 import search_combobox from 'core/comboboxsearch/search_combobox';
 import {renderForPromise, replaceNodeContents, replaceNode} from 'core/templates';
 import {debounce} from 'core/utils';
-import Dropdown from 'theme_boost/bootstrap/dropdown';
+import $ from 'jquery';
 import {getStrings} from 'core/str';
 import CustomEvents from "core/custom_interaction_events";
 import storage from 'core/localstorage';
@@ -57,7 +57,6 @@ const selectors = {
     placeholder: '.collapsecolumndropdown [data-region="placeholder"]',
     fullDropdown: '.collapsecolumndropdown',
     searchResultContainer: '.searchresultitemscontainer',
-    cellMenuButton: '.cellmenubtn',
 };
 
 const countIndicator = document.querySelector(selectors.count);
@@ -101,7 +100,7 @@ export default class ColumnSearch extends search_combobox {
             }, 10);
         }).then(() => pendingPromise.resolve()).catch(Notification.exception);
 
-        this.component.addEventListener('hide.bs.dropdown', () => {
+        this.$component.on('hide.bs.dropdown', () => {
             const searchResultContainer = this.component.querySelector(selectors.searchResultContainer);
             searchResultContainer.scrollTop = 0;
 
@@ -197,7 +196,6 @@ export default class ColumnSearch extends search_combobox {
     async docClickHandler(e) {
         if (e.target.dataset.hider === selectors.hider) {
             e.preventDefault();
-            const pendingPromise = new Pending('gradereport_grader/collapse:docClickHandler:hide');
             const desiredToHide = e.target.closest(selectors.colVal) ?
                 e.target.closest(selectors.colVal)?.dataset.col :
                 e.target.closest(selectors.itemVal)?.dataset.itemid;
@@ -207,13 +205,11 @@ export default class ColumnSearch extends search_combobox {
             }
             await this.prefcountpipe();
 
-            await this.nodesUpdate(desiredToHide);
-            pendingPromise.resolve();
+            this.nodesUpdate(desiredToHide);
         }
 
         if (e.target.closest('button')?.dataset.hider === selectors.expand) {
             e.preventDefault();
-            const pendingPromise = new Pending('gradereport_grader/collapse:docClickHandler:expand');
             const desiredToHide = e.target.closest(selectors.colVal) ?
                 e.target.closest(selectors.colVal)?.dataset.col :
                 e.target.closest(selectors.itemVal)?.dataset.itemid;
@@ -222,9 +218,8 @@ export default class ColumnSearch extends search_combobox {
 
             await this.prefcountpipe();
 
-            await this.nodesUpdate(e.target.closest(selectors.colVal)?.dataset.col);
-            await this.nodesUpdate(e.target.closest(selectors.colVal)?.dataset.itemid);
-            pendingPromise.resolve();
+            this.nodesUpdate(e.target.closest(selectors.colVal)?.dataset.col);
+            this.nodesUpdate(e.target.closest(selectors.colVal)?.dataset.itemid);
         }
     }
 
@@ -319,7 +314,7 @@ export default class ColumnSearch extends search_combobox {
         form.addEventListener('submit', async(e) => {
             e.preventDefault();
             if (e.submitter.dataset.action === selectors.formItems.cancel) {
-                Dropdown.getOrCreateInstance(this.component).toggle();
+                $(this.component).dropdown('toggle');
                 return;
             }
             // Get the users' checked columns to change.
@@ -336,14 +331,11 @@ export default class ColumnSearch extends search_combobox {
         });
     }
 
-    async nodesUpdate(item) {
+    nodesUpdate(item) {
         const colNodesToHide = [...document.querySelectorAll(`[data-col="${item}"]`)];
         const itemIDNodesToHide = [...document.querySelectorAll(`[data-itemid="${item}"]`)];
-        const elements = [...colNodesToHide, ...itemIDNodesToHide];
-        if (elements && elements.length) {
-            const pendingPromise = new Pending('gradereport_grader/collapse:nodesUpdate:' + item);
-            this.updateDisplay(elements).then(() => pendingPromise.resolve()).catch(Notification.exception);
-        }
+        this.nodes = [...colNodesToHide, ...itemIDNodesToHide];
+        this.updateDisplay();
     }
 
     /**
@@ -408,68 +400,52 @@ export default class ColumnSearch extends search_combobox {
 
     /**
      * With an array of nodes, switch their classes and values.
-     *
-     * @param {Array} elements The elements to update.
      */
-    async updateDisplay(elements) {
-        const promises = [];
-        elements.forEach((element) => {
-            promises.push(this.updateDisplayForElement(element));
-        });
+    updateDisplay() {
+        this.nodes.forEach((element) => {
+            const content = element.querySelector(selectors.content);
+            const sort = element.querySelector(selectors.sort);
+            const expandButton = element.querySelector(selectors.expandbutton);
+            const rangeRowCell = element.querySelector(selectors.rangerowcell);
+            const avgRowCell = element.querySelector(selectors.avgrowcell);
+            const nodeSet = [
+                element.querySelector(selectors.menu),
+                element.querySelector(selectors.icons),
+                content
+            ];
 
-        await Promise.all(promises);
-    }
-
-    /**
-     * Update display for given element, switch its classes and values.
-     *
-     * @param {HTMLElement} element The element to update.
-     */
-    async updateDisplayForElement(element) {
-        const content = element.querySelector(selectors.content);
-        const sort = element.querySelector(selectors.sort);
-        const expandButton = element.querySelector(selectors.expandbutton);
-        const rangeRowCell = element.querySelector(selectors.rangerowcell);
-        const avgRowCell = element.querySelector(selectors.avgrowcell);
-        const cellMenuButton = element.querySelector(selectors.cellMenuButton);
-        const nodeSet = [
-            element.querySelector(selectors.menu),
-            element.querySelector(selectors.icons),
-            content
-        ];
-
-        // This can be further improved to reduce redundant similar calls.
-        if (element.classList.contains('cell')) {
-            // The column is actively being sorted, lets reset that and reload the page.
-            if (sort !== null) {
-                window.location = this.defaultSort;
-            }
-            if (content === null) {
-                // If it's not a content cell, it must be an overall average or a range cell.
-                const rowCell = avgRowCell ?? rangeRowCell;
-
-                rowCell?.classList.toggle('d-none');
-            } else if (content.classList.contains('d-none')) {
-                // We should always have content but some cells do not contain menus or other actions.
-                element.classList.remove('collapsed');
-                // If there are many nodes, apply the following.
-                if (content.childNodes.length > 1) {
-                    content.classList.add('d-flex');
+            // This can be further improved to reduce redundant similar calls.
+            if (element.classList.contains('cell')) {
+                // The column is actively being sorted, lets reset that and reload the page.
+                if (sort !== null) {
+                    window.location = this.defaultSort;
                 }
-                nodeSet.forEach(node => {
-                    node?.classList.remove('d-none');
-                });
-                expandButton?.classList.add('d-none');
-                cellMenuButton?.focus();
-            } else {
-                element.classList.add('collapsed');
-                content.classList.remove('d-flex');
-                nodeSet.forEach(node => {
-                    node?.classList.add('d-none');
-                });
-                expandButton?.classList.remove('d-none');
+                if (content === null) {
+                    // If it's not a content cell, it must be an overall average or a range cell.
+                    const rowCell = avgRowCell ?? rangeRowCell;
+
+                    rowCell?.classList.toggle('d-none');
+                } else if (content.classList.contains('d-none')) {
+                    // We should always have content but some cells do not contain menus or other actions.
+                    element.classList.remove('collapsed');
+                    // If there are many nodes, apply the following.
+                    if (content.childNodes.length > 1) {
+                        content.classList.add('d-flex');
+                    }
+                    nodeSet.forEach(node => {
+                        node?.classList.remove('d-none');
+                    });
+                    expandButton?.classList.add('d-none');
+                } else {
+                    element.classList.add('collapsed');
+                    content.classList.remove('d-flex');
+                    nodeSet.forEach(node => {
+                        node?.classList.add('d-none');
+                    });
+                    expandButton?.classList.remove('d-none');
+                }
             }
-        }
+        });
     }
 
     /**
@@ -508,7 +484,7 @@ export default class ColumnSearch extends search_combobox {
         this.registerInputEvents();
 
         // Add a small BS listener so that we can set the focus correctly on open.
-        this.component.addEventListener('shown.bs.dropdown', () => {
+        this.$component.on('shown.bs.dropdown', () => {
             this.searchInput.focus({preventScroll: true});
             this.selectallEnable();
         });

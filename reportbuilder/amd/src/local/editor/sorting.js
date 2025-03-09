@@ -23,6 +23,7 @@
 
 "use strict";
 
+import $ from 'jquery';
 import 'core/inplace_editable';
 import Notification from 'core/notification';
 import Pending from 'core/pending';
@@ -69,12 +70,14 @@ const reloadSettingsSortingRegion = context => {
  * @return {Promise}
  */
 const updateSorting = (reportElement, element, sortenabled, sortdirection) => {
-    const columnSortContainer = element.closest(reportSelectors.regions.activeColumnSort);
-    const {columnSortId, columnSortName} = columnSortContainer.dataset;
+    const reportId = reportElement.dataset.reportId;
+    const listElement = element.closest('li');
+    const columnId = listElement.dataset.columnSortId;
+    const columnName = listElement.dataset.columnSortName;
 
-    return toggleColumnSorting(reportElement.dataset.reportId, columnSortId, sortenabled, sortdirection)
+    return toggleColumnSorting(reportId, columnId, sortenabled, sortdirection)
         .then(reloadSettingsSortingRegion)
-        .then(() => getString('columnsortupdated', 'core_reportbuilder', columnSortName))
+        .then(() => getString('columnsortupdated', 'core_reportbuilder', columnName))
         .then(addToast)
         .then(() => {
             dispatchEvent(reportEvents.tableReload, {}, reportElement);
@@ -106,8 +109,7 @@ export const init = (initialized) => {
 
             const pendingPromise = new Pending('core_reportbuilder/sorting:toggle');
             const reportElement = toggleSorting.closest(reportSelectors.regions.report);
-            const columnSortContainer = toggleSorting.closest(reportSelectors.regions.activeColumnSort);
-            const sortdirection = parseInt(columnSortContainer.dataset.columnSortDirection);
+            const sortdirection = parseInt(toggleSorting.closest('li').dataset.columnSortDirection);
 
             updateSorting(reportElement, toggleSorting, toggleSorting.checked, sortdirection)
                 .then(() => {
@@ -126,10 +128,10 @@ export const init = (initialized) => {
 
             const pendingPromise = new Pending('core_reportbuilder/sorting:direction');
             const reportElement = toggleSortDirection.closest(reportSelectors.regions.report);
-            const columnSortContainer = toggleSortDirection.closest(reportSelectors.regions.activeColumnSort);
-            const toggleSorting = columnSortContainer.querySelector(reportSelectors.actions.reportToggleColumnSort);
+            const listElement = toggleSortDirection.closest('li');
+            const toggleSorting = listElement.querySelector(reportSelectors.actions.reportToggleColumnSort);
 
-            let sortdirection = parseInt(columnSortContainer.dataset.columnSortDirection);
+            let sortdirection = parseInt(listElement.dataset.columnSortDirection);
             if (sortdirection === SORTORDER.ASCENDING) {
                 sortdirection = SORTORDER.DESCENDING;
             } else if (sortdirection === SORTORDER.DESCENDING) {
@@ -147,31 +149,28 @@ export const init = (initialized) => {
         }
     });
 
-    // Initialize sortable list to handle column sorting moving.
-    const columnsSortingSelector = `${reportSelectors.regions.settingsSorting} ul`;
-    const columnsSortingSortableList = new SortableList(columnsSortingSelector, {isHorizontal: false});
+    // Initialize sortable list to handle column sorting moving (note JQuery dependency, see MDL-72293 for resolution).
+    var columnsSortingSortableList = new SortableList(`${reportSelectors.regions.settingsSorting} ul`, {isHorizontal: false});
     columnsSortingSortableList.getElementName = element => Promise.resolve(element.data('columnSortName'));
 
-    document.addEventListener(SortableList.EVENTS.elementDrop, event => {
-        const toggleSortOrder = event.target.closest(`${columnsSortingSelector} ${reportSelectors.regions.activeColumnSort}`);
-        if (toggleSortOrder && event.detail.positionChanged) {
+    $(document).on(SortableList.EVENTS.DROP, `${reportSelectors.regions.report} li[data-column-sort-id]`, (event, info) => {
+        if (info.positionChanged) {
             const pendingPromise = new Pending('core_reportbuilder/sorting:reorder');
-
-            const reportElement = toggleSortOrder.closest(reportSelectors.regions.report);
-            const {columnSortId, columnSortPosition, columnSortName} = toggleSortOrder.dataset;
+            const reportElement = event.target.closest(reportSelectors.regions.report);
+            const columnId = info.element.data('columnSortId');
+            const columnPosition = info.element.data('columnSortPosition');
 
             // Select target position, if moving to the end then count number of element siblings.
-            let targetColumnSortPosition = event.detail.targetNextElement.data('columnSortPosition')
-                || event.detail.element.siblings().length + 2;
-            if (targetColumnSortPosition > columnSortPosition) {
+            let targetColumnSortPosition = info.targetNextElement.data('columnSortPosition') || info.element.siblings().length + 2;
+            if (targetColumnSortPosition > columnPosition) {
                 targetColumnSortPosition--;
             }
 
             // Re-order column sorting, giving drop event transition time to finish.
-            const reorderPromise = reorderColumnSorting(reportElement.dataset.reportId, columnSortId, targetColumnSortPosition);
+            const reorderPromise = reorderColumnSorting(reportElement.dataset.reportId, columnId, targetColumnSortPosition);
             Promise.all([reorderPromise, new Promise(resolve => setTimeout(resolve, 1000))])
                 .then(([data]) => reloadSettingsSortingRegion(data))
-                .then(() => getString('columnsortupdated', 'core_reportbuilder', columnSortName))
+                .then(() => getString('columnsortupdated', 'core_reportbuilder', info.element.data('columnSortName')))
                 .then(addToast)
                 .then(() => {
                     dispatchEvent(reportEvents.tableReload, {}, reportElement);

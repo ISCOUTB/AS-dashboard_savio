@@ -47,6 +47,9 @@
 function xmldb_h5pactivity_upgrade($oldversion) {
     global $DB;
 
+    // Automatically generated Moodle v4.1.0 release upgrade line.
+    // Put any upgrade step following this.
+
     // Automatically generated Moodle v4.2.0 release upgrade line.
     // Put any upgrade step following this.
 
@@ -68,9 +71,6 @@ function xmldb_h5pactivity_upgrade($oldversion) {
     // Put any upgrade step following this.
 
     // Automatically generated Moodle v4.4.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Automatically generated Moodle v4.5.0 release upgrade line.
     // Put any upgrade step following this.
 
     return true;

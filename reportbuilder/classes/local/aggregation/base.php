@@ -18,7 +18,7 @@ declare(strict_types=1);
 
 namespace core_reportbuilder\local\aggregation;
 
-use core\lang_string;
+use lang_string;
 use core_reportbuilder\local\report\column;
 
 /**
@@ -91,8 +91,8 @@ abstract class base {
     ): string {
         global $DB;
 
-        // We need to ensure all values are char in supported DBs.
-        $sqlfieldrequirescast = in_array($DB->get_dbfamily(), ['mssql', 'postgres']);
+        // We need to ensure all values are char.
+        $sqlfieldrequirescast = in_array($DB->get_dbfamily(), ['mssql', 'oracle', 'postgres']);
 
         $concatfields = [];
         foreach ($sqlfields as $sqlfield) {
@@ -117,29 +117,6 @@ abstract class base {
      * @return string
      */
     abstract public static function get_field_sql(string $field, int $columntype): string;
-
-    /**
-     * Whether the aggregation method is applied to a column, this method determines whether the report table should
-     * group by the column fields or not
-     *
-     * @return bool
-     */
-    public static function column_groupby(): bool {
-        return false;
-    }
-
-    /**
-     * Return aggregated column type, that being one of the column TYPE_* constants like {@see column::get_type}
-     *
-     * Classes should override this method to define the type of data that the aggregated column value returns (e.g 'count'
-     * returns a numeric value, regardless of the original column type to which it is applied)
-     *
-     * @param int $columntype The type of the column to which the aggregation is applied
-     * @return int
-     */
-    public static function get_column_type(int $columntype): int {
-        return column::TYPE_TEXT;
-    }
 
     /**
      * Return formatted value for column when applying aggregation, by default executing all callbacks on the value

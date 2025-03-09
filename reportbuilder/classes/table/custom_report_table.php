@@ -93,7 +93,10 @@ class custom_report_table extends base_report_table {
         }
 
         // If we are aggregating any columns, we should group by the remaining ones.
-        $aggregatedcolumns = array_filter($columns, fn(column $column): bool => !empty($column->get_aggregation()));
+        $aggregatedcolumns = array_filter($columns, static function(column $column): bool {
+            return !empty($column->get_aggregation());
+        });
+
         $hasaggregatedcolumns = !empty($aggregatedcolumns);
 
         // Also take account of the report setting to show unique rows (only if no columns are being aggregated).
@@ -105,8 +108,7 @@ class custom_report_table extends base_report_table {
             $columnheaders[$column->get_column_alias()] = $columnheading !== '' ? $columnheading : $column->get_title();
 
             // We need to determine for each column whether we should group by its fields, to support aggregation.
-            $columnaggregation = $column->get_aggregation();
-            if ($showuniquerows || ($hasaggregatedcolumns && (empty($columnaggregation) || $columnaggregation::column_groupby()))) {
+            if ($showuniquerows || ($hasaggregatedcolumns && empty($column->get_aggregation()))) {
                 $groupby = array_merge($groupby, $column->get_groupby_sql());
             }
 
@@ -348,7 +350,7 @@ class custom_report_table extends base_report_table {
                 'type' => 'button',
                 'class' => 'btn collapsed',
                 'title' => $buttontitle,
-                'data-bs-toggle' => 'collapse',
+                'data-toggle' => 'collapse',
                 'data-action' => 'toggle-card'
             ]);
             $html .= html_writer::tag('td', $button, ['class' => 'card-toggle d-none']);

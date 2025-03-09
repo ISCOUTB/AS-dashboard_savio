@@ -28,7 +28,7 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \core_courseformat\output\local\state\cm
  */
-final class cm_test extends \advanced_testcase {
+class cm_test extends \advanced_testcase {
 
     /**
      * Setup to ensure that fixtures are loaded.
@@ -151,7 +151,7 @@ final class cm_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function hasrestrictions_state_provider(): array {
+    public function hasrestrictions_state_provider(): array {
         return [
             // Teacher scenarios (topics).
             'Teacher, Topics, can edit, has availability and is available' => [

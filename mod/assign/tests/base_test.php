@@ -32,7 +32,7 @@ require_once(__DIR__ . '/fixtures/testable_assign.php');
  * @copyright  1999 onwards Martin Dougiamas  {@link http://moodle.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class base_test extends \advanced_testcase {
+class base_test extends \advanced_testcase {
 
     /** @var Default number of students to create */
     const DEFAULT_STUDENT_COUNT = 3;
@@ -134,7 +134,7 @@ final class base_test extends \advanced_testcase {
     }
 
     /*
-     * For tests that make sense to use a lot of data, create extra students/teachers.
+     * For tests that make sense to use alot of data, create extra students/teachers.
      */
     protected function create_extra_users() {
         global $DB;

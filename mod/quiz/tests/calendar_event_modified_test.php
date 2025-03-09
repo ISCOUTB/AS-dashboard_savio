@@ -31,7 +31,7 @@ require_once($CFG->dirroot . '/mod/quiz/lib.php');
  * @copyright  2017 Ryan Wyllie <ryan@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
-final class calendar_event_modified_test extends \advanced_testcase {
+class calendar_event_modified_test extends \advanced_testcase {
 
     /**
      * Create an instance of the quiz activity.

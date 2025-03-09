@@ -16,8 +16,6 @@
 
 namespace core;
 
-use core\tests\fake_plugins_test_trait;
-
 /**
  * Unit tests for (some of) ../moodlelib.php.
  *
@@ -28,8 +26,6 @@ use core\tests\fake_plugins_test_trait;
  * @author     nicolas@moodle.com
  */
 final class moodlelib_test extends \advanced_testcase {
-
-    use fake_plugins_test_trait;
 
     /**
      * Define a local decimal separator.
@@ -1108,7 +1104,7 @@ final class moodlelib_test extends \advanced_testcase {
      *
      * @return array of ($filename, $length, $expected, $includehash)
      */
-    public static function shorten_filename_provider(): array {
+    public function shorten_filename_provider() {
         $filename = 'sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium totam rem';
         $shortfilename = 'sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque';
 
@@ -1211,7 +1207,7 @@ final class moodlelib_test extends \advanced_testcase {
      *
      * @return array of ($filename, $length, $expected, $includehash)
      */
-    public static function shorten_filenames_provider(): array {
+    public function shorten_filenames_provider() {
         $shortfilename = 'sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque';
         $longfilename = 'sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium totam rem';
         $extfilename = $longfilename.'.zip';
@@ -1499,14 +1495,14 @@ final class moodlelib_test extends \advanced_testcase {
         $this->assertEquals($longvalue,
             $DB->get_field('user_preferences', 'value', array('userid' => $USER->id, 'name' => '_test_long_user_preference')));
 
-        // Larger preference values are allowed as of MDL-46739.
-        $longervalue = str_repeat('a', 1334);
-        set_user_preference('_test_long_user_preference', $longervalue);
-        $this->assertEquals($longervalue, get_user_preferences('_test_long_user_preference'));
-        $this->assertEquals(
-            $longervalue,
-            $DB->get_field('user_preferences', 'value', ['userid' => $USER->id, 'name' => '_test_long_user_preference'])
-        );
+        // Test > 1333 char values, coding_exception expected.
+        $longvalue = str_repeat('a', 1334);
+        try {
+            set_user_preference('_test_long_user_preference', $longvalue);
+            $this->fail('Exception expected - longer than 1333 chars not allowed as preference value');
+        } catch (\moodle_exception $ex) {
+            $this->assertInstanceOf('coding_exception', $ex);
+        }
 
         // Test invalid params.
         try {
@@ -2955,7 +2951,7 @@ EOF;
      */
     public static function update_internal_user_password_no_cache_provider(): array {
         return [
-            'Password is not empty' => ['db', 'wonkawonka'],
+            'Password is not empty' => ['cas', 'wonkawonka'],
             'Password is an empty string' => ['oauth2', ''],
             'Password is null' => ['oauth2', null],
         ];
@@ -2970,7 +2966,7 @@ EOF;
 
         $user = $this->getDataGenerator()->create_user(array('password' => 'test'));
         $this->assertNotEquals(AUTH_PASSWORD_NOT_CACHED, $user->password);
-        $user->auth = 'db'; // Change to a auth that does not store passwords.
+        $user->auth = 'cas'; // Change to a auth that does not store passwords.
 
         $sink = $this->redirectEvents();
         update_internal_user_password($user, 'wonkawonka');
@@ -3215,18 +3211,18 @@ EOF;
     /**
      * A data provider for testing email messageid
      */
-    public static function generate_email_messageid_provider(): array {
+    public function generate_email_messageid_provider() {
         return array(
             'nopath' => array(
                 'wwwroot' => 'http://www.example.com',
-                'msgids' => array(
+                'ids' => array(
                     'a-custom-id' => '<a-custom-id@www.example.com>',
                     'an-id-with-/-a-slash' => '<an-id-with-%2F-a-slash@www.example.com>',
                 ),
             ),
             'path' => array(
                 'wwwroot' => 'http://www.example.com/path/subdir',
-                'msgids' => array(
+                'ids' => array(
                     'a-custom-id' => '<a-custom-id/path/subdir@www.example.com>',
                     'an-id-with-/-a-slash' => '<an-id-with-%2F-a-slash/path/subdir@www.example.com>',
                 ),
@@ -3282,12 +3278,12 @@ EOF;
     /**
      * A data provider for testing email diversion
      */
-    public static function diverted_emails_provider(): array {
+    public function diverted_emails_provider() {
         return array(
             'nodiverts' => array(
                 'divertallemailsto' => null,
                 'divertallemailsexcept' => null,
-                'addresses' => array(
+                array(
                     'foo@example.com',
                     'test@real.com',
                     'fred.jones@example.com',
@@ -3295,12 +3291,12 @@ EOF;
                     'fred@example.com',
                     'fred+verp@example.com',
                 ),
-                'expected' => false,
+                false,
             ),
             'alldiverts' => array(
                 'divertallemailsto' => 'somewhere@elsewhere.com',
                 'divertallemailsexcept' => null,
-                'addresses' => array(
+                array(
                     'foo@example.com',
                     'test@real.com',
                     'fred.jones@example.com',
@@ -3308,65 +3304,65 @@ EOF;
                     'fred@example.com',
                     'fred+verp@example.com',
                 ),
-                'expected' => true,
+                true,
             ),
             'alsodiverts' => array(
                 'divertallemailsto' => 'somewhere@elsewhere.com',
                 'divertallemailsexcept' => '@dev.com, fred(\+.*)?@example.com',
-                'addresses' => array(
+                array(
                     'foo@example.com',
                     'test@real.com',
                     'fred.jones@example.com',
                     'Fred.Jones@Example.com',
                 ),
-                'expected' => true,
+                true,
             ),
             'divertsexceptions' => array(
                 'divertallemailsto' => 'somewhere@elsewhere.com',
                 'divertallemailsexcept' => '@dev.com, fred(\+.*)?@example.com',
-                'addresses' => array(
+                array(
                     'dev1@dev.com',
                     'fred@example.com',
                     'Fred@Example.com',
                     'fred+verp@example.com',
                 ),
-                'expected' => false,
+                false,
             ),
             'divertsexceptionsnewline' => array(
                 'divertallemailsto' => 'somewhere@elsewhere.com',
                 'divertallemailsexcept' => "@dev.com\nfred(\+.*)?@example.com",
-                'addresses' => array(
+                array(
                     'dev1@dev.com',
                     'fred@example.com',
                     'fred+verp@example.com',
                 ),
-                'expected' => false,
+                false,
             ),
             'alsodivertsnewline' => array(
                 'divertallemailsto' => 'somewhere@elsewhere.com',
                 'divertallemailsexcept' => "@dev.com\nfred(\+.*)?@example.com",
-                'addresses' => array(
+                array(
                     'foo@example.com',
                     'test@real.com',
                     'fred.jones@example.com',
                 ),
-                'expected' => true,
+                true,
             ),
             'alsodivertsblankline' => array(
                 'divertallemailsto' => 'somewhere@elsewhere.com',
                 'divertallemailsexcept' => "@dev.com\n",
-                'addresses' => [
+                [
                     'lionel@example.com',
                 ],
-                'expected' => true,
+                true,
             ),
             'divertsexceptionblankline' => array(
                 'divertallemailsto' => 'somewhere@elsewhere.com',
                 'divertallemailsexcept' => "@example.com\n",
-                'addresses' => [
+                [
                     'lionel@example.com',
                 ],
-                'expected' => false,
+                false,
             ),
         );
     }
@@ -3489,7 +3485,7 @@ EOF;
      *
      * @return array
      */
-    public static function email_to_user_attachment_provider(): array {
+    public function email_to_user_attachment_provider(): array {
         global $CFG;
 
         // Return all paths that can be used to send attachments from.
@@ -3862,7 +3858,7 @@ EOF;
      *
      * @return array of test cases.
      */
-    public static function count_words_testcases(): array {
+    public function count_words_testcases(): array {
         // Copy-pasting example from MDL-64240.
         $copypasted = <<<EOT
 <p onclick="alert('boop');">Snoot is booped</p>
@@ -3937,7 +3933,7 @@ EOT;
      *
      * @return array of test cases.
      */
-    public static function count_letters_testcases(): array {
+    public function count_letters_testcases(): array {
         return [
             [0, ''],
             [1, 'x'],
@@ -4102,7 +4098,7 @@ EOT;
     /**
      * Data provider for private ips.
      */
-    public static function data_private_ips(): array {
+    public function data_private_ips() {
         return array(
             array('10.0.0.0'),
             array('172.16.0.0'),
@@ -4127,7 +4123,7 @@ EOT;
     /**
      * Data provider for public ips.
      */
-    public static function data_public_ips(): array {
+    public function data_public_ips() {
         return array(
             array('2400:cb00:2048:1::8d65:71b3'),
             array('2400:6180:0:d0::1b:2001'),
@@ -4180,7 +4176,7 @@ EOT;
      *
      * @return array Returns an array of test data for the above function.
      */
-    public static function data_can_send_from_real_email_address(): array {
+    public function data_can_send_from_real_email_address() {
         return [
             // Test from email is in allowed domain.
             // Test that from display is set to show no one.
@@ -4326,7 +4322,7 @@ EOT;
      *
      * @return array Returns an array of test data for the above function.
      */
-    public static function data_email_is_not_allowed_for_allowemailaddresses(): array {
+    public function data_email_is_not_allowed_for_allowemailaddresses() {
         return [
             // Test allowed domain empty list.
             [
@@ -4405,7 +4401,7 @@ EOT;
      *
      * @return array Returns an array of test data for the above function.
      */
-    public static function data_email_is_not_allowed_for_denyemailaddresses(): array {
+    public function data_email_is_not_allowed_for_denyemailaddresses() {
         return [
             // Test denied domain empty list.
             [
@@ -4583,7 +4579,7 @@ EOT;
      *
      * @return array
      */
-    public static function component_class_callback_default_provider(): array {
+    public function component_class_callback_default_provider() {
         return [
             'null' => [null],
             'empty string' => [''],
@@ -4599,7 +4595,7 @@ EOT;
      *
      * @return array
      */
-    public static function component_class_callback_data_provider(): array {
+    public function component_class_callback_data_provider() {
         return [
             'empty string' => [''],
             'string' => ['This is a string'],
@@ -4614,7 +4610,7 @@ EOT;
      *
      * @return array
      */
-    public static function component_class_callback_multiple_params_provider(): array {
+    public function component_class_callback_multiple_params_provider() {
         return [
             'empty array' => [
                 [],
@@ -4659,7 +4655,7 @@ EOT;
      *
      * @return array of (string)case => [(mixed)callable, (string|bool)expected description]
      */
-    public static function callable_names_provider(): array {
+    public function callable_names_provider() {
         return [
             'integer' => [
                 386,
@@ -4677,6 +4673,10 @@ EOT;
                 ['my_foobar_class', 'my_foobar_method'],
                 'my_foobar_class::my_foobar_method',
             ],
+            'static_method_of_object' => [
+                [$this, 'my_foobar_method'],
+                'core\moodlelib_test::my_foobar_method',
+            ],
             'method_of_object' => [
                 [new lang_string('parentlanguage', 'core_langconfig'), 'my_foobar_method'],
                 'core\lang_string::my_foobar_method',
@@ -4693,18 +4693,11 @@ EOT;
     }
 
     /**
-     * Test that get_callable_name works with a static method on an instance.
-     */
-    public function test_get_callable_name_this(): void {
-        $this->assertSame('core\moodlelib_test::foo', get_callable_name([$this, 'foo']));
-    }
-
-    /**
      * Data provider for \core_moodlelib_testcase::test_get_complete_user_data().
      *
      * @return array
      */
-    public static function user_data_provider(): array {
+    public function user_data_provider() {
         return [
             'Fetch data using a valid username' => [
                 'username', 's1', true
@@ -4839,7 +4832,7 @@ EOT;
     /**
      * Data provider for the test_get_time_interval_string() method.
      */
-    public static function get_time_interval_string_provider(): array {
+    public function get_time_interval_string_provider() {
         return [
             'Time is after the reference time by 1 minute, omitted format' => [
                 'time1' => 12345660,
@@ -4997,7 +4990,7 @@ EOT;
      *
      * @return array of ($size, $expected)
      */
-    public static function display_size_provider(): array {
+    public function display_size_provider() {
 
         return [
             [0, '0 bytes'],
@@ -5039,7 +5032,7 @@ EOT;
      *
      * @return array of ($size, $units, $expected)
      */
-    public static function display_size_fixed_provider(): array {
+    public function display_size_fixed_provider(): array {
         return [
             [0, 'KB', '0.0 KB'],
             [1, 'MB', '0.0 MB'],
@@ -5069,7 +5062,7 @@ EOT;
      *
      * @return array of ($size, $decimalplaces, $units, $expected)
      */
-    public static function display_size_dp_provider(): array {
+    public function display_size_dp_provider(): array {
         return [
             [0, 1, 'KB', '0.0 KB'],
             [1, 6, 'MB', '0.000001 MB'],
@@ -5115,7 +5108,7 @@ EOT;
      *
      * @return  array
      */
-    public static function get_list_of_plugins_provider(): array {
+    public function get_list_of_plugins_provider(): array {
         return [
             'Standard excludes' => [
                 ['amdd', 'class', 'local', 'test'],
@@ -5488,88 +5481,43 @@ EOT;
      *
      * @return array of test cases.
      */
-    public static function is_proxybypass_provider(): array {
+    public function is_proxybypass_provider(): array {
 
         return [
             'Proxybypass contains the same IP as the beginning of the URL' => [
                 'http://192.168.5.5-fake-app-7f000101.nip.io',
-                '192.168.5.5,127.0.0.1',
-                false,
-            ],
-            'Proxybypass contains some extra whitespaces (test with hostname)' => [
-                'store.mydomain.com',
-                'store.mydomain.com , 192.168.5.5',
-                false,
-            ],
-            'Proxybypass contains some extra whitespaces (test with IP)' => [
-                '192.168.5.5',
-                'store.mydomain.com , 192.168.5.5',
-                false,
+                '192.168.5.5, 127.0.0.1',
+                false
             ],
             'Proxybypass contains the last part of the URL' => [
                 'http://192.168.5.5-fake-app-7f000101.nip.io',
                 'app-7f000101.nip.io',
-                false,
+                false
             ],
             'Proxybypass contains the last part of the URL 2' => [
                 'http://store.mydomain.com',
                 'mydomain.com',
-                false,
+                false
             ],
             'Proxybypass contains part of the url' => [
                 'http://myweb.com',
                 'store.myweb.com',
-                false,
-            ],
-            'Proxybypass with a wildcard contains part of the url' => [
-                'http://myweb.com',
-                '*.myweb.com',
-                false,
+                false
             ],
             'Different IPs used in proxybypass' => [
                 'http://192.168.5.5',
                 '192.168.5.3',
-                false,
-            ],
-            'Different partial IPs used in proxybypass' => [
-                'http://192.168.5.5',
-                '192.16',
-                false,
-            ],
-            'Different partial IPs used in proxybypass with ending dot' => [
-                'http://192.168.5.5',
-                '192.16.',
-                false,
+                false
             ],
             'Proxybypass and URL matchs' => [
                 'http://store.mydomain.com',
                 'store.mydomain.com',
-                true,
-            ],
-            'Proxybypass with a wildcard value covers any subdomain' => [
-                'http://store.mydomain.com',
-                '*.mydomain.com',
-                true,
-            ],
-            'Proxybypass with a wildcard value covers any higher level subdomain' => [
-                'http://another.store.mydomain.com',
-                '*.mydomain.com',
-                true,
-            ],
-            'Proxybypass with multiple domains' => [
-                'http://store.mydomain.com',
-                '127.0.0.1,*.mydomain.com',
-                true,
+                true
             ],
             'IP used in proxybypass' => [
                 'http://192.168.5.5',
                 '192.168.5.5',
-                true,
-            ],
-            'Partial IP used in proxybypass' => [
-                'http://192.168.5.5',
-                '192.168.',
-                true,
+                true
             ],
         ];
     }
@@ -5716,93 +5664,5 @@ EOT;
             ['setnew_password_and_mail', false],
             ['send_password_change_confirmation_email', $extrasendpasswordchangeconfirmationemail],
         ];
-    }
-
-    /**
-     * Test various moodlelib functions when dealing with a deprecated plugin type.
-     *
-     * @runInSeparateProcess
-     *
-     * @covers ::get_string_manager
-     * @covers ::component_callback_exists
-     * @covers ::component_callback
-     * @covers ::component_class_callback
-     * @covers ::get_plugins_with_function
-     * @covers ::get_plugin_list_with_function
-     * @return void
-     */
-    public function test_moodlelib_deprecated_plugintype(): void {
-        $this->resetAfterTest();
-        global $CFG;
-
-        // Inject the 'fake' plugin type and deprecate it.
-        // Note: this method of injection is required to ensure core_component fully builds all caches from the ground up,
-        // which is necessary to test things like class autoloading, required for class callbacks checks.
-        $this->add_full_mocked_plugintype(
-            plugintype: 'fake',
-            path: 'lib/tests/fixtures/fakeplugins/fake',
-        );
-        $this->deprecate_full_mocked_plugintype('fake');
-
-        // Verify strings can be fetched for deprecated plugins.
-        $stringman = get_string_manager();
-        $this->assertEquals('Fake full featured plugin', $stringman->get_string('pluginname', 'fake_fullfeatured'));
-
-        // Verify callbacks are NOT supported for deprecated plugins (falling back to using the default return).
-        $this->assertFalse(component_callback_exists('fake_fullfeatured', 'test_callback'));
-        $this->assertEquals('default', component_callback('fake_fullfeatured', 'test_callback', [], 'default'));
-        $this->assertEquals('cat', component_class_callback(\fake_fullfeatured\dummy::class, 'class_callback_test', [], 'cat'));
-
-        // Unset allversionshash to trigger a plugin functions rebuild, forcing it to pick up the injected mock plugin functions.
-        unset($CFG->allversionshash);
-        $plugins = get_plugins_with_function('test_callback');
-        $this->assertArrayNotHasKey('fake', $plugins);
-        $pluginlist = get_plugin_list_with_function('fake', 'test_callback');
-        $this->assertArrayNotHasKey('fake_fullfeatured', $pluginlist);
-    }
-
-    /**
-     * Test various moodlelib functions when dealing with a deleted plugin type.
-     *
-     * @runInSeparateProcess
-     *
-     * @covers ::get_string_manager
-     * @covers ::component_callback_exists
-     * @covers ::component_callback
-     * @covers ::component_class_callback
-     * @covers ::get_plugins_with_function
-     * @covers ::get_plugin_list_with_function
-     * @return void
-     */
-    public function test_moodlelib_deleted_plugintype(): void {
-        $this->resetAfterTest();
-        global $CFG;
-
-        // Inject the 'fake' plugin type and flag it as deleted.
-        // Note: this deep method of injection is required to ensure core_component fully builds all caches from the ground up,
-        // which is necessary to test things like class autoloading, required for class callbacks checks.
-        $this->add_full_mocked_plugintype(
-            plugintype: 'fake',
-            path: 'lib/tests/fixtures/fakeplugins/fake',
-        );
-        $this->delete_full_mocked_plugintype('fake');
-
-        // Verify no string support for deleted plugins.
-        $stringman = get_string_manager();
-        $this->assertEquals('[[pluginname]]', $stringman->get_string('pluginname', 'fake_fullfeatured'));
-        $this->assertDebuggingCalled();
-
-        // Verify callbacks are NOT supported for deleted plugins (falling back to using the default return).
-        $this->assertFalse(component_callback_exists('fake_fullfeatured', 'test_callback'));
-        $this->assertEquals('default', component_callback('fake_fullfeatured', 'test_callback', [], 'default'));
-        $this->assertEquals('default',
-            component_class_callback(\fake_fullfeatured\dummy::class, 'class_callback_test', [], 'default'));
-
-        // Unset allversionshash to trigger a plugin functions rebuild, forcing it to pick up the injected mock plugin functions.
-        unset($CFG->allversionshash);
-        $plugins = get_plugins_with_function('test_callback');
-        $this->assertArrayNotHasKey('fake', $plugins);
-        $pluginlist = get_plugin_list_with_function('fake', 'test_callback');
-        $this->assertArrayNotHasKey('fake_fullfeatured', $pluginlist);
     }
 }

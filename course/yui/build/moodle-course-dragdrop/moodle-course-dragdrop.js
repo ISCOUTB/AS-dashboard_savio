@@ -4,11 +4,8 @@ YUI.add('moodle-course-dragdrop', function (Y, NAME) {
 /**
  * Drag and Drop for course sections and course modules.
  *
- * TODO: remove this module as part of MDL-83627.
- *
  * @module moodle-course-dragdrop
  */
-
 
 var CSS = {
     ACTIONAREA: '.actions',
@@ -36,8 +33,6 @@ M.course = M.course || {};
 /**
  * Section drag and drop.
  *
- * TODO: remove this module as part of MDL-83627.
- *
  * @class M.course.dragdrop.section
  * @constructor
  * @extends M.core.dragdrop
@@ -45,8 +40,6 @@ M.course = M.course || {};
 var DRAGSECTION = function() {
     DRAGSECTION.superclass.constructor.apply(this, arguments);
 };
-
-
 Y.extend(DRAGSECTION, M.core.dragdrop, {
     sectionlistselector: null,
 
@@ -334,8 +327,6 @@ M.course.init_section_dragdrop = function(params) {
 /**
  * Resource drag and drop.
  *
- * TODO: remove this module as part of MDL-83627.
- *
  * @class M.course.dragdrop.resource
  * @constructor
  * @extends M.core.dragdrop
@@ -343,8 +334,6 @@ M.course.init_section_dragdrop = function(params) {
 var DRAGRESOURCE = function() {
     DRAGRESOURCE.superclass.constructor.apply(this, arguments);
 };
-
-
 Y.extend(DRAGRESOURCE, M.core.dragdrop, {
     initializer: function() {
         // Set group for parent class

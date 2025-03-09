@@ -35,7 +35,7 @@ require_once($CFG->libdir . '/filestorage/file_system.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \file_system
  */
-final class file_system_test extends \advanced_testcase {
+class file_system_test extends \advanced_testcase {
 
     public function setUp(): void {
         parent::setUp();
@@ -1218,14 +1218,7 @@ final class file_system_test extends \advanced_testcase {
         ]);
 
         $fs->method('is_file_readable_locally_by_hash')->willReturn(false);
-        $getinvocations = $this->exactly(2);
-        $fs
-            ->expects($getinvocations)
-            ->method('get_local_path_from_hash')
-            ->willReturnCallback(fn () => match (self::getInvocationCount($getinvocations)) {
-                1 => '/path/to/remote/file',
-                2 => $filepath,
-            });
+        $fs->method('get_local_path_from_hash')->will($this->onConsecutiveCalls('/path/to/remote/file', $filepath));
 
         $file = $this->get_stored_file('example content');
 
@@ -1238,7 +1231,7 @@ final class file_system_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function is_image_from_storedfile_provider(): array {
+    public function is_image_from_storedfile_provider() {
         return array(
             'Standard image'            => array('image/png', true),
             'Made up document/image'    => array('document/image', false),
@@ -1250,7 +1243,7 @@ final class file_system_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function get_local_path_from_storedfile_provider(): array {
+    public function get_local_path_from_storedfile_provider() {
         return [
             'default args (nofetch)' => [
                 'args' => [],

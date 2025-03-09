@@ -20,8 +20,13 @@ namespace core_files\reportbuilder\datasource;
 
 use core\context\{course, coursecat, user};
 use core_reportbuilder_generator;
+use core_reportbuilder_testcase;
 use core_reportbuilder\local\filters\{boolean_select, date, filesize, select, text};
-use core_reportbuilder\tests\core_reportbuilder_testcase;
+
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once("{$CFG->dirroot}/reportbuilder/tests/helpers.php");
 
 /**
  * Unit tests for files datasource

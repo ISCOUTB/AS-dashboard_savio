@@ -141,10 +141,9 @@ class tokens extends system_report {
                 "{$entityservicealias}.id",
                 "{$entityservicealias}.shortname",
             ]))
-            ->add_callback(static function($value, \stdClass $row): string {
+            ->add_callback(static function(string $value, \stdClass $row): string {
                 global $OUTPUT;
-
-                $missingcapabilities = self::get_missing_capabilities((int) $row->userid, (int) $row->id, (string) $row->shortname);
+                $missingcapabilities = self::get_missing_capabilities((int)$row->userid, (int)$row->id, $row->shortname);
                 if (empty($missingcapabilities)) {
                     return '';
                 }

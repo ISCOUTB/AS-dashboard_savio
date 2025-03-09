@@ -18,9 +18,19 @@ declare(strict_types=1);
 
 namespace core_user\reportbuilder\datasource;
 
+use core_reportbuilder_testcase;
 use core_reportbuilder_generator;
-use core_reportbuilder\local\filters\{boolean_select, date, select, tags, text, user as user_filter};
-use core_reportbuilder\tests\core_reportbuilder_testcase;
+use core_reportbuilder\local\filters\boolean_select;
+use core_reportbuilder\local\filters\date;
+use core_reportbuilder\local\filters\select;
+use core_reportbuilder\local\filters\tags;
+use core_reportbuilder\local\filters\text;
+use core_reportbuilder\local\filters\user as user_filter;
+
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once("{$CFG->dirroot}/reportbuilder/tests/helpers.php");
 
 /**
  * Unit tests for users datasource
@@ -210,56 +220,6 @@ final class users_test extends core_reportbuilder_testcase {
     }
 
     /**
-     * Test fullname columns when alternative fullname format is configured
-     */
-    public function test_datasource_alternative_fullname_columns(): void {
-        $this->resetAfterTest();
-        $this->setAdminUser();
-
-        set_config('alternativefullnameformat', '(alternatename) firstname lastname');
-
-        $this->getDataGenerator()->create_user(['firstname' => 'John', 'lastname' => 'Smith', 'alternatename' => 'JS']);
-
-        /** @var core_reportbuilder_generator $generator */
-        $generator = $this->getDataGenerator()->get_plugin_generator('core_reportbuilder');
-        $report = $generator->create_report(['name' => 'Users', 'source' => users::class, 'default' => 0]);
-
-        $generator->create_column(['reportid' => $report->get('id'), 'uniqueidentifier' => 'user:fullname', 'sortenabled' => 1]);
-        $generator->create_column(['reportid' => $report->get('id'), 'uniqueidentifier' => 'user:fullnamewithlink']);
-        $generator->create_column(['reportid' => $report->get('id'), 'uniqueidentifier' => 'user:fullnamewithpicture']);
-        $generator->create_column(['reportid' => $report->get('id'), 'uniqueidentifier' => 'user:fullnamewithpicturelink']);
-
-        $content = $this->get_custom_report_content($report->get('id'));
-        $this->assertCount(2, $content);
-
-        // Admin row.
-        [
-            $fullname,
-            $fullnamewithlink,
-            $fullnamewithpicture,
-            $fullnamewithpicturelink
-        ] = array_values($content[0]);
-
-        $this->assertEquals('Admin User', $fullname);
-        $this->assertStringContainsString('Admin User', $fullnamewithlink);
-        $this->assertStringContainsString('Admin User', $fullnamewithpicture);
-        $this->assertStringContainsString('Admin User', $fullnamewithpicturelink);
-
-        // User row.
-        [
-            $fullname,
-            $fullnamewithlink,
-            $fullnamewithpicture,
-            $fullnamewithpicturelink
-        ] = array_values($content[1]);
-
-        $this->assertEquals('(JS) John Smith', $fullname);
-        $this->assertStringContainsString('(JS) John Smith', $fullnamewithlink);
-        $this->assertStringContainsString('(JS) John Smith', $fullnamewithpicture);
-        $this->assertStringContainsString('(JS) John Smith', $fullnamewithpicturelink);
-    }
-
-    /**
      * Data provider for {@see test_datasource_filters}
      *
      * @return array[]
@@ -278,12 +238,6 @@ final class users_test extends core_reportbuilder_testcase {
             'Filter fullname (no match)' => ['user:fullname', [
                 'user:fullname_operator' => text::CONTAINS,
                 'user:fullname_value' => 'Alfie',
-            ], false],
-            'Filter picture' => ['user:picture', [
-                'user:picture_operator' => boolean_select::NOT_CHECKED,
-            ], true],
-            'Filter picture (no match)' => ['user:picture', [
-                'user:picture_operator' => boolean_select::CHECKED,
             ], false],
             'Filter firstname' => ['user:firstname', [
                 'user:firstname_operator' => text::IS_EQUAL_TO,
@@ -386,8 +340,8 @@ final class users_test extends core_reportbuilder_testcase {
                 'user:lang_value' => 'en',
             ], true],
             'Filter lang (no match)' => ['user:lang', [
-                'user:lang_operator' => select::NOT_EQUAL_TO,
-                'user:lang_value' => 'en',
+                'user:lang_operator' => select::EQUAL_TO,
+                'user:lang_value' => 'de',
             ], false],
             'Filter timezone' => ['user:timezone', [
                 'user:timezone_operator' => select::EQUAL_TO,
@@ -573,7 +527,7 @@ final class users_test extends core_reportbuilder_testcase {
         $generator = $this->getDataGenerator()->get_plugin_generator('core_reportbuilder');
 
         // Create report containing single column, and given filter.
-        $report = $generator->create_report(['name' => 'Users', 'source' => users::class, 'default' => 0]);
+        $report = $generator->create_report(['name' => 'Tasks', 'source' => users::class, 'default' => 0]);
         $generator->create_column(['reportid' => $report->get('id'), 'uniqueidentifier' => 'user:username']);
 
         // Add filter, set it's values.

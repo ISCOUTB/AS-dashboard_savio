@@ -557,7 +557,7 @@ $calendarCurrentDateBackground: $primary;
                 }
                 .calendarwrapper {
                     .arrow_text {
-                        @include visually-hidden;
+                        @include sr-only;
                     }
                 }
             }
@@ -609,7 +609,7 @@ table.calendartable caption {
 }
 
 @media (min-width: 768px) {
-    [data-blockregion]:not([data-blockregion="content"]) {
+    section:not(#region-main) {
         .block {
             &.block_calendar_month {
                 .maincalendar {

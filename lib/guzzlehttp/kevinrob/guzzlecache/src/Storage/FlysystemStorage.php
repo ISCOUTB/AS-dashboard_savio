@@ -44,12 +44,7 @@ class FlysystemStorage implements CacheStorageInterface
      */
     public function save($key, CacheEntry $data)
     {
-      try {
         $this->filesystem->write($key, serialize($data));
-        return true;
-      } catch (FilesystemException $e) {
-        return false;
-      }
     }
 
     /**
@@ -59,7 +54,6 @@ class FlysystemStorage implements CacheStorageInterface
     {
         try {
             $this->filesystem->delete($key);
-            return true;
         } catch (FilesystemException $ex) {
             return true;
         }

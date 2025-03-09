@@ -31,7 +31,7 @@ require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
  * @copyright  2010 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class restore_dbops_test extends \advanced_testcase {
+class restore_dbops_test extends \advanced_testcase {
 
     /**
      * Verify the xxx_ids_cached (in-memory backup_ids cache) stuff works as expected.
@@ -124,7 +124,8 @@ final class restore_dbops_test extends \advanced_testcase {
     /**
      * Data provider for {@link test_precheck_user()}
      */
-    public static function precheck_user_provider(): array {
+    public function precheck_user_provider() {
+
         $emailmultiplier = [
             'shortmail' => 'normalusername@example.com',
             'longmail' => str_repeat('a', 100)  // It's not validated, hence any string is ok.
@@ -134,7 +135,7 @@ final class restore_dbops_test extends \advanced_testcase {
 
         foreach ($emailmultiplier as $emailk => $email) {
             // Get the related cases.
-            $cases = self::precheck_user_cases($email);
+            $cases = $this->precheck_user_cases($email);
             // Rename them (keys).
             foreach ($cases as $key => $case) {
                 $providercases[$key . ' - ' . $emailk] = $case;
@@ -149,7 +150,7 @@ final class restore_dbops_test extends \advanced_testcase {
      *
      * @param string $email
      */
-    private static function precheck_user_cases($email) {
+    private function precheck_user_cases($email) {
         global $CFG;
 
         $baseuserarr = [

@@ -1,6 +1,4 @@
 <?php
-use PHPUnit\Framework\Attributes\After;
-use PHPUnit\Framework\Attributes\Before;
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -38,6 +36,7 @@ use PHPUnit\Framework\Attributes\Before;
  *      1=>array('dbtype'=>'mysqli', 'dbhost'=>'localhost', 'dbname'=>'moodle', 'dbuser'=>'root', 'dbpass'=>'', 'prefix'=>'phpu2_'),
  *      2=>array('dbtype'=>'pgsql', 'dbhost'=>'localhost', 'dbname'=>'moodle', 'dbuser'=>'postgres', 'dbpass'=>'', 'prefix'=>'phpu2_'),
  *      3=>array('dbtype'=>'sqlsrv', 'dbhost'=>'127.0.0.1', 'dbname'=>'moodle', 'dbuser'=>'sa', 'dbpass'=>'', 'prefix'=>'phpu2_'),
+ *      4=>array('dbtype'=>'oci', 'dbhost'=>'127.0.0.1', 'dbname'=>'XE', 'dbuser'=>'sa', 'dbpass'=>'', 'prefix'=>'t_'),
  * );
  * define('PHPUNIT_TEST_DRIVER')=1; //number is index in the previous array
  *
@@ -57,11 +56,14 @@ abstract class database_driver_testcase extends base_testcase {
      * Constructs a test case with the given name.
      *
      * @param string $name
+     * @param array  $data
+     * @param string $dataName
      */
-    final public function __construct($name = null) {
-        parent::__construct($name);
+    final public function __construct($name = null, array $data = array(), $dataName = '') {
+        parent::__construct($name, $data, $dataName);
 
         $this->setBackupGlobals(false);
+        $this->setBackupStaticAttributes(false);
         $this->setRunTestInSeparateProcess(false);
     }
 
@@ -99,9 +101,9 @@ abstract class database_driver_testcase extends base_testcase {
         self::$extradb = $d;
     }
 
-    #[Before]
-    protected function setup_extradb(): void {
+    protected function setUp(): void {
         global $DB;
+        parent::setUp();
 
         if (self::$extradb) {
             $this->tdb = self::$extradb;
@@ -110,8 +112,7 @@ abstract class database_driver_testcase extends base_testcase {
         }
     }
 
-    #[After]
-    protected function teardown_extradb(): void {
+    protected function tearDown(): void {
         // delete all test tables
         $dbman = $this->tdb->get_manager();
         $tables = $this->tdb->get_tables(false);
@@ -121,6 +122,7 @@ abstract class database_driver_testcase extends base_testcase {
                 $dbman->drop_table($table);
             }
         }
+        parent::tearDown();
     }
 
     public static function tearDownAfterClass(): void {
@@ -132,13 +134,34 @@ abstract class database_driver_testcase extends base_testcase {
         parent::tearDownAfterClass();
     }
 
-    #[After]
-    public function check_debugging(): void {
-        // Deal with any debugging messages.
-        $debugerror = phpunit_util::display_debugging_messages(true);
-        $this->resetDebugging();
-        if (!empty($debugerror)) {
-            trigger_error('Unexpected debugging() call detected.' . "\n" . $debugerror, E_USER_NOTICE);
+    /**
+     * Runs the bare test sequence.
+     * @return void
+     */
+    public function runBare(): void {
+        try {
+            parent::runBare();
+
+            // Deal with any debugging messages.
+            $debugerror = phpunit_util::display_debugging_messages(true);
+            $this->resetDebugging();
+            if (!empty($debugerror)) {
+                trigger_error('Unexpected debugging() call detected.' . "\n" . $debugerror, E_USER_NOTICE);
+            }
+
+        } catch (Exception $ex) {
+            $e = $ex;
+        } catch (Throwable $ex) {
+            // Engine errors in PHP7 throw exceptions of type Throwable (this "catch" will be ignored in PHP5).
+            $e = $ex;
+        }
+
+        if (isset($e)) {
+            if ($this->tdb->is_transaction_started()) {
+                $this->tdb->force_transaction_rollback();
+            }
+            $this->tearDown();
+            throw $e;
         }
     }
 

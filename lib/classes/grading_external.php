@@ -364,7 +364,6 @@ class core_grading_external extends external_api {
                 'warningcode' => '1'
             );
         }
-
         foreach ($activeinstances as $activeinstance) {
             $instance = array();
             $instance['id'] = $activeinstance->get_id();
@@ -372,17 +371,17 @@ class core_grading_external extends external_api {
             $instance['itemid'] = $activeinstance->get_data('itemid');
             $instance['rawgrade'] = $activeinstance->get_data('rawgrade');
             $instance['status'] = $activeinstance->get_data('status');
-
+            $instance['feedback'] = $activeinstance->get_data('feedback');
+            $instance['feedbackformat'] = $activeinstance->get_data('feedbackformat');
             // Format the feedback text field.
-            [$instance['feedback'], $instance['feedbackformat']] = \core_external\util::format_text(
-                $activeinstance->get_data('feedback'),
+            $formattedtext = \core_external\util::format_text($activeinstance->get_data('feedback'),
                 $activeinstance->get_data('feedbackformat'),
-                $context,
+                $context->id,
                 $area->component,
                 'feedback',
-                $params['definitionid'],
-            );
-
+                $params['definitionid']);
+            $instance['feedback'] = $formattedtext[0];
+            $instance['feedbackformat'] = $formattedtext[1];
             $instance['timemodified'] = $activeinstance->get_data('timemodified');
 
             if ($details != null && $getfilling != null) {

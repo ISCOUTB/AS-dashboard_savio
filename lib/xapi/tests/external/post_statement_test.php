@@ -48,7 +48,7 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  * @copyright  2020 Ferran Recio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class post_statement_test extends externallib_advanced_testcase {
+class post_statement_test extends externallib_advanced_testcase {
 
     /** @var test_helper for generating valid xapi statements. */
     private $testhelper;
@@ -188,7 +188,7 @@ final class post_statement_test extends externallib_advanced_testcase {
      *
      * @return  array
      */
-    public static function components_provider(): array {
+    public function components_provider(): array {
         return [
             'Inexistent component' => [
                 'inexistent_component', []
@@ -234,7 +234,7 @@ final class post_statement_test extends externallib_advanced_testcase {
      *
      * @return  array
      */
-    public static function invalid_json_provider(): array {
+    public function invalid_json_provider(): array {
         return [
             'Wrong json' => [
                 'This is not { a json object /'
@@ -377,7 +377,7 @@ final class post_statement_test extends externallib_advanced_testcase {
      *
      * @return  array
      */
-    public static function statement_provider(): array {
+    public function statement_provider(): array {
         return [
             // Single statement with group statements enabled.
             'Single, Valid actor, valid verb' => [
@@ -450,7 +450,7 @@ final class post_statement_test extends externallib_advanced_testcase {
      *
      * @return  array
      */
-    public static function group_statement_provider(): array {
+    public function group_statement_provider(): array {
         return [
             // Single statement with group statements enabled.
             'Group statement + group statement without group support' => [

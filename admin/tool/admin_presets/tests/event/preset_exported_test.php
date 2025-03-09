@@ -25,7 +25,7 @@ namespace tool_admin_presets\event;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \tool_admin_presets\event\preset_exported
  */
-final class preset_exported_test extends \advanced_testcase {
+class preset_exported_test extends \advanced_testcase {
 
     /**
      * Test preset_exported event.

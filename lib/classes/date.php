@@ -153,7 +153,7 @@ class core_date {
 
         // Is server timezone usable?
         if (isset($CFG->timezone) and !is_numeric($CFG->timezone)) {
-            $result = timezone_open($CFG->timezone); // Hide notices if invalid.
+            $result = @timezone_open($CFG->timezone); // Hide notices if invalid.
             if ($result !== false) {
                 return $result->getName();
             }
@@ -319,7 +319,7 @@ class core_date {
         if (!defined('PHPUNIT_TEST')) {
             throw new coding_exception('core_date::phpunit_override_default_php_timezone() must be used only from unit tests');
         }
-        $result = @timezone_open($tz ?? ''); // This triggers error if $tz invalid.
+        $result = timezone_open($tz ?? ''); // This triggers error if $tz invalid.
         if ($result !== false) {
             self::$defaultphptimezone = $tz;
         } else {
@@ -741,14 +741,13 @@ class core_date {
         $intl_formats = [
           '%a' => 'EEE',	// An abbreviated textual representation of the day	Sun through Sat
           '%A' => 'EEEE',	// A full textual representation of the day	Sunday through Saturday
+          '%b' => 'MMM',	// Abbreviated month name, based on the locale	Jan through Dec
+          '%B' => 'MMMM',	// Full month name, based on the locale	January through December
+          '%h' => 'MMM',	// Abbreviated month name, based on the locale (an alias of %b)	Jan through Dec
         ];
 
-        $originalformat = $format;
-        $intl_formatter = function (DateTimeInterface $timestamp, string $format) use (
-            $intl_formats,
-            $locale,
-            $originalformat,
-        ) {
+        $intl_formatter = function (DateTimeInterface $timestamp, string $format) use ($intl_formats, $locale) {
+
           // Map IANA timezone DB names (used by PHP) to those used internally by the "intl" extension. The extension uses its
           // own data based on ICU timezones, which may not necessarily be in-sync with IANA depending on the version installed
           // on the local system. See: https://unicode-org.github.io/icu/userguide/datetime/timezone/#updating-the-time-zone-data
@@ -789,19 +788,6 @@ class core_date {
               $date_type = IntlDateFormatter::NONE;
               $time_type = IntlDateFormatter::MEDIUM;
               break;
-
-            case "%B":
-            case "%b":
-            case "%h":
-                // Check for any day (%d, or %e) in the string.
-                if (preg_match('/%[de]/', $originalformat)) {
-                    // The day is present so use the standard format.
-                    $pattern = $format === '%B' ? 'MMMM' : 'MMM';
-                } else {
-                    // The day is not present so use the stand-alone format.
-                    $pattern = $format === '%B' ? 'LLLL' : 'LLL';
-                }
-                break;
 
             default:
               $pattern = $intl_formats[$format];

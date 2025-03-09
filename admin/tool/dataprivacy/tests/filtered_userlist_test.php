@@ -23,7 +23,7 @@ namespace tool_dataprivacy;
  * @copyright  2018 Andrew Nicols <andrew@nicols.co.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class filtered_userlist_test extends \advanced_testcase {
+class filtered_userlist_test extends \advanced_testcase {
     /**
      * Test the apply_expired_contexts_filters function with arange of options.
      *
@@ -57,32 +57,32 @@ final class filtered_userlist_test extends \advanced_testcase {
      *
      * @return  array
      */
-    public static function apply_expired_contexts_filters_provider(): array {
+    public function apply_expired_contexts_filters_provider(): array {
         return [
             // Entire list should be preserved.
             'No overrides' => [
-                'initial' => [1, 2, 3, 4, 5],
+                'users' => [1, 2, 3, 4, 5],
                 'expired' => [],
                 'unexpired' => [],
-                'expected' => [1, 2, 3, 4, 5],
+                [1, 2, 3, 4, 5],
             ],
             // The list should be filtered to only keep the expired users.
             'Expired only' => [
-                'initial' => [1, 2, 3, 4, 5],
+                'users' => [1, 2, 3, 4, 5],
                 'expired' => [2, 3, 4],
                 'unexpired' => [],
                 'expected' => [2, 3, 4],
             ],
             // The list should be filtered to remove any unexpired users.
             'Unexpired only' => [
-                'initial' => [1, 2, 3, 4, 5],
+                'users' => [1, 2, 3, 4, 5],
                 'expired' => [],
                 'unexpired' => [1, 5],
                 'expected' => [2, 3, 4],
             ],
             // The list should be filtered to only keep expired users who are not on the unexpired list.
             'Combination of expired and unexpired' => [
-                'initial' => [1, 2, 3, 4, 5],
+                'users' => [1, 2, 3, 4, 5],
                 'expired' => [1, 2, 3],
                 'unexpired' => [1, 5],
                 'expected' => [2, 3],

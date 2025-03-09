@@ -39,7 +39,7 @@ require_once($CFG->dirroot . '/question/editlib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers \qformat_aiken
  */
-final class qformat_aiken_export_test extends advanced_testcase {
+class qformat_aiken_export_test extends advanced_testcase {
     /**
      * Assert that 2 strings are the same, ignoring ends of line.
      * We need to override this function because we don't want any output
@@ -59,9 +59,8 @@ final class qformat_aiken_export_test extends advanced_testcase {
         // Create a new course category and and a new course in that.
         $category = $this->getDataGenerator()->create_category();
         $course = $this->getDataGenerator()->create_course(array('category' => $category->id));
-        $qbank = self::getDataGenerator()->create_module('qbank', ['course' => $course->id]);
-        $context = context_module::instance($qbank->cmid);
         $generator = $this->getDataGenerator()->get_plugin_generator('core_question');
+        $context = context_coursecat::instance($category->id);
         $cat = $generator->create_question_category(array('contextid' => $context->id));
         $question1 = $generator->create_question('shortanswer', null,
                 array('category' => $cat->id));
@@ -95,8 +94,7 @@ EOT;
         $category = $this->getDataGenerator()->create_category();
         $course = $this->getDataGenerator()->create_course(array('category' => $category->id));
         $generator = $this->getDataGenerator()->get_plugin_generator('core_question');
-        $qbank = self::getDataGenerator()->create_module('qbank', ['course' => $course->id]);
-        $context = context_module::instance($qbank->cmid);
+        $context = context_coursecat::instance($category->id);
         $cat = $generator->create_question_category(array('contextid' => $context->id));
         $question  = $generator->create_question('multichoice', 'one_of_four',
                 array('category' => $cat->id));

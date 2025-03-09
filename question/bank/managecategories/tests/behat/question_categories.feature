@@ -12,19 +12,16 @@ Feature: A teacher can put questions in categories in the question bank
       | fullname | shortname | format |
       | Course 1 | C1        | weeks  |
     And the following "course enrolments" exist:
-      | user | course | role |
-      | teacher1 | C1 | editingteacher |
-    And the following "activities" exist:
-      | activity | name           | course | idnumber |
-      | qbank    | Qbank 1        | C1     | qbank1   |
+      | user     | course | role           |
+      | teacher1 | C1     | editingteacher |
     And the following "question categories" exist:
-      | contextlevel    | reference | questioncategory   | name                        |
-      | Activity module | qbank1    | Top                | top                         |
-      | Activity module | qbank1    | top                | Default for qbank1          |
-      | Activity module | qbank1    | Default for qbank1 | Subcategory & < > " ' &amp; |
-      | Activity module | qbank1    | Default for qbank1 | Another subcat              |
-      | Activity module | qbank1    | top                | Used category               |
-      | Activity module | qbank1    | top                | Default & testing           |
+      | contextlevel | reference | questioncategory | name              | sortorder | desciption                     |
+      | Course       | C1        | Top              | top               | 0         |                                |
+      | Course       | C1        | top              | Default for C1    | 0         | Description for default for C1 |
+      | Course       | C1        | Default for C1   | Subcategory       | 0         | Description for Subcategory    |
+      | Course       | C1        | Default for C1   | Another subcat    | 1         | Description for Another subcat |
+      | Course       | C1        | top              | Used category     | 1         |                                |
+      | Course       | C1        | top              | Default & testing | 2         |                                |
     And the following "questions" exist:
       | questioncategory | qtype | name                      | questiontext                  |
       | Used category    | essay | Test question to be moved | Write about whatever you want |
@@ -32,7 +29,7 @@ Feature: A teacher can put questions in categories in the question bank
     And I log in as "teacher1"
 
   Scenario: A new question category can be created
-    When I am on the "Qbank 1" "core_question > question categories" page
+    When I am on the "Course 1" "core_question > course question categories" page
     And I press "Add category"
     And I set the following fields to these values:
       | Name            | 'Test' & 'display'                                       |
@@ -50,14 +47,14 @@ Feature: A teacher can put questions in categories in the question bank
     And the "Parent category" select box should contain "'Test' & 'display' [newcatidnumber]"
 
   Scenario: A question category can be edited
-    When I am on the "Qbank 1" "core_question > question categories" page
+    When I am on the "Course 1" "core_question > course question categories" page
     # There have been bugs which only happened if a question category was not empty, so add a question.
     And the following "questions" exist:
-      | questioncategory            | qtype | name                                | questiontext                  |
-      | Subcategory & < > " ' &amp; | essay | Test question for renaming category | Write about whatever you want |
-    And I open the action menu in "Subcategory & < > \" ' &amp;" "list_item"
+      | questioncategory | qtype | name                                | questiontext                  |
+      | Subcategory      | essay | Test question for renaming category | Write about whatever you want |
+    And I open the action menu in "Subcategory" "list_item"
     And I choose "Edit settings" in the open action menu
-    And the field "parent" matches value "&nbsp;&nbsp;&nbsp;Default for qbank1"
+    And the field "parent" matches value "&nbsp;&nbsp;&nbsp;Default for C1"
     And I set the following fields to these values:
       | Name            | New name     |
       | Category info   | I was edited |
@@ -67,34 +64,32 @@ Feature: A teacher can put questions in categories in the question bank
     And I should see "I was edited"
 
   Scenario: An empty question category can be deleted
-    When I am on the "Qbank 1" "core_question > question categories" page
-    And I should see "Subcategory & < > \" ' &amp;"
-    And the "data-bs-original-title" attribute of "span.qbank_managecategories-newchild.dropready" "css_element" should contain "As new child of Subcategory & < > \" ' &amp;"
+    When I am on the "Course 1" "core_question > course question categories" page
     And I open the action menu in "Subcategory" "list_item"
     And I choose "Delete" in the open action menu
     And I click on "Delete" "button" in the "Delete" "dialogue"
-    Then I should not see "Subcategory & < > \" ' &amp;"
+    Then I should not see "Subcategory"
 
   Scenario: An non-empty question category can be deleted if you move the contents elsewhere
-    When I am on the "Qbank 1" "core_question > question categories" page
+    When I am on the "Course 1" "core_question > course question categories" page
     And I open the action menu in "Used category" "list_item"
     And I choose "Delete" in the open action menu
     And I click on "Delete" "button" in the "Delete" "dialogue"
     And I should see "The category 'Used category' contains 1 questions"
-    And I select "Default for qbank1" from the "Category" singleselect
+    And I select "Default for C1" from the "Category" singleselect
     And I press "Save in category"
     Then I should not see "Used category"
-    And I press "Add category"
-    And I should see "Default for qbank1 (1)"
+    And I should see "Default for C1"
+    And I should see "(1)"
 
   @_file_upload
   Scenario: Multi answer questions with their child questions can be moved to another category when the current category is deleted
-    When I am on the "Qbank 1" "core_question > question import" page
+    When I am on the "Course 1" "core_question > course question import" page
     And I set the field "id_format_xml" to "1"
     And I upload "question/format/xml/tests/fixtures/multianswer.xml" file to "Import" filemanager
     And I press "id_submitbutton"
     And I press "Continue"
-    And I am on the "Qbank 1" "core_question > question categories" page
+    And I am on the "Course 1" "core_question > course question categories" page
     And I open the action menu in "Default for Test images in backup" "list_item"
     And I choose "Delete" in the open action menu
     And I click on "Delete" "button" in the ".modal-footer" "css_element"
@@ -106,34 +101,9 @@ Feature: A teacher can put questions in categories in the question bank
     And I should see "Used category (2)"
 
   Scenario: Filter questions by category and subcategories
-    When I am on the "Qbank 1" "core_question > question bank" page
-    And I apply question bank filter "Category" with value "Default for qbank1"
+    When I am on the "Course 1" "core_question > course question bank" page
+    And I apply question bank filter "Category" with value "Default for C1"
     Then I should not see "Question 1"
     When I set the field "Also show questions from subcategories" to "1"
     And I click on "Apply filters" "button"
     Then I should see "Question 1" in the "categoryquestions" "table"
-    When I reload the page
-    Then I should see "Question 1" in the "categoryquestions" "table"
-    And the field "Also show questions from subcategories" matches value "1"
-    And I am on the "Course 1" "core_question > course question bank" page
-    And the field "Also show questions from subcategories" matches value "1"
-
-  Scenario: Filter question by category and subcategories in Quiz question page
-    Given the following "activities" exist:
-      | activity | name      | course | idnumber |
-      | quiz     | Test quiz | C1     | quiz1    |
-    And I am on the "Test quiz" "mod_quiz > Edit" page
-    And I open the "last" add to quiz menu
-    And I follow "from question bank"
-    And I click on "Switch bank" "button"
-    And I click on "Qbank 1" "link" in the "Select question bank" "dialogue"
-    When I set the field "Also show questions from subcategories" to "1"
-    And I click on "Apply filters" "button"
-    Then I should see "Question 1" in the "categoryquestions" "table"
-    And I set the field "Also show questions from subcategories" to "0"
-    And I click on "Apply filters" "button"
-    And I should not see "Question 1"
-    And I click on "Close" "button" in the "Add from the question bank at the end" "dialogue"
-    And I open the "last" add to quiz menu
-    And I follow "from question bank"
-    And the field "Also show questions from subcategories" matches value "0"

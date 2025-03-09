@@ -14,16 +14,9 @@ Feature: Attempt a quiz
     And the following "course enrolments" exist:
       | user     | course | role    |
       | student  | C1     | student |
-    And the following "activities" exist:
-      | activity | name    | intro              | course | idnumber | grade | navmethod  |
-      | quiz     | Quiz 1  | Quiz 1 description | C1     | quiz1    | 100   | free       |
-      | quiz     | Quiz 2  | Quiz 2 description | C1     | quiz2    | 6     | free       |
-      | quiz     | Quiz 3  | Quiz 3 description | C1     | quiz3    | 100   | free       |
-      | quiz     | Quiz 4  | Quiz 4 description | C1     | quiz4    | 100   | sequential |
-      | qbank    | Qbank 1 | Question bank 1    | C1     | qbank1   |       |            |
     And the following "question categories" exist:
-      | contextlevel    | reference  | name            |
-      | Activity module | quiz1     | Test questions  |
+      | contextlevel | reference | name           |
+      | Course       | C1        | Test questions |
     And the following "questions" exist:
       | questioncategory | qtype       | name  | questiontext    |
       | Test questions   | truefalse   | TF1   | First question  |
@@ -32,6 +25,12 @@ Feature: Attempt a quiz
       | Test questions   | truefalse   | TF4   | Fourth question |
       | Test questions   | truefalse   | TF5   | Fifth question  |
       | Test questions   | truefalse   | TF6   | Sixth question  |
+    And the following "activities" exist:
+      | activity | name   | intro              | course | idnumber | grade | navmethod  |
+      | quiz     | Quiz 1 | Quiz 1 description | C1     | quiz1    | 100   | free       |
+      | quiz     | Quiz 2 | Quiz 2 description | C1     | quiz2    | 6     | free       |
+      | quiz     | Quiz 3 | Quiz 3 description | C1     | quiz3    | 100   | free       |
+      | quiz     | Quiz 4 | Quiz 4 description | C1     | quiz4    | 100   | sequential |
     And quiz "Quiz 1" contains the following questions:
       | question | page | maxmark |
       | TF1      | 1    |         |
@@ -235,25 +234,3 @@ Feature: Attempt a quiz
     And I press "Continue your attempt"
     Then I should see "First question"
     And I should not see "First question version 2"
-
-  @javascript
-  Scenario: User image in the quiz navigation in normal mode.
-    Given I am on the "Quiz 1" "quiz activity editing" page logged in as "admin"
-    And I expand all fieldsets
-    And I set the field "Show the user's picture" to "Large image"
-    And I press "Save and return to course"
-    And I am on the "Quiz 1" "mod_quiz > View" page logged in as "student"
-    And I press "Attempt quiz"
-    Then "Student One" "link" should exist in the "Quiz navigation" "block"
-
-  @javascript
-  Scenario: User image in the quiz navigation in secure layout.
-    Given I am on the "Quiz 1" "quiz activity editing" page logged in as "admin"
-    And I expand all fieldsets
-    And I set the field "Show the user's picture" to "Large image"
-    And I set the field "Browser security" to "Full screen pop-up with some JavaScript security"
-    And I press "Save and return to course"
-    And I am on the "Quiz 1" "mod_quiz > View" page logged in as "student"
-    And I press "Attempt quiz"
-    And I switch to a second window
-    Then "Student One" "link" should not exist in the "Quiz navigation" "block"

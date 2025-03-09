@@ -27,7 +27,7 @@ use completion_completion;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers \core_completion\progress
  */
-final class progress_test extends \advanced_testcase {
+class progress_test extends \advanced_testcase {
 
     /**
      * Test setup.

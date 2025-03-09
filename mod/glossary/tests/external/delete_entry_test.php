@@ -39,7 +39,7 @@ final class delete_entry_test extends externallib_advanced_testcase {
     /**
      * Test the behaviour of delete_entry().
      */
-    public function test_delete_entry(): void {
+    public function test_delete_entry() {
         global $DB;
         $this->resetAfterTest();
 

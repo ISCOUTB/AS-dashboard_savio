@@ -3622,19 +3622,9 @@ class core_course_external extends external_api {
     }
 
     /**
-     * Mark the edit_module as deprecated.
-     * @todo Remove this method in Moodle 6.0 (MDL-83530).
-     * @return bool
-     */
-    public static function edit_module_is_deprecated() {
-        return true;
-    }
-
-    /**
      * Parameters for function edit_module()
      *
-     * @deprecated since 5.0
-     * @todo Remove this method in Moodle 6.0 (MDL-83530).
+     * @since Moodle 3.3
      * @return external_function_parameters
      */
     public static function edit_module_parameters() {
@@ -3657,8 +3647,7 @@ class core_course_external extends external_api {
      *
      * Throws exception if operation is not permitted/possible
      *
-     * @deprecated since 5.0
-     * @todo Remove this method in Moodle 6.0 (MDL-83530).
+     * @since Moodle 3.3
      * @param string $action
      * @param int $id
      * @param null|int $sectionreturn
@@ -3764,8 +3753,7 @@ class core_course_external extends external_api {
     /**
      * Return structure for edit_module()
      *
-     * @deprecated since 5.0
-     * @todo Remove this method in Moodle 6.0 (MDL-83530).
+     * @since Moodle 3.3
      * @return \core_external\external_description
      */
     public static function edit_module_returns() {
@@ -3773,19 +3761,9 @@ class core_course_external extends external_api {
     }
 
     /**
-     * Mark the get_module as deprecated.
-     * @todo Remove this method in Moodle 6.0 (MDL-83530).
-     * @return bool
-     */
-    public static function get_module_is_deprecated() {
-        return true;
-    }
-
-    /**
      * Parameters for function get_module()
      *
-     * @deprecated since 5.0
-     * @todo Remove this method in Moodle 6.0 (MDL-83530).
+     * @since Moodle 3.3
      * @return external_function_parameters
      */
     public static function get_module_parameters() {
@@ -3799,8 +3777,7 @@ class core_course_external extends external_api {
     /**
      * Returns html for displaying one activity module on course page
      *
-     * @deprecated since 5.0
-     * @todo Remove this method in Moodle 6.0 (MDL-83530).
+     * @since Moodle 3.3
      * @param int $id
      * @param null|int $sectionreturn
      * @return string
@@ -3842,8 +3819,7 @@ class core_course_external extends external_api {
     /**
      * Return structure for get_module()
      *
-     * @deprecated since 5.0
-     * @todo Remove this method in Moodle 6.0 (MDL-83530).
+     * @since Moodle 3.3
      * @return \core_external\external_description
      */
     public static function get_module_returns() {
@@ -3851,19 +3827,9 @@ class core_course_external extends external_api {
     }
 
     /**
-     * Mark the edit_section as deprecated.
-     * @todo Remove this method in Moodle 6.0 (MDL-83530).
-     * @return bool
-     */
-    public static function edit_section_is_deprecated() {
-        return true;
-    }
-
-    /**
      * Parameters for function edit_section()
      *
-     * @deprecated since 5.0
-     * @todo Remove this method in Moodle 6.0 (MDL-83530).
+     * @since Moodle 3.3
      * @return external_function_parameters
      */
     public static function edit_section_parameters() {
@@ -3878,8 +3844,7 @@ class core_course_external extends external_api {
     /**
      * Performs one of the edit section actions
      *
-     * @deprecated since 5.0
-     * @todo Remove this method in Moodle 6.0 (MDL-83530).
+     * @since Moodle 3.3
      * @param string $action
      * @param int $id section id
      * @param int $sectionreturn section to return to
@@ -3909,8 +3874,7 @@ class core_course_external extends external_api {
     /**
      * Return structure for edit_section()
      *
-     * @deprecated since 5.0
-     * @todo Remove this method in Moodle 6.0 (MDL-83530).
+     * @since Moodle 3.3
      * @return \core_external\external_description
      */
     public static function edit_section_returns() {

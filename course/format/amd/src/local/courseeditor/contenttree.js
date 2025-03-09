@@ -27,10 +27,9 @@
  */
 
 // The core/tree uses jQuery to expand all nodes.
-import Collapse from 'theme_boost/bootstrap/collapse';
 import jQuery from 'jquery';
 import Tree from 'core/tree';
-import {getList, getFirst} from 'core/normalise';
+import {getList} from 'core/normalise';
 
 export default class extends Tree {
 
@@ -62,10 +61,9 @@ export default class extends Tree {
                 return this._getVisibleItems();
             };
         }
-        this.treeRoot[0].querySelectorAll(selectors.COLLAPSE).forEach(toggler => {
-            const collapsible = document.getElementById(toggler.getAttribute('href').replace('#', ''));
-            collapsible.addEventListener('hidden.bs.collapse', () => this.refreshVisibleItemsCache());
-            collapsible.addEventListener('shown.bs.collapse', () => this.refreshVisibleItemsCache());
+        // All jQuery events can be replaced when MDL-71979 is integrated.
+        this.treeRoot.on('hidden.bs.collapse shown.bs.collapse', () => {
+            this.refreshVisibleItemsCache();
         });
         // Register a custom callback for pressing enter key.
         this.registerEnterCallback(this.enterCallback.bind(this));
@@ -148,16 +146,18 @@ export default class extends Tree {
      * @param {JQuery} item  the jQuery object
      */
     toggleGroup(item) {
-        const toggler = getFirst(item).querySelector(this.selectors.COLLAPSE);
-        let collapsibleId = toggler.dataset?.target ?? toggler.getAttribute('href');
+        // All jQuery in this segment of code can be replaced when MDL-71979 is integrated.
+        const toggler = item.find(this.selectors.COLLAPSE);
+        let collapsibleId = toggler.data('target') ?? toggler.attr('href');
         if (!collapsibleId) {
             return;
         }
         collapsibleId = collapsibleId.replace('#', '');
 
-        const collapsible = document.getElementById(collapsibleId);
-        if (collapsible) {
-            Collapse.getOrCreateInstance(collapsible).toggle();
+        // Bootstrap 4 uses jQuery to interact with collapsibles.
+        const collapsible = jQuery(`#${collapsibleId}`);
+        if (collapsible.length) {
+            jQuery(`#${collapsibleId}`).collapse('toggle');
         }
     }
 

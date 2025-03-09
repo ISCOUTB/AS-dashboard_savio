@@ -39,8 +39,6 @@ Feature: Set up and manage user factors
       | enabled | 1 | factor_webauthn |
     And the following config values are set as admin:
       | enabled | 1 | factor_sms     |
-    And the following config values are set as admin:
-      | enabled | 0 | factor_email |
     And the following "tool_mfa > User factors" exist:
     | username | factor   | label                |
     | admin    | sms      | +409111222           |
@@ -50,7 +48,7 @@ Feature: Set up and manage user factors
     And I click on "Manage SMS" "button"
     And I click on "Remove" "button" in the "+409111222" "table_row"
     When I click on "Yes, remove" "button" in the "Remove '+409111222' SMS?" "dialogue"
-    Then I should see "'SMS - +409111222' successfully removed"
+    Then I should see "'SMS mobile phone - +409111222' successfully removed"
     # Now there is only one active factor left.
     And I click on "Manage security key" "button"
     And I should see "Replace" in the "MacBook" "table_row"

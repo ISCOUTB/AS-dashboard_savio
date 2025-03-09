@@ -37,14 +37,14 @@ Feature: View activity completion in the lesson activity
       | Music history part 1 | The history of music part 1 | Next page | 0     |
       | Music essay          |                             | Next page | 1     |
 
-  Scenario: A teacher can view a lesson activity automatic completion conditions
+  Scenario: View automatic completion items as a teacher
     When I am on the "Music history" "lesson activity" page logged in as teacher1
     Then "Music history" should have the "View" completion condition
     And "Music history" should have the "Spend at least 3 secs on this activity" completion condition
     And "Music history" should have the "Go through the activity to the end" completion condition
     And "Music history" should have the "Receive a grade" completion condition
 
-  Scenario: A student can complete a lesson activity by meeting the completion conditions
+  Scenario: View automatic completion items as a student
     Given I am on the "Music history" "lesson activity" page logged in as student1
     And the "View" completion condition of "Music history" is displayed as "done"
     And the "Spend at least 3 secs on this activity" completion condition of "Music history" is displayed as "todo"
@@ -66,7 +66,7 @@ Feature: View activity completion in the lesson activity
     And the "Receive a grade" completion condition of "Music history" is displayed as "done"
 
   @javascript
-  Scenario: A student can manually mark the lesson activity as done but a teacher cannot
+  Scenario: Use manual completion
     Given I am on the "Music history" "lesson activity editing" page logged in as teacher1
     And I expand all fieldsets
     And I set the field "Students must manually mark the activity as done" to "1"

@@ -423,6 +423,15 @@ abstract class context extends stdClass implements IteratorAggregate {
                                  ct.depth = temp.depth,
                                  ct.locked = temp.locked
                            WHERE ct.id = temp.id";
+        } else if ($dbfamily == 'oracle') {
+            $updatesql = "UPDATE {context} ct
+                             SET (ct.path, ct.depth, ct.locked) =
+                                 (SELECT temp.path, temp.depth, temp.locked
+                                    FROM {context_temp} temp
+                                   WHERE temp.id=ct.id)
+                           WHERE EXISTS (SELECT 'x'
+                                           FROM {context_temp} temp
+                                           WHERE temp.id = ct.id)";
         } else if ($dbfamily == 'postgres' || $dbfamily == 'mssql') {
             $updatesql = "UPDATE {context}
                              SET path = temp.path,
@@ -431,7 +440,12 @@ abstract class context extends stdClass implements IteratorAggregate {
                             FROM {context_temp} temp
                            WHERE temp.id={context}.id";
         } else {
-            throw new \core\exception\coding_exception("Unsupported database family: {$dbfamily}");
+            // Sqlite and others.
+            $updatesql = "UPDATE {context}
+                             SET path = (SELECT path FROM {context_temp} WHERE id = {context}.id),
+                                 depth = (SELECT depth FROM {context_temp} WHERE id = {context}.id),
+                                 locked = (SELECT locked FROM {context_temp} WHERE id = {context}.id)
+                             WHERE id IN (SELECT id FROM {context_temp})";
         }
 
         $DB->execute($updatesql);

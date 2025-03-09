@@ -29,7 +29,7 @@ require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
  * @copyright  2018 Marina Glancy
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class customfield_test extends \advanced_testcase {
+class customfield_test extends \advanced_testcase {
 
     /**
      * Set up

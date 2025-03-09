@@ -410,13 +410,13 @@ class brickfield_accessibility_color_test extends brickfield_accessibility_test 
         $pos3 = stripos($fontsize, 'px');
         if ($pos1 !== false) {
             $rem = substr($fontsize, 0, -3);
-            $newfontsize = is_numeric($rem) ? $newfontsize * $rem : $newfontsize;
+            $newfontsize = $newfontsize * $rem;
         } else if ($pos2 !== false) {
             $em = substr($fontsize, 0, -2);
-            $newfontsize = is_numeric($em) ? $newfontsize * $em : $newfontsize;
+            $newfontsize = $newfontsize * $em;
         } else if ($pos3 !== false) {
             $px = substr($fontsize, 0, -2);
-            $newfontsize = is_numeric($px) ? 0.75 * $px : $newfontsize;
+            $newfontsize = 0.75 * $px;
         } else if (in_array($fontsize, array_keys($this->fontsizenames))) {
             $newfontsize = $this->fontsizenames[$fontsize];
         } else {

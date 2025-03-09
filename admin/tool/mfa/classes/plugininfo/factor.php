@@ -126,30 +126,6 @@ class factor extends \core\plugininfo\base {
         return $return;
     }
 
-    #[\Override]
-    public static function enable_plugin(string $pluginname, int $enabled): bool {
-        $enabledfactors = array_map(fn($f) => $f->name, self::get_enabled_factors());
-        $currentlyenabled = in_array($pluginname, $enabledfactors);
-
-        // Determine if there's a change in the enabled status.
-        if ($enabled && !$currentlyenabled) {
-            $action = 'enable';
-        } else if (!$enabled && $currentlyenabled) {
-            $action = 'disable';
-        } else {
-            return false; // No change needed.
-        }
-
-        // Execute the configuration and action based on the determined action.
-        \tool_mfa\manager::set_factor_config(['enabled' => $enabled], 'factor_' . $pluginname);
-        \tool_mfa\manager::do_factor_action($pluginname, $action);
-
-        \core\session\manager::gc(); // Remove stale sessions.
-        \core_plugin_manager::reset_caches();
-
-        return true;
-    }
-
     /**
      * Finds active factors for a user.
      * If user is not specified, current user is used.
@@ -280,10 +256,6 @@ class factor extends \core\plugininfo\base {
      * @param bool $hassiteconfig whether the current user has moodle/site:config capability
      */
     public function load_settings(\part_of_admin_tree $adminroot, $parentnodename, $hassiteconfig): void {
-        global $CFG, $USER, $DB, $OUTPUT, $PAGE; // In case settings.php wants to refer to them.
-        /** @var \admin_root $ADMIN */
-        $ADMIN = $adminroot; // May be used in settings.php.
-        $plugininfo = $this; // Also can be used inside settings.php.
 
         if (!$this->is_installed_and_upgraded()) {
             return;
@@ -297,7 +269,9 @@ class factor extends \core\plugininfo\base {
 
         $settings = new \admin_settingpage($section, $this->displayname, 'moodle/site:config', $this->is_enabled() === false);
 
-        include($this->full_path('settings.php'));
+        if ($adminroot->fulltree) {
+            include($this->full_path('settings.php'));
+        }
 
         $adminroot->add($parentnodename, $settings);
     }
@@ -344,16 +318,6 @@ class factor extends \core\plugininfo\base {
      */
     public function is_uninstall_allowed(): bool {
         return $this->name !== 'nosetup';
-    }
-
-    #[\Override]
-    public static function plugintype_supports_disabling(): bool {
-        return true;
-    }
-
-    #[\Override]
-    public static function plugintype_supports_ordering(): bool {
-        return true;
     }
 
     /**
@@ -418,43 +382,5 @@ class factor extends \core\plugininfo\base {
         }));
 
         return $count > 1;
-    }
-
-    #[\Override]
-    public static function get_sorted_plugins(bool $enabledonly = false): ?array {
-        $pluginmanager = \core_plugin_manager::instance();
-        $plugins = $pluginmanager->get_plugins_of_type('factor');
-        $orders = self::get_factors();
-        $sortedplugins = [];
-        foreach ($orders as $order) {
-            $sortedplugins[$order->name] = $plugins[$order->name];
-        }
-
-        return $sortedplugins;
-    }
-
-    #[\Override]
-    public static function change_plugin_order(string $pluginname, int $direction): bool {
-        $activefactors = array_keys(self::get_sorted_plugins(true));
-        $key = array_search($pluginname, $activefactors);
-
-        if ($key === false) {
-            return false;
-        }
-
-        if ($direction === self::MOVE_DOWN && $key < (count($activefactors) - 1)) {
-            $action = 'down';
-        } else if ($direction === self::MOVE_UP && $key >= 1) {
-            $action = 'up';
-        } else {
-            return false;
-        }
-
-        \tool_mfa\manager::do_factor_action($pluginname, $action);
-
-        \core\session\manager::gc(); // Remove stale sessions.
-        \core_plugin_manager::reset_caches();
-
-        return true;
     }
 }

@@ -36,7 +36,7 @@ require_once($CFG->libdir . '/outputlib.php');
  * @covers \theme_config
  * @coversDefaultClass \theme_config
  */
-final class theme_config_test extends advanced_testcase {
+class theme_config_test extends advanced_testcase {
     /**
      * This function will test directives used to serve SVG images to make sure
      * this are making the right decisions.

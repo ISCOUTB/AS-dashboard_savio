@@ -28,7 +28,7 @@ use restore_dbops;
  * @copyright   2021 Paul Holden <paulh@moodle.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class restore_attempt_test extends \advanced_testcase {
+class restore_attempt_test extends \advanced_testcase {
 
     /**
      * Load required libraries
@@ -54,7 +54,7 @@ final class restore_attempt_test extends \advanced_testcase {
         // Contains a quiz with four attempts from different users. The users are as follows (user ID -> user):
         // 3 -> User 01, 4 -> User 02, 5 -> User 03, 6 -> User 04.
         // The user details for User 02 and User 03 have been removed from the backup file.
-        $testfixture = self::get_fixture_path(__NAMESPACE__, 'question_attempts_missing_users.mbz');
+        $testfixture = __DIR__ . '/fixtures/question_attempts_missing_users.mbz';
 
         // Extract our test fixture, ready to be restored.
         $backuptempdir = 'aaa';
@@ -68,15 +68,7 @@ final class restore_attempt_test extends \advanced_testcase {
         $controller = new restore_controller($backuptempdir, $courseid, backup::INTERACTIVE_NO, backup::MODE_GENERAL, $USER->id,
             backup::TARGET_NEW_COURSE);
 
-        $controller->execute_precheck();
-        $results = $controller->get_precheck_results();
-        // Backup contains categories attached to deprecated contexts so the results should only contain warnings for these.
-        $this->assertCount(2, $results['warnings']);
-        foreach ($results['warnings'] as $warning) {
-            $this->assertStringContainsString('will be created at a question bank module context by restore', $warning);
-        }
-        $this->assertArrayNotHasKey('errors', $results);
-
+        $this->assertTrue($controller->execute_precheck());
         $controller->execute_plan();
         $controller->destroy();
 

@@ -36,7 +36,7 @@ use core_files\converter;
  * @copyright  2017 Andrew nicols <andrew@nicols.co.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class converter_test extends advanced_testcase {
+class converter_test extends advanced_testcase {
 
     /**
      * Get a testable mock of the abstract files_converter class.
@@ -547,14 +547,11 @@ final class converter_test extends advanced_testcase {
             ]);
 
         $converter->method('get_document_converter_classes')->willReturn([]);
-        $getinvocations = $this->any();
-        $converter
-            ->expects($getinvocations)
-            ->method('get_next_converter')
-            ->willReturnCallback(fn (): string => match (self::getInvocationCount($getinvocations)) {
-                1 => get_class($converterinstance),
-                default => get_class($converterinstance2),
-            });
+        $converter->method('get_next_converter')
+            ->will($this->onConsecutiveCalls(
+                get_class($converterinstance),
+                get_class($converterinstance2)
+            ));
 
         $file = $this->create_stored_file('example content', 'example', [
                 'mimetype' => null,
@@ -569,31 +566,25 @@ final class converter_test extends advanced_testcase {
         $conversion->set('status', conversion::STATUS_PENDING);
         $conversion->create();
 
-        $statusinvocations = $this->atLeast(4);
-        $conversion
-            ->expects($statusinvocations)
-            ->method('get_status')
-            ->willReturnCallback(fn (): int => match (self::getInvocationCount($statusinvocations)) {
+        $conversion->method('get_status')
+            ->will($this->onConsecutiveCalls(
                 // Initial status check.
-                1 => conversion::STATUS_PENDING,
+                conversion::STATUS_PENDING,
                 // Second check to make sure it's still pending after polling.
-                2 => conversion::STATUS_PENDING,
+                conversion::STATUS_PENDING,
                 // First one fails.
-                3 => conversion::STATUS_FAILED,
+                conversion::STATUS_FAILED,
                 // Second one succeeds.
-                4 => conversion::STATUS_COMPLETE,
+                conversion::STATUS_COMPLETE,
                 // And the final result checked in this unit test.
-                default => conversion::STATUS_COMPLETE,
-            });
+                conversion::STATUS_COMPLETE
+            ));
 
-        $instanceinvocations = $this->any();
-        $conversion
-            ->expects($instanceinvocations)
-            ->method('get_converter_instance')
-            ->willReturnCallback(fn (): object => match (self::getInvocationCount($instanceinvocations)) {
-                1 => $converterinstance,
-                default => $converterinstance2,
-            });
+        $conversion->method('get_converter_instance')
+            ->will($this->onConsecutiveCalls(
+                $converterinstance,
+                $converterinstance2
+            ));
 
         $converterinstance->expects($this->once())
             ->method('start_document_conversion');

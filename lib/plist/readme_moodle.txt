@@ -1,7 +1,7 @@
 CFPropertyList library
 ---------------
 
-Downloaded latest release (2.0.5) from: https://github.com/moodlehq/CFPropertyList/tags
+Downloaded last release from: https://github.com/TECLIB/CFPropertyList/tags
 
 Import procedure:
 

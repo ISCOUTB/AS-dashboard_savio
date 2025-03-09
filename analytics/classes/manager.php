@@ -38,7 +38,7 @@ class manager {
     /**
      * Default mlbackend
      */
-    const DEFAULT_MLBACKEND = '\mlbackend_python\processor';
+    const DEFAULT_MLBACKEND = '\mlbackend_php\processor';
 
     /**
      * Name of the file where components declare their models.
@@ -257,16 +257,11 @@ class manager {
     public static function is_mlbackend_used($plugin) {
         $models = self::get_all_models();
         foreach ($models as $model) {
-            try {
-                $processor = $model->get_predictions_processor();
-                $noprefixnamespace = ltrim(get_class($processor), '\\');
-                $processorplugin = substr($noprefixnamespace, 0, strpos($noprefixnamespace, '\\'));
-                if ($processorplugin == $plugin) {
-                    return true;
-                }
-            } catch (\Exception $e) {
-                // The model does not have a predictions processor.
-                continue;
+            $processor = $model->get_predictions_processor();
+            $noprefixnamespace = ltrim(get_class($processor), '\\');
+            $processorplugin = substr($noprefixnamespace, 0, strpos($noprefixnamespace, '\\'));
+            if ($processorplugin == $plugin) {
+                return true;
             }
         }
 
@@ -793,7 +788,7 @@ class manager {
                     if (preg_match('~^\\\\mod_([^\\\\]+)\\\\~', $indicator, $matches)) {
                         if (!$allmodules) {
                             // The first time, get all modules.
-                            $allmodules = \core\plugin_manager::instance()->get_present_plugins('mod');
+                            $allmodules = \core\plugin_manager::instance()->get_plugins_of_type('mod');
                         }
                         if (!array_key_exists($matches[1], $allmodules)) {
                             // Module does not exist, so skip indicator.

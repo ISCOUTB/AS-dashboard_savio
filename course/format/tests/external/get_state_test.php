@@ -32,7 +32,7 @@ use core_external\external_api;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \core_courseformat\external\get_state
  */
-final class get_state_test extends \externallib_advanced_testcase {
+class get_state_test extends \externallib_advanced_testcase {
 
     /** @var array Sections in the testing course. */
     private $sections;
@@ -86,7 +86,7 @@ final class get_state_test extends \externallib_advanced_testcase {
 
         // Create a course.
         $numsections = 6;
-
+        $visiblesections = $numsections + 1; // Include topic 0.
         $course = $this->getDataGenerator()->create_course(['numsections' => $numsections, 'format' => $format]);
         $hiddensections = [4, 6];
         foreach ($hiddensections as $section) {
@@ -99,19 +99,15 @@ final class get_state_test extends \externallib_advanced_testcase {
         if ($isadmin) {
             $this->setAdminUser();
         } else {
+            if (!$canedit) {
+                // User won't see the hidden sections. Remove them from the total.
+                $visiblesections = $visiblesections - count($hiddensections);
+            }
             $user = $this->getDataGenerator()->create_user();
             if ($role != 'unenroled') {
                 $this->getDataGenerator()->enrol_user($user->id, $course->id, $role);
             }
             $this->setUser($user);
-        }
-        $visiblesections = $numsections + 1; // We include topic 0.
-        if (!$canedit) {
-            // User won't see the hidden sections. Remove them from the total.
-            $visiblesections = $visiblesections - count($hiddensections);
-        }
-        if ($format == 'social') {
-            $visiblesections = 1; // But Social format has one section visible.
         }
 
         // Social course format automatically creates a forum activity.
@@ -129,7 +125,6 @@ final class get_state_test extends \externallib_advanced_testcase {
             $this->activities[$activitycm->id] = $activitycm;
         } else {
             // Add some activities to the course.
-            $this->create_activity($course->id, 'qbank', 0, true, $canedit);
             $this->create_activity($course->id, 'page', 1, true, $canedit);
             $this->create_activity($course->id, 'forum', 1, true, $canedit);
             $this->create_activity($course->id, 'book', 1, false, $canedit);
@@ -177,12 +172,10 @@ final class get_state_test extends \externallib_advanced_testcase {
                 $this->assertEquals($this->sections[$section->number], $section->cmlist);
             }
         }
-        // Check course modules information,
-        // must not contain modules that cannot be displayed to the course page under any circumstances.
+        // Check course modules information.
         foreach ($result->cm as $cm) {
             $this->assertEquals($this->activities[$cm->id]->name, $cm->name);
             $this->assertEquals((bool) $this->activities[$cm->id]->visible, $cm->visible);
-            $this->assertNotEquals('qbank', $this->activities[$cm->id]->modname);
         }
     }
 
@@ -191,7 +184,7 @@ final class get_state_test extends \externallib_advanced_testcase {
      *
      * @return array
      */
-    public static function get_state_provider(): array {
+    public function get_state_provider(): array {
         return [
             // ROLES. Testing behaviour depending on the user role calling the method.
             'Admin user should work' => [
@@ -284,7 +277,7 @@ final class get_state_test extends \externallib_advanced_testcase {
 
         list(, $activitycm) = get_course_and_cm_from_instance($activity->id, $type);
 
-        if (($visible || $canedit) && $activitycm->is_of_type_that_can_display()) {
+        if ($visible || $canedit) {
             $this->activities[$activitycm->id] = $activitycm;
             $this->sections[$section][] = $activitycm->id;
         }

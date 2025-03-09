@@ -28,7 +28,7 @@ require_once(__DIR__ . '/fixtures/restore_hack.php');
  * @copyright  2014 Petr Skoda {@link http://skodak.org/}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class store_test extends \advanced_testcase {
+class store_test extends \advanced_testcase {
     /**
      * @var bool Determine if we disabled the GC, so it can be re-enabled in tearDown.
      */
@@ -389,7 +389,7 @@ final class store_test extends \advanced_testcase {
      *
      * @return array Array of parameters
      */
-    public static function decode_other_provider(): array {
+    public function decode_other_provider(): array {
         return [
             [['info' => 'd2819896', 'logurl' => 'discuss.php?d=2819896']],
             [null],

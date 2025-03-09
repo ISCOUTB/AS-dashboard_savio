@@ -22,6 +22,7 @@
  * @package mod_data
  */
 
+use mod_data\local\importer\preset_existing_importer;
 use mod_data\manager;
 
 defined('MOODLE_INTERNAL') || die();
@@ -29,11 +30,20 @@ defined('MOODLE_INTERNAL') || die();
 class mod_data_renderer extends plugin_renderer_base {
 
     /**
+     * Rendering setting and mapping page to import a preset.
+     *
+     * @param stdClass $datamodule  Database module to import to.
+     * @param data_preset_importer $importer Importer instance to use for the importing.
+     * @return string
      * @deprecated since Moodle 4.1 MDL-75140 - please do not use this class any more.
+     * @todo MDL-75189 Final deprecation in Moodle 4.5.
      */
-     #[\core\attribute\deprecated('mod_data_renderer::importing_preset()', since: '4.1', mdl: 'MDL-75140', final: true)]
-    public function import_setting_mappings(): void {
-        \core\deprecation::emit_deprecation_if_present([self::class, __FUNCTION__]);
+    public function import_setting_mappings($datamodule, data_preset_importer $importer) {
+        debugging('import_setting_mappings is deprecated. Please use importing_preset instead', DEBUG_DEVELOPER);
+
+        $manager = \mod_data\manager::create_from_coursemodule($datamodule);
+        $fullname = $importer->get_directory();
+        return $this->importing_preset($datamodule, new preset_existing_importer($manager, $fullname));
     }
 
     /**
@@ -72,7 +82,7 @@ class mod_data_renderer extends plugin_renderer_base {
             foreach ($newfields as $nid => $newfield) {
                 $row = array();
                 $row[0] = html_writer::tag('label', $newfield->name, array('for'=>'id_'.$newfield->name));
-                $attrs = ['name' => 'field_' . $nid, 'id' => 'id_' . $newfield->name, 'class' => 'form-select'];
+                $attrs = array('name' => 'field_' . $nid, 'id' => 'id_' . $newfield->name, 'class' => 'custom-select');
                 $row[1] = html_writer::start_tag('select', $attrs);
 
                 $selected = false;

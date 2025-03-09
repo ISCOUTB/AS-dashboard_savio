@@ -35,7 +35,7 @@ global $CFG;
 
 require_once($CFG->dirroot . '/question/editlib.php');
 
-final class events_test extends \advanced_testcase {
+class events_test extends \advanced_testcase {
 
     /**
      * Tests set up.
@@ -59,7 +59,7 @@ final class events_test extends \advanced_testcase {
 
         $contexts = new \core_question\local\bank\question_edit_contexts(\context_module::instance($quiz->cmid));
 
-        $defaultcategory = question_get_default_category($contexts->lowest()->id, true);
+        $defaultcategory = question_make_default_categories([$contexts->lowest()]);
 
         $category = $questiongenerator->create_question_category([
             'name' => 'newcategory',
@@ -103,7 +103,7 @@ final class events_test extends \advanced_testcase {
 
         $contexts = new \core_question\local\bank\question_edit_contexts(\context_module::instance($quiz->cmid));
 
-        $defaultcategory = question_get_default_category($contexts->lowest()->id, true);
+        $defaultcategory = question_make_default_categories([$contexts->lowest()]);
 
         $category = $questiongenerator->create_question_category([
             'name' => 'newcategory',

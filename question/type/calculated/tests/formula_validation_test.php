@@ -28,7 +28,7 @@ require_once($CFG->dirroot . '/question/type/calculated/questiontype.php');
  * @copyright  2014 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class formula_validation_test extends \basic_testcase {
+class formula_validation_test extends \basic_testcase {
     protected function assert_nonempty_string($actual) {
         $this->assertIsString($actual);
         $this->assertNotEquals('', $actual);

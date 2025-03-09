@@ -33,7 +33,7 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since      Moodle 3.6
  */
-final class externallib_test extends externallib_advanced_testcase {
+class externallib_test extends externallib_advanced_testcase {
 
     /**
      * Test the get_recent_items function.
@@ -84,8 +84,8 @@ final class externallib_test extends externallib_advanced_testcase {
 
         // Student access all assignments.
         foreach ($assign as $module) {
-            $event = \mod_assign\event\course_module_viewed::create(['context' => \context_module::instance($module->cmid),
-                    'objectid' => $module->id]);
+            $event = \mod_chat\event\course_module_viewed::create(array('context' => \context_module::instance($module->cmid),
+                    'objectid' => $module->id));
             $event->trigger();
             $this->waitForSecond();
         }

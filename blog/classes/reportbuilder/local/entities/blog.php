@@ -89,6 +89,8 @@ class blog extends base {
      * @return column[]
      */
     protected function get_all_columns(): array {
+        global $DB;
+
         $postalias = $this->get_table_alias('post');
 
         // Title.
@@ -120,6 +122,11 @@ class blog extends base {
             });
 
         // Body.
+        $summaryfieldsql = "{$postalias}.summary";
+        if ($DB->get_dbfamily() === 'oracle') {
+            $summaryfieldsql = $DB->sql_order_by_text($summaryfieldsql, 1024);
+        }
+
         $columns[] = (new column(
             'body',
             new lang_string('entrybody', 'core_blog'),
@@ -127,8 +134,8 @@ class blog extends base {
         ))
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_LONGTEXT)
-            ->add_fields("{$postalias}.summary, {$postalias}.summaryformat, {$postalias}.id")
-            ->set_is_sortable(true)
+            ->add_field($summaryfieldsql, 'summary')
+            ->add_fields("{$postalias}.summaryformat, {$postalias}.id")
             ->add_callback(static function(?string $summary, stdClass $post): string {
                 global $CFG;
                 require_once("{$CFG->libdir}/filelib.php");
@@ -252,7 +259,7 @@ class blog extends base {
             'body',
             new lang_string('entrybody', 'core_blog'),
             $this->get_entity_name(),
-            "{$postalias}.summary"
+            $DB->sql_cast_to_char("{$postalias}.summary")
         ))
             ->add_joins($this->get_joins());
 

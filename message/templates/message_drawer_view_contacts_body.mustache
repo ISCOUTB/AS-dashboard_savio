@@ -43,7 +43,7 @@
                         id="contacts-tab-{{uniqid}}"
                         class="nav-link active"
                         href="#contacts-tab-panel-{{uniqid}}"
-                        data-bs-toggle="tab"
+                        data-toggle="tab"
                         data-action="show-contacts-section"
                         role="tab"
                         aria-controls="contacts-tab-panel-{{uniqid}}"
@@ -57,7 +57,7 @@
                         id="requests-tab-{{uniqid}}"
                         class="nav-link"
                         href="#requests-tab-panel-{{uniqid}}"
-                        data-bs-toggle="tab"
+                        data-toggle="tab"
                         data-action="show-requests-section"
                         role="tab"
                         aria-controls="requests-tab-panel-{{uniqid}}"
@@ -68,7 +68,7 @@
                             data-region="contact-request-count"
                         >
                             <span aria-hidden="true">{{contactrequestcount}}</span>
-                            <span class="visually-hidden">{{#str}} pendingcontactrequests, core_message, {{contactrequestcount}} {{/str}}</span>
+                            <span class="sr-only">{{#str}} pendingcontactrequests, core_message, {{contactrequestcount}} {{/str}}</span>
                         </span>
                     </a>
                 </li>

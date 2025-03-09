@@ -40,6 +40,9 @@ final class sectiondelegatemodule_test extends \advanced_testcase {
     public function test_get_parent_section(): void {
         $this->resetAfterTest();
 
+        $manager = \core_plugin_manager::resolve_plugininfo_class('mod');
+        $manager::enable_plugin('subsection', 1);
+
         $course = $this->getDataGenerator()->create_course(['format' => 'topics', 'numsections' => 2]);
         $module = $this->getDataGenerator()->create_module('subsection', (object)['course' => $course->id, 'section' => 2]);
 
@@ -62,6 +65,9 @@ final class sectiondelegatemodule_test extends \advanced_testcase {
      */
     public function test_get_cm(): void {
         $this->resetAfterTest();
+
+        $manager = \core_plugin_manager::resolve_plugininfo_class('mod');
+        $manager::enable_plugin('subsection', 1);
 
         $course = $this->getDataGenerator()->create_course(['format' => 'topics', 'numsections' => 1]);
         $module = $this->getDataGenerator()->create_module('subsection', (object)['course' => $course->id, 'section' => 1]);
@@ -86,6 +92,9 @@ final class sectiondelegatemodule_test extends \advanced_testcase {
     public function test_get_course(): void {
         $this->resetAfterTest();
 
+        $manager = \core_plugin_manager::resolve_plugininfo_class('mod');
+        $manager::enable_plugin('subsection', 1);
+
         $course = $this->getDataGenerator()->create_course(['format' => 'topics', 'numsections' => 1]);
         $module = $this->getDataGenerator()->create_module('subsection', (object)['course' => $course->id, 'section' => 1]);
 
@@ -104,6 +113,9 @@ final class sectiondelegatemodule_test extends \advanced_testcase {
     public function test_instance_plugin_disabled(): void {
         $this->resetAfterTest();
 
+        $manager = \core_plugin_manager::resolve_plugininfo_class('mod');
+        $manager::enable_plugin('subsection', 1);
+
         $course = $this->getDataGenerator()->create_course(['format' => 'topics', 'numsections' => 2]);
         $module = $this->getDataGenerator()->create_module(
             'subsection',
@@ -118,7 +130,6 @@ final class sectiondelegatemodule_test extends \advanced_testcase {
         $this->assertTrue($delegated->is_enabled());
 
         // Disabling the plugin should disable the delegate.
-        $manager = \core_plugin_manager::resolve_plugininfo_class('mod');
         $manager::enable_plugin('subsection', 0);
         rebuild_course_cache($course->id, true);
 

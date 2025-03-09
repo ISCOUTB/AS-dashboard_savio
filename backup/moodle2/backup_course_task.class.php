@@ -76,7 +76,7 @@ class backup_course_task extends backup_task {
         $this->add_step(new backup_course_structure_step('course_info', 'course.xml'));
 
         // Generate the enrolment file (conditionally, prevent it in any IMPORT/HUB operation)
-        if ($this->plan->get_mode() != backup::MODE_IMPORT) {
+        if ($this->plan->get_mode() != backup::MODE_IMPORT && $this->plan->get_mode() != backup::MODE_HUB) {
             $this->add_step(new backup_enrolments_structure_step('course_enrolments', 'enrolments.xml'));
         }
 
@@ -96,6 +96,10 @@ class backup_course_task extends backup_task {
             $this->add_step(new backup_annotate_groups_from_groupings('annotate_groups_from_groupings'));
         }
 
+        // Annotate the question_categories belonging to the course context (conditionally).
+        if ($this->get_setting_value('questionbank')) {
+            $this->add_step(new backup_calculate_question_categories('course_question_categories'));
+        }
 
         // Generate the roles file (optionally role assignments and always role overrides)
         $this->add_step(new backup_roles_structure_step('course_roles', 'roles.xml'));
@@ -157,7 +161,6 @@ class backup_course_task extends backup_task {
         // Link to the course main page (it also covers "&topic=xx" and "&week=xx"
         // because they don't become transformed (section number) in backup/restore.
         $content = self::encode_links_helper($content, 'COURSEVIEWBYID',       '/course/view.php?id=');
-        $content = self::encode_links_helper($content, 'COURSESECTIONBYID',    '/course/section.php?id=');
 
         // A few other key course links.
         $content = self::encode_links_helper($content, 'GRADEINDEXBYID',       '/grade/index.php?id=');

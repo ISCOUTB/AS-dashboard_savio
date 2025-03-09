@@ -36,8 +36,6 @@ use stdClass;
  * @category  test
  * @copyright 2020 Andrew Nicols <andrew@nicols.co.uk>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \core_user\table\participants_search
  */
 final class participants_search_test extends advanced_testcase {
 
@@ -191,7 +189,7 @@ final class participants_search_test extends advanced_testcase {
         $tests = [
             // Users who only have one role each.
             'Users in each role' => (object) [
-                'usersdata' => [
+                'users' => [
                     'a' => [
                         'courseroles' => [
                             'student',
@@ -248,7 +246,7 @@ final class participants_search_test extends advanced_testcase {
                 'expect' => [
                     // Tests for jointype: ANY.
                     'ANY: No role filter' => (object) [
-                        'testroles' => [],
+                        'roles' => [],
                         'jointype' => filter::JOINTYPE_ANY,
                         'count' => 8,
                         'expectedusers' => [
@@ -263,7 +261,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'ANY: Filter on student' => (object) [
-                        'testroles' => ['student'],
+                        'roles' => ['student'],
                         'jointype' => filter::JOINTYPE_ANY,
                         'count' => 2,
                         'expectedusers' => [
@@ -272,7 +270,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'ANY: Filter on student, teacher' => (object) [
-                        'testroles' => ['student', 'teacher'],
+                        'roles' => ['student', 'teacher'],
                         'jointype' => filter::JOINTYPE_ANY,
                         'count' => 4,
                         'expectedusers' => [
@@ -283,7 +281,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'ANY: Filter on student, manager (category level role)' => (object) [
-                        'testroles' => ['student', 'manager'],
+                        'roles' => ['student', 'manager'],
                         'jointype' => filter::JOINTYPE_ANY,
                         'count' => 3,
                         'expectedusers' => [
@@ -293,7 +291,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'ANY: Filter on student, coursecreator (not assigned)' => (object) [
-                        'testroles' => ['student', 'coursecreator'],
+                        'roles' => ['student', 'coursecreator'],
                         'jointype' => filter::JOINTYPE_ANY,
                         'count' => 2,
                         'expectedusers' => [
@@ -304,7 +302,7 @@ final class participants_search_test extends advanced_testcase {
 
                     // Tests for jointype: ALL.
                     'ALL: No role filter' => (object) [
-                        'testroles' => [],
+                        'roles' => [],
                         'jointype' => filter::JOINTYPE_ALL,
                         'count' => 8,
                         'expectedusers' => [
@@ -319,7 +317,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'ALL: Filter on student' => (object) [
-                        'testroles' => ['student'],
+                        'roles' => ['student'],
                         'jointype' => filter::JOINTYPE_ALL,
                         'count' => 2,
                         'expectedusers' => [
@@ -328,19 +326,19 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'ALL: Filter on student, teacher' => (object) [
-                        'testroles' => ['student', 'teacher'],
+                        'roles' => ['student', 'teacher'],
                         'jointype' => filter::JOINTYPE_ALL,
                         'count' => 0,
                         'expectedusers' => [],
                     ],
                     'ALL: Filter on student, manager (category level role))' => (object) [
-                        'testroles' => ['student', 'manager'],
+                        'roles' => ['student', 'manager'],
                         'jointype' => filter::JOINTYPE_ALL,
                         'count' => 0,
                         'expectedusers' => [],
                     ],
                     'ALL: Filter on student, coursecreator (not assigned))' => (object) [
-                        'testroles' => ['student', 'coursecreator'],
+                        'roles' => ['student', 'coursecreator'],
                         'jointype' => filter::JOINTYPE_ALL,
                         'count' => 0,
                         'expectedusers' => [],
@@ -348,7 +346,7 @@ final class participants_search_test extends advanced_testcase {
 
                     // Tests for jointype: NONE.
                     'NONE: No role filter' => (object) [
-                        'testroles' => [],
+                        'roles' => [],
                         'jointype' => filter::JOINTYPE_NONE,
                         'count' => 8,
                         'expectedusers' => [
@@ -363,7 +361,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'NONE: Filter on student' => (object) [
-                        'testroles' => ['student'],
+                        'roles' => ['student'],
                         'jointype' => filter::JOINTYPE_NONE,
                         'count' => 6,
                         'expectedusers' => [
@@ -376,7 +374,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'NONE: Filter on student, teacher' => (object) [
-                        'testroles' => ['student', 'teacher'],
+                        'roles' => ['student', 'teacher'],
                         'jointype' => filter::JOINTYPE_NONE,
                         'count' => 4,
                         'expectedusers' => [
@@ -387,7 +385,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'NONE: Filter on student, manager (category level role))' => (object) [
-                        'testroles' => ['student', 'manager'],
+                        'roles' => ['student', 'manager'],
                         'jointype' => filter::JOINTYPE_NONE,
                         'count' => 5,
                         'expectedusers' => [
@@ -399,7 +397,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'NONE: Filter on student, coursecreator (not assigned))' => (object) [
-                        'testroles' => ['student', 'coursecreator'],
+                        'roles' => ['student', 'coursecreator'],
                         'jointype' => filter::JOINTYPE_NONE,
                         'count' => 6,
                         'expectedusers' => [
@@ -414,7 +412,7 @@ final class participants_search_test extends advanced_testcase {
                 ],
             ],
             'Users with multiple roles' => (object) [
-                'usersdata' => [
+                'users' => [
                     'a' => [
                         'courseroles' => [
                             'student',
@@ -474,7 +472,7 @@ final class participants_search_test extends advanced_testcase {
                 'expect' => [
                     // Tests for jointype: ANY.
                     'ANY: No role filter' => (object) [
-                        'testroles' => [],
+                        'roles' => [],
                         'jointype' => filter::JOINTYPE_ANY,
                         'count' => 8,
                         'expectedusers' => [
@@ -489,7 +487,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'ANY: Filter on student' => (object) [
-                        'testroles' => ['student'],
+                        'roles' => ['student'],
                         'jointype' => filter::JOINTYPE_ANY,
                         'count' => 2,
                         'expectedusers' => [
@@ -498,7 +496,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'ANY: Filter on teacher' => (object) [
-                        'testroles' => ['teacher'],
+                        'roles' => ['teacher'],
                         'jointype' => filter::JOINTYPE_ANY,
                         'count' => 3,
                         'expectedusers' => [
@@ -508,7 +506,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'ANY: Filter on editingteacher' => (object) [
-                        'testroles' => ['editingteacher'],
+                        'roles' => ['editingteacher'],
                         'jointype' => filter::JOINTYPE_ANY,
                         'count' => 3,
                         'expectedusers' => [
@@ -518,7 +516,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'ANY: Filter on student, teacher' => (object) [
-                        'testroles' => ['student', 'teacher'],
+                        'roles' => ['student', 'teacher'],
                         'jointype' => filter::JOINTYPE_ANY,
                         'count' => 4,
                         'expectedusers' => [
@@ -529,7 +527,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'ANY: Filter on teacher, editingteacher' => (object) [
-                        'testroles' => ['teacher', 'editingteacher'],
+                        'roles' => ['teacher', 'editingteacher'],
                         'jointype' => filter::JOINTYPE_ANY,
                         'count' => 5,
                         'expectedusers' => [
@@ -541,7 +539,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'ANY: Filter on student, manager (category level role)' => (object) [
-                        'testroles' => ['student', 'manager'],
+                        'roles' => ['student', 'manager'],
                         'jointype' => filter::JOINTYPE_ANY,
                         'count' => 3,
                         'expectedusers' => [
@@ -551,7 +549,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'ANY: Filter on student, coursecreator (not assigned)' => (object) [
-                        'testroles' => ['student', 'coursecreator'],
+                        'roles' => ['student', 'coursecreator'],
                         'jointype' => filter::JOINTYPE_ANY,
                         'count' => 2,
                         'expectedusers' => [
@@ -562,7 +560,7 @@ final class participants_search_test extends advanced_testcase {
 
                     // Tests for jointype: ALL.
                     'ALL: No role filter' => (object) [
-                        'testroles' => [],
+                        'roles' => [],
                         'jointype' => filter::JOINTYPE_ALL,
                         'count' => 8,
                         'expectedusers' => [
@@ -577,7 +575,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'ALL: Filter on student' => (object) [
-                        'testroles' => ['student'],
+                        'roles' => ['student'],
                         'jointype' => filter::JOINTYPE_ALL,
                         'count' => 2,
                         'expectedusers' => [
@@ -586,7 +584,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'ALL: Filter on teacher' => (object) [
-                        'testroles' => ['teacher'],
+                        'roles' => ['teacher'],
                         'jointype' => filter::JOINTYPE_ALL,
                         'count' => 3,
                         'expectedusers' => [
@@ -596,7 +594,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'ALL: Filter on editingteacher' => (object) [
-                        'testroles' => ['editingteacher'],
+                        'roles' => ['editingteacher'],
                         'jointype' => filter::JOINTYPE_ALL,
                         'count' => 3,
                         'expectedusers' => [
@@ -606,7 +604,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'ALL: Filter on student, teacher' => (object) [
-                        'testroles' => ['student', 'teacher'],
+                        'roles' => ['student', 'teacher'],
                         'jointype' => filter::JOINTYPE_ALL,
                         'count' => 1,
                         'expectedusers' => [
@@ -614,7 +612,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'ALL: Filter on teacher, editingteacher' => (object) [
-                        'testroles' => ['teacher', 'editingteacher'],
+                        'roles' => ['teacher', 'editingteacher'],
                         'jointype' => filter::JOINTYPE_ALL,
                         'count' => 1,
                         'expectedusers' => [
@@ -622,13 +620,13 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'ALL: Filter on student, manager (category level role)' => (object) [
-                        'testroles' => ['student', 'manager'],
+                        'roles' => ['student', 'manager'],
                         'jointype' => filter::JOINTYPE_ALL,
                         'count' => 0,
                         'expectedusers' => [],
                     ],
                     'ALL: Filter on student, coursecreator (not assigned)' => (object) [
-                        'testroles' => ['student', 'coursecreator'],
+                        'roles' => ['student', 'coursecreator'],
                         'jointype' => filter::JOINTYPE_ALL,
                         'count' => 0,
                         'expectedusers' => [],
@@ -636,7 +634,7 @@ final class participants_search_test extends advanced_testcase {
 
                     // Tests for jointype: NONE.
                     'NONE: No role filter' => (object) [
-                        'testroles' => [],
+                        'roles' => [],
                         'jointype' => filter::JOINTYPE_NONE,
                         'count' => 8,
                         'expectedusers' => [
@@ -651,7 +649,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'NONE: Filter on student' => (object) [
-                        'testroles' => ['student'],
+                        'roles' => ['student'],
                         'jointype' => filter::JOINTYPE_NONE,
                         'count' => 6,
                         'expectedusers' => [
@@ -664,7 +662,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'NONE: Filter on teacher' => (object) [
-                        'testroles' => ['teacher'],
+                        'roles' => ['teacher'],
                         'jointype' => filter::JOINTYPE_NONE,
                         'count' => 5,
                         'expectedusers' => [
@@ -676,7 +674,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'NONE: Filter on editingteacher' => (object) [
-                        'testroles' => ['editingteacher'],
+                        'roles' => ['editingteacher'],
                         'jointype' => filter::JOINTYPE_NONE,
                         'count' => 5,
                         'expectedusers' => [
@@ -688,7 +686,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'NONE: Filter on student, teacher' => (object) [
-                        'testroles' => ['student', 'teacher'],
+                        'roles' => ['student', 'teacher'],
                         'jointype' => filter::JOINTYPE_NONE,
                         'count' => 4,
                         'expectedusers' => [
@@ -699,7 +697,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'NONE: Filter on teacher, editingteacher' => (object) [
-                        'testroles' => ['teacher', 'editingteacher'],
+                        'roles' => ['teacher', 'editingteacher'],
                         'jointype' => filter::JOINTYPE_NONE,
                         'count' => 3,
                         'expectedusers' => [
@@ -709,7 +707,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'NONE: Filter on student, manager (category level role)' => (object) [
-                        'testroles' => ['student', 'manager'],
+                        'roles' => ['student', 'manager'],
                         'jointype' => filter::JOINTYPE_NONE,
                         'count' => 5,
                         'expectedusers' => [
@@ -721,7 +719,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'NONE: Filter on student, coursecreator (not assigned)' => (object) [
-                        'testroles' => ['student', 'coursecreator'],
+                        'roles' => ['student', 'coursecreator'],
                         'jointype' => filter::JOINTYPE_NONE,
                         'count' => 6,
                         'expectedusers' => [
@@ -741,8 +739,8 @@ final class participants_search_test extends advanced_testcase {
         foreach ($tests as $testname => $testdata) {
             foreach ($testdata->expect as $expectname => $expectdata) {
                 $finaltests["{$testname} => {$expectname}"] = [
-                    'usersdata' => $testdata->usersdata,
-                    'testroles' => $expectdata->testroles,
+                    'users' => $testdata->users,
+                    'roles' => $expectdata->roles,
                     'jointype' => $expectdata->jointype,
                     'count' => $expectdata->count,
                     'expectedusers' => $expectdata->expectedusers,
@@ -801,9 +799,9 @@ final class participants_search_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function country_provider(): array {
+    public function country_provider(): array {
         $tests = [
-            'usersdata' => [
+            'users' => [
                 'user1' => 'DE',
                 'user2' => 'ES',
                 'user3' => 'ES',
@@ -910,7 +908,7 @@ final class participants_search_test extends advanced_testcase {
         $finaltests = [];
         foreach ($tests['expects'] as $testname => $test) {
             $finaltests[$testname] = [
-                'usersdata' => $tests['usersdata'],
+                'users' => $tests['users'],
                 'countries' => $test->countries,
                 'jointype' => $test->jointype,
                 'expectedusers' => $test->expectedusers,
@@ -998,11 +996,11 @@ final class participants_search_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function keywords_provider(): array {
+    public function keywords_provider(): array {
         $tests = [
             // Users where the keyword matches basic user fields such as names and email.
             'Users with basic names' => (object) [
-                'usersdata' => [
+                'users' => [
                     'adam.ant' => [
                         'firstname' => 'Adam',
                         'lastname' => 'Ant',
@@ -1458,7 +1456,7 @@ final class participants_search_test extends advanced_testcase {
         foreach ($tests as $testname => $testdata) {
             foreach ($testdata->expect as $expectname => $expectdata) {
                 $finaltests["{$testname} => {$expectname}"] = [
-                    'usersdata' => $testdata->usersdata,
+                    'users' => $testdata->users,
                     'keywords' => $expectdata->keywords,
                     'jointype' => $expectdata->jointype,
                     'count' => $expectdata->count,
@@ -1499,8 +1497,8 @@ final class participants_search_test extends advanced_testcase {
         foreach ($usersdata as $username => $userdata) {
             $user = $this->getDataGenerator()->create_user(['username' => $username]);
 
-            if (array_key_exists('statuses', $userdata)) {
-                foreach ($userdata['statuses'] as $enrolmethod => $status) {
+            if (array_key_exists('status', $userdata)) {
+                foreach ($userdata['status'] as $enrolmethod => $status) {
                     $this->getDataGenerator()->enrol_user($user->id, $course->id, 'student', $enrolmethod, 0, 0, $status);
                 }
             }
@@ -1546,33 +1544,33 @@ final class participants_search_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function status_provider(): array {
+    public function status_provider(): array {
         $tests = [
             // Users with different statuses and enrolment methods (so multiple statuses are possible for the same user).
             'Users with different enrolment statuses' => (object) [
-                'usersdata' => [
+                'users' => [
                     'a' => [
-                        'statuses' => [
+                        'status' => [
                             'manual' => ENROL_USER_ACTIVE,
                         ]
                     ],
                     'b' => [
-                        'statuses' => [
+                        'status' => [
                             'self' => ENROL_USER_ACTIVE,
                         ]
                     ],
                     'c' => [
-                        'statuses' => [
+                        'status' => [
                             'manual' => ENROL_USER_SUSPENDED,
                         ]
                     ],
                     'd' => [
-                        'statuses' => [
+                        'status' => [
                             'self' => ENROL_USER_SUSPENDED,
                         ]
                     ],
                     'e' => [
-                        'statuses' => [
+                        'status' => [
                             'manual' => ENROL_USER_ACTIVE,
                             'self' => ENROL_USER_SUSPENDED,
                         ]
@@ -1581,7 +1579,7 @@ final class participants_search_test extends advanced_testcase {
                 'expect' => [
                     // Tests for jointype: ANY.
                     'ANY: No filter' => (object) [
-                        'statuses' => [],
+                        'status' => [],
                         'jointype' => filter::JOINTYPE_ANY,
                         'count' => 5,
                         'expectedusers' => [
@@ -1593,7 +1591,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'ANY: Filter on active only' => (object) [
-                        'statuses' => [ENROL_USER_ACTIVE],
+                        'status' => [ENROL_USER_ACTIVE],
                         'jointype' => filter::JOINTYPE_ANY,
                         'count' => 3,
                         'expectedusers' => [
@@ -1603,7 +1601,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'ANY: Filter on suspended only' => (object) [
-                        'statuses' => [ENROL_USER_SUSPENDED],
+                        'status' => [ENROL_USER_SUSPENDED],
                         'jointype' => filter::JOINTYPE_ANY,
                         'count' => 3,
                         'expectedusers' => [
@@ -1613,7 +1611,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'ANY: Filter on multiple statuses' => (object) [
-                        'statuses' => [ENROL_USER_ACTIVE, ENROL_USER_SUSPENDED],
+                        'status' => [ENROL_USER_ACTIVE, ENROL_USER_SUSPENDED],
                         'jointype' => filter::JOINTYPE_ANY,
                         'count' => 5,
                         'expectedusers' => [
@@ -1627,7 +1625,7 @@ final class participants_search_test extends advanced_testcase {
 
                     // Tests for jointype: ALL.
                     'ALL: No filter' => (object) [
-                       'statuses' => [],
+                       'status' => [],
                         'jointype' => filter::JOINTYPE_ALL,
                         'count' => 5,
                         'expectedusers' => [
@@ -1639,7 +1637,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'ALL: Filter on active only' => (object) [
-                        'statuses' => [ENROL_USER_ACTIVE],
+                        'status' => [ENROL_USER_ACTIVE],
                         'jointype' => filter::JOINTYPE_ALL,
                         'count' => 3,
                         'expectedusers' => [
@@ -1649,7 +1647,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'ALL: Filter on suspended only' => (object) [
-                        'statuses' => [ENROL_USER_SUSPENDED],
+                        'status' => [ENROL_USER_SUSPENDED],
                         'jointype' => filter::JOINTYPE_ALL,
                         'count' => 3,
                         'expectedusers' => [
@@ -1659,7 +1657,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'ALL: Filter on multiple statuses' => (object) [
-                        'statuses' => [ENROL_USER_ACTIVE, ENROL_USER_SUSPENDED],
+                        'status' => [ENROL_USER_ACTIVE, ENROL_USER_SUSPENDED],
                         'jointype' => filter::JOINTYPE_ALL,
                         'count' => 1,
                         'expectedusers' => [
@@ -1669,7 +1667,7 @@ final class participants_search_test extends advanced_testcase {
 
                     // Tests for jointype: NONE.
                     'NONE: No filter' => (object) [
-                       'statuses' => [],
+                       'status' => [],
                         'jointype' => filter::JOINTYPE_NONE,
                         'count' => 5,
                         'expectedusers' => [
@@ -1681,7 +1679,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'NONE: Filter on active only' => (object) [
-                        'statuses' => [ENROL_USER_ACTIVE],
+                        'status' => [ENROL_USER_ACTIVE],
                         'jointype' => filter::JOINTYPE_NONE,
                         'count' => 3,
                         'expectedusers' => [
@@ -1691,7 +1689,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'NONE: Filter on suspended only' => (object) [
-                        'statuses' => [ENROL_USER_SUSPENDED],
+                        'status' => [ENROL_USER_SUSPENDED],
                         'jointype' => filter::JOINTYPE_NONE,
                         'count' => 3,
                         'expectedusers' => [
@@ -1701,7 +1699,7 @@ final class participants_search_test extends advanced_testcase {
                         ],
                     ],
                     'NONE: Filter on multiple statuses' => (object) [
-                        'statuses' => [ENROL_USER_ACTIVE, ENROL_USER_SUSPENDED],
+                        'status' => [ENROL_USER_ACTIVE, ENROL_USER_SUSPENDED],
                         'jointype' => filter::JOINTYPE_NONE,
                         'count' => 0,
                         'expectedusers' => [],
@@ -1714,8 +1712,8 @@ final class participants_search_test extends advanced_testcase {
         foreach ($tests as $testname => $testdata) {
             foreach ($testdata->expect as $expectname => $expectdata) {
                 $finaltests["{$testname} => {$expectname}"] = [
-                    'usersdata' => $testdata->usersdata,
-                    'statuses' => $expectdata->statuses,
+                    'users' => $testdata->users,
+                    'status' => $expectdata->status,
                     'jointype' => $expectdata->jointype,
                     'count' => $expectdata->count,
                     'expectedusers' => $expectdata->expectedusers,
@@ -1803,11 +1801,11 @@ final class participants_search_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function enrolments_provider(): array {
+    public function enrolments_provider(): array {
         $tests = [
             // Users with different enrolment methods.
             'Users with different enrolment methods' => (object) [
-                'usersdata' => [
+                'users' => [
                     'a' => [
                         'enrolmethods' => [
                             'manual',
@@ -1928,7 +1926,7 @@ final class participants_search_test extends advanced_testcase {
         foreach ($tests as $testname => $testdata) {
             foreach ($testdata->expect as $expectname => $expectdata) {
                 $finaltests["{$testname} => {$expectname}"] = [
-                    'usersdata' => $testdata->usersdata,
+                    'users' => $testdata->users,
                     'enrolmethods' => $expectdata->enrolmethods,
                     'jointype' => $expectdata->jointype,
                     'count' => $expectdata->count,
@@ -2029,7 +2027,7 @@ final class participants_search_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function groups_provider(): array {
+    public function groups_provider(): array {
         $tests = [
             'Users in different groups' => (object) [
                 'groupsavailable' => [
@@ -2037,7 +2035,7 @@ final class participants_search_test extends advanced_testcase {
                     'groupb',
                     'groupc',
                 ],
-                'usersdata' => [
+                'users' => [
                     'a' => [
                         'groups' => ['groupa'],
                     ],
@@ -2247,7 +2245,7 @@ final class participants_search_test extends advanced_testcase {
         foreach ($tests as $testname => $testdata) {
             foreach ($testdata->expect as $expectname => $expectdata) {
                 $finaltests["{$testname} => {$expectname}"] = [
-                    'usersdata' => $testdata->usersdata,
+                    'users' => $testdata->users,
                     'groupsavailable' => $testdata->groupsavailable,
                     'filtergroups' => $expectdata->groups,
                     'jointype' => $expectdata->jointype,
@@ -2370,7 +2368,7 @@ final class participants_search_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function groups_separate_provider(): array {
+    public function groups_separate_provider(): array {
         $tests = [
             'Users in different groups with separate groups mode enabled' => (object) [
                 'groupsavailable' => [
@@ -2378,7 +2376,7 @@ final class participants_search_test extends advanced_testcase {
                     'groupb',
                     'groupc',
                 ],
-                'usersdata' => [
+                'users' => [
                     'a' => [
                         'groups' => ['groupa'],
                     ],
@@ -2648,7 +2646,7 @@ final class participants_search_test extends advanced_testcase {
         foreach ($tests as $testname => $testdata) {
             foreach ($testdata->expect as $expectname => $expectdata) {
                 $finaltests["{$testname} => {$expectname}"] = [
-                    'usersdata' => $testdata->usersdata,
+                    'users' => $testdata->users,
                     'groupsavailable' => $testdata->groupsavailable,
                     'filtergroups' => $expectdata->groups,
                     'jointype' => $expectdata->jointype,
@@ -2732,11 +2730,11 @@ final class participants_search_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function accesssince_provider(): array {
+    public function accesssince_provider(): array {
         $tests = [
             // Users with different last access times.
             'Users in different groups' => (object) [
-                'usersdata' => [
+                'users' => [
                     'a' => [
                         'lastlogin' => '-3 days',
                     ],
@@ -2948,7 +2946,7 @@ final class participants_search_test extends advanced_testcase {
         foreach ($tests as $testname => $testdata) {
             foreach ($testdata->expect as $expectname => $expectdata) {
                 $finaltests["{$testname} => {$expectname}"] = [
-                    'usersdata' => $testdata->usersdata,
+                    'users' => $testdata->users,
                     'accesssince' => $expectdata->accesssince,
                     'jointype' => $expectdata->jointype,
                     'count' => $expectdata->count,
@@ -3139,7 +3137,7 @@ final class participants_search_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function filterset_joins_provider(): array {
+    public function filterset_joins_provider(): array {
         $tests = [
             // Users with different configurations.
             'Users with different configurations' => (object) [
@@ -3148,7 +3146,7 @@ final class participants_search_test extends advanced_testcase {
                     'groupb',
                     'groupc',
                 ],
-                'usersdata' => [
+                'users' => [
                     'adam.ant' => [
                         'firstname' => 'Adam',
                         'lastname' => 'Ant',
@@ -3498,7 +3496,7 @@ final class participants_search_test extends advanced_testcase {
         foreach ($tests as $testname => $testdata) {
             foreach ($testdata->expect as $expectname => $expectdata) {
                 $finaltests["{$testname} => {$expectname}"] = [
-                    'usersdata' => $testdata->usersdata,
+                    'users' => $testdata->users,
                     'filterdata' => $expectdata->filterdata,
                     'groupsavailable' => $testdata->groupsavailable,
                     'jointype' => $expectdata->jointype,
@@ -3509,45 +3507,5 @@ final class participants_search_test extends advanced_testcase {
         }
 
         return $finaltests;
-    }
-
-    /**
-     * Tests sorting of participants in a course.
-     *
-     * This test runs a search for participants twice, first with an "ORDER BY" clause and second without.
-     * The test asserts the correct ordering of participants based on the sorting condition.
-     */
-    public function test_sort_participants(): void {
-        $this->resetAfterTest();
-
-        $course = $this->getDataGenerator()->create_course();
-        $coursecontext = context_course::instance($course->id);
-
-        // Generate users with their role.
-        $this->getDataGenerator()->create_and_enrol($course, 'teacher');
-        $this->getDataGenerator()->create_and_enrol($course, 'student');
-
-        // Create the basic filter.
-        $filterset = new participants_filterset();
-        $filterset->add_filter(new integer_filter('courseid', null, [(int) $course->id]));
-
-        // Run the search with using ORDER BY.
-        $search = new participants_search($course, $coursecontext, $filterset);
-        $rs = $search->get_participants(
-            sort: 'ORDER     BY id', // Adding spaces between "ORDER" and "BY" is intentional.
-        );
-        $records = $this->convert_recordset_to_array($rs);
-        $userids = array_keys($records);
-        $this->assertGreaterThan($userids[0], $userids[1]);
-
-        // Run the search without using ORDER BY.
-        $rs = $search->get_participants(
-            sort: 'id DESC',
-        );
-        $records = $this->convert_recordset_to_array($rs);
-        $userids = array_keys($records);
-        $this->assertGreaterThan($userids[1], $userids[0]);
-
-        $rs->close();
     }
 }

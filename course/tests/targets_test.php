@@ -33,14 +33,14 @@ require_once($CFG->dirroot . '/lib/grade/constants.php');
  * @copyright 2019 Victor Deniz <victor@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class targets_test extends \advanced_testcase {
+class targets_test extends \advanced_testcase {
 
     /**
      * Provides course params for the {@link self::test_core_target_course_completion_analysable()} method.
      *
      * @return array
      */
-    public static function analysable_provider(): array {
+    public function analysable_provider() {
 
         $now = new \DateTime("now", \core_date::get_server_timezone_object());
         $year = $now->format('Y');
@@ -48,14 +48,14 @@ final class targets_test extends \advanced_testcase {
 
         return [
             'coursenotyetstarted' => [
-                'courseparams' => [
+                'params' => [
                     'enablecompletion' => 1,
                     'startdate' => mktime(0, 0, 0, 10, 24, $year + 1)
                 ],
                 'isvalid' => get_string('coursenotyetstarted', 'course')
             ],
             'coursenostudents' => [
-                'courseparams' => [
+                'params' => [
                     'enablecompletion' => 1,
                     'startdate' => mktime(0, 0, 0, 10, 24, $year - 2),
                     'enddate' => mktime(0, 0, 0, 10, 24, $year - 1)
@@ -63,15 +63,15 @@ final class targets_test extends \advanced_testcase {
                 'isvalid' => get_string('nocoursestudents', 'course')
             ],
             'coursenosections' => [
-                'courseparams' => [
+                'params' => [
                     'enablecompletion' => 1,
-                    'format' => 'singleactivity',
+                    'format' => 'social',
                     'students' => true
                 ],
                 'isvalid' => get_string('nocoursesections', 'course')
             ],
             'coursenoendtime' => [
-                'courseparams' => [
+                'params' => [
                     'enablecompletion' => 1,
                     'format' => 'topics',
                     'enddate' => 0,
@@ -80,7 +80,7 @@ final class targets_test extends \advanced_testcase {
                 'isvalid' => get_string('nocourseendtime', 'course')
             ],
             'courseendbeforestart' => [
-                'courseparams' => [
+                'params' => [
                     'enablecompletion' => 1,
                     'enddate' => mktime(0, 0, 0, 10, 23, $year - 2),
                     'students' => true
@@ -88,7 +88,7 @@ final class targets_test extends \advanced_testcase {
                 'isvalid' => get_string('errorendbeforestart', 'course')
             ],
             'coursetoolong' => [
-                'courseparams' => [
+                'params' => [
                     'enablecompletion' => 1,
                     'startdate' => mktime(0, 0, 0, 10, 24, $year - 2),
                     'enddate' => mktime(0, 0, 0, 10, 23, $year),
@@ -97,7 +97,7 @@ final class targets_test extends \advanced_testcase {
                 'isvalid' => get_string('coursetoolong', 'course')
             ],
             'coursealreadyfinished' => [
-                'courseparams' => [
+                'params' => [
                     'enablecompletion' => 1,
                     'startdate' => mktime(0, 0, 0, 10, 24, $year - 2),
                     'enddate' => mktime(0, 0, 0, 10, 23, $year - 1),
@@ -107,7 +107,7 @@ final class targets_test extends \advanced_testcase {
                 'fortraining' => false
             ],
             'coursenotyetfinished' => [
-                'courseparams' => [
+                'params' => [
                     'enablecompletion' => 1,
                     'startdate' => mktime(0, 0, 0, $month - 1, 24, $year),
                     'enddate' => mktime(0, 0, 0, $month + 2, 23, $year),
@@ -116,7 +116,7 @@ final class targets_test extends \advanced_testcase {
                 'isvalid' => get_string('coursenotyetfinished', 'course')
             ],
             'coursenocompletion' => [
-                'courseparams' => [
+                'params' => [
                     'enablecompletion' => 0,
                     'startdate' => mktime(0, 0, 0, $month - 2, 24, $year),
                     'enddate' => mktime(0, 0, 0, $month - 1, 23, $year),
@@ -125,7 +125,7 @@ final class targets_test extends \advanced_testcase {
                 'isvalid' => get_string('completionnotenabledforcourse', 'completion')
             ],
             'coursehiddentraining' => [
-                'courseparams' => [
+                'params' => [
                     'enablecompletion' => 1,
                     'startdate' => mktime(0, 0, 0, $month - 1, 24, $year - 1),
                     'enddate' => mktime(0, 0, 0, $month - 1, 23, $year),
@@ -135,7 +135,7 @@ final class targets_test extends \advanced_testcase {
                 'isvalid' => true,
             ],
             'coursehiddenprediction' => [
-                'courseparams' => [
+                'params' => [
                     'enablecompletion' => 1,
                     'startdate' => mktime(0, 0, 0, $month - 1, 24, $year),
                     'enddate' => mktime(0, 0, 0, $month - 1, 23, $year + 1),
@@ -153,7 +153,7 @@ final class targets_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function sample_provider(): array {
+    public function sample_provider() {
         $now = time();
         return [
             'enrolmentendbeforecourse' => [
@@ -204,7 +204,7 @@ final class targets_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function active_during_analysis_time_provider(): array {
+    public function active_during_analysis_time_provider() {
         $now = time();
 
         return [

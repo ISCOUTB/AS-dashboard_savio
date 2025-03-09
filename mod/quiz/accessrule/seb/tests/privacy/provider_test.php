@@ -43,7 +43,7 @@ require_once(__DIR__ . '/../test_helper_trait.php');
  * @copyright  2020 Catalyst IT
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class provider_test extends provider_testcase {
+class provider_test extends provider_testcase {
     use \quizaccess_seb_test_helper_trait;
 
     /**
@@ -108,7 +108,7 @@ final class provider_test extends provider_testcase {
         // (note this is only effective with databases not using fed (+1000) sequences
         // per table, like postgres and mysql do, rendering this useless. In any
         // case better to have the situation covered by some DBs,
-        // like sqlsrv than by none).
+        // like sqlsrv or oracle than by none).
         $this->getDataGenerator()->create_module('label', ['course' => $this->course->id]);
 
         $contextlist = provider::get_contexts_for_userid($this->user->id);

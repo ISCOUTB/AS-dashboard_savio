@@ -1,25 +1,5 @@
 # mod_assign Upgrade notes
 
-## 5.0dev+
-
-### Deprecated
-
-- The assign_course_index_summary is now deprecated. The assign index is now generated using the mod_assign\course\overview integration class.
-
-  For more information see [MDL-83888](https://tracker.moodle.org/browse/MDL-83888)
-
-### Fixed
-
-- The unit test for the privacy provider has been marked as final.
-
-  A number of core tests had been incorrectly configured to extend this test
-  but should instead be extending `\mod_assign\tests\provider_testcase`.
-
-  Any community plugins extending the `\mod_assign\privacy\provider_test` test
-  class should be updated to extend `\mod_assign\tests\provider_testcase` instead.
-
-  For more information see [MDL-81520](https://tracker.moodle.org/browse/MDL-81520)
-
 ## 4.5
 
 ### Added

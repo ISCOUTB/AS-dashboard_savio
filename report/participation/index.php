@@ -388,7 +388,11 @@ if (!empty($instanceid) && !empty($roleid)) {
         echo '</div>'."\n";
         echo '</form>'."\n";
 
-        $PAGE->requires->js_call_amd('report_participation/participants', 'init');
+        $options = new stdClass();
+        $options->courseid = $course->id;
+        $options->noteStateNames = note_get_state_names();
+        $options->stateHelpIcon = $OUTPUT->help_icon('publishstate', 'notes');
+        $PAGE->requires->js_call_amd('report_participation/participants', 'init', [$options]);
     }
     echo '</div>'."\n";
 }

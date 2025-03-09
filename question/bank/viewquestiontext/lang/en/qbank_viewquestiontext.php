@@ -25,4 +25,3 @@
 
 $string['pluginname'] = 'View question text';
 $string['privacy:metadata'] = 'The View question text question bank plugin does not store any personal data.';
-$string['questiontext_condition'] = 'Question text and general feedback';

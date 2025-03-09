@@ -221,7 +221,7 @@ class memcached extends handler {
             $memcached->quit();
         }
 
-        return parent::destroy_all();
+        return true;
     }
 
     #[\Override]
@@ -242,7 +242,7 @@ class memcached extends handler {
             $memcached->quit();
         }
 
-        return parent::destroy($id);
+        return true;
     }
 
     /**

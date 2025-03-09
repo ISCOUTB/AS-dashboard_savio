@@ -141,14 +141,14 @@ class schedule {
      *
      * @param model $schedule
      * @return int
-     *
-     * @deprecated since Moodle 5.0 - please do not use this function any more, {@see report::get_report_row_count}
      */
-    #[\core\attribute\deprecated('report::get_report_row_count', since: '5.0', mdl: 'MDL-74488')]
     public static function get_schedule_report_count(model $schedule): int {
-        \core\deprecation::emit_deprecation_if_present([self::class, __FUNCTION__]);
+        global $DB;
 
-        return report::get_report_row_count($schedule->get('reportid'));
+        $table = custom_report_table_view::create($schedule->get('reportid'));
+        $table->setup();
+
+        return $DB->count_records_sql($table->countsql, $table->countparams);
     }
 
     /**
@@ -163,6 +163,7 @@ class schedule {
         require_once("{$CFG->libdir}/filelib.php");
 
         $table = custom_report_table_view::create($schedule->get('reportid'));
+
         $table->setup();
         $table->query_db(0, false);
 

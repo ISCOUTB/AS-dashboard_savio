@@ -128,11 +128,11 @@ function(
         var showContactsAction = getShowContactsAction(body);
         var showRequestsAction = getShowRequestsAction(body);
 
-        showContactsAction[0].addEventListener('show.bs.tab', function() {
+        showContactsAction.on('show.bs.tab', function() {
             ContactsSection.show(contactsSection);
         });
 
-        showRequestsAction[0].addEventListener('show.bs.tab', function() {
+        showRequestsAction.on('show.bs.tab', function() {
             RequestsSection.show(requestsSection);
         });
 

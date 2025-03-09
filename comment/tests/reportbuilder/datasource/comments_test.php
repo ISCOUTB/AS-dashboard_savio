@@ -18,11 +18,16 @@ declare(strict_types=1);
 
 namespace core_comment\reportbuilder\datasource;
 
+use context_course;
 use core_comment_generator;
-use core\context\{block, course};
 use core_reportbuilder_generator;
+use core_reportbuilder_testcase;
 use core_reportbuilder\local\filters\{date, select, text};
-use core_reportbuilder\tests\core_reportbuilder_testcase;
+
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once("{$CFG->dirroot}/reportbuilder/tests/helpers.php");
 
 /**
  * Unit tests for comments datasource
@@ -32,7 +37,7 @@ use core_reportbuilder\tests\core_reportbuilder_testcase;
  * @copyright   2022 Paul Holden <paulh@moodle.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class comments_test extends core_reportbuilder_testcase {
+class comments_test extends core_reportbuilder_testcase {
 
     /**
      * Test default datasource
@@ -41,7 +46,7 @@ final class comments_test extends core_reportbuilder_testcase {
         $this->resetAfterTest();
 
         $course = $this->getDataGenerator()->create_course();
-        $coursecontext = course::instance($course->id);
+        $coursecontext = context_course::instance($course->id);
 
         /** @var core_comment_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('core_comment');
@@ -73,7 +78,7 @@ final class comments_test extends core_reportbuilder_testcase {
 
         /** @var core_reportbuilder_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('core_reportbuilder');
-        $report = $generator->create_report(['name' => 'Comments', 'source' => comments::class, 'default' => 1]);
+        $report = $generator->create_report(['name' => 'Blogs', 'source' => comments::class, 'default' => 1]);
 
         $content = $this->get_custom_report_content($report->get('id'));
 
@@ -94,7 +99,8 @@ final class comments_test extends core_reportbuilder_testcase {
         $this->setAdminUser();
 
         $course = $this->getDataGenerator()->create_course();
-        $coursecontext = course::instance($course->id);
+        $courseurl = course_get_url($course);
+        $coursecontext = context_course::instance($course->id);
 
         /** @var core_comment_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('core_comment');
@@ -107,9 +113,9 @@ final class comments_test extends core_reportbuilder_testcase {
 
         /** @var core_reportbuilder_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('core_reportbuilder');
-        $report = $generator->create_report(['name' => 'Comments', 'source' => comments::class, 'default' => 0]);
+        $report = $generator->create_report(['name' => 'Blogs', 'source' => comments::class, 'default' => 0]);
 
-        $generator->create_column(['reportid' => $report->get('id'), 'uniqueidentifier' => 'context:name']);
+        $generator->create_column(['reportid' => $report->get('id'), 'uniqueidentifier' => 'context:link']);
         $generator->create_column(['reportid' => $report->get('id'), 'uniqueidentifier' => 'comment:component']);
         $generator->create_column(['reportid' => $report->get('id'), 'uniqueidentifier' => 'comment:area']);
         $generator->create_column(['reportid' => $report->get('id'), 'uniqueidentifier' => 'comment:itemid']);
@@ -118,7 +124,7 @@ final class comments_test extends core_reportbuilder_testcase {
         $this->assertCount(1, $content);
 
         $this->assertEquals([
-            $coursecontext->get_context_name(),
+            "<a href=\"{$courseurl}\">{$coursecontext->get_context_name()}</a>",
             'block_comments',
             'page_comments',
             0,
@@ -130,7 +136,7 @@ final class comments_test extends core_reportbuilder_testcase {
      *
      * @return array[]
      */
-    public static function datasource_filters_provider(): array {
+    public function datasource_filters_provider(): array {
         return [
             // Comment.
             'Filter content' => ['comment:content', [
@@ -153,11 +159,11 @@ final class comments_test extends core_reportbuilder_testcase {
             // Context.
             'Context level' => ['context:level', [
                 'context:level_operator' => select::EQUAL_TO,
-                'context:level_value' => course::LEVEL,
+                'context:level_value' => CONTEXT_COURSE,
             ], true],
             'Context level (no match)' => ['context:level', [
                 'context:level_operator' => select::EQUAL_TO,
-                'context:level_value' => block::LEVEL,
+                'context:level_value' => CONTEXT_BLOCK,
             ], false],
 
             // User.
@@ -190,11 +196,12 @@ final class comments_test extends core_reportbuilder_testcase {
         $this->setAdminUser();
 
         $course = $this->getDataGenerator()->create_course();
+        $coursecontext = context_course::instance($course->id);
 
         /** @var core_comment_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('core_comment');
         $generator->create_comment([
-            'context' => course::instance($course->id),
+            'context' => $coursecontext,
             'component' => 'block_comments',
             'area' => 'page_comments',
             'content' => 'Cool',
@@ -204,7 +211,7 @@ final class comments_test extends core_reportbuilder_testcase {
         $generator = $this->getDataGenerator()->get_plugin_generator('core_reportbuilder');
 
         // Create report containing single column, and given filter.
-        $report = $generator->create_report(['name' => 'Comments', 'source' => comments::class, 'default' => 0]);
+        $report = $generator->create_report(['name' => 'Tasks', 'source' => comments::class, 'default' => 0]);
         $generator->create_column(['reportid' => $report->get('id'), 'uniqueidentifier' => 'comment:component']);
 
         // Add filter, set it's values.
@@ -233,11 +240,12 @@ final class comments_test extends core_reportbuilder_testcase {
         $this->setAdminUser();
 
         $course = $this->getDataGenerator()->create_course();
+        $coursecontext = context_course::instance($course->id);
 
         /** @var core_comment_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('core_comment');
         $generator->create_comment([
-            'context' => course::instance($course->id),
+            'context' => $coursecontext,
             'component' => 'block_comments',
             'area' => 'page_comments',
             'content' => 'Cool',

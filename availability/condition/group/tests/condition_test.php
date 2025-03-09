@@ -23,7 +23,7 @@ namespace availability_group;
  * @copyright 2014 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class condition_test extends \advanced_testcase {
+class condition_test extends \advanced_testcase {
     /**
      * Load required classes.
      */

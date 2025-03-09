@@ -26,7 +26,7 @@ use core_group\visibility;
  * @author     Andrew Nicols
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class grouplib_test extends \advanced_testcase {
+class grouplib_test extends \advanced_testcase {
 
     public function test_groups_get_group_by_idnumber(): void {
         $this->resetAfterTest(true);
@@ -501,7 +501,7 @@ final class grouplib_test extends \advanced_testcase {
                 'userid' => $user2->id,
                 'groupnames' => $group1->name,
             ],
-        ], array_values($records));
+        ], $records);
     }
 
     public function test_groups_get_group_by_name(): void {
@@ -1158,7 +1158,7 @@ final class grouplib_test extends \advanced_testcase {
         $this->assertEquals([$c1group1->id], array_keys($groups));
         $this->assertEqualsCanonicalizing(
                 [$c1user1->id, $c12user1->id],
-                array_values($groups[$c1group1->id]->members),
+                $groups[$c1group1->id]->members
         );
     }
 

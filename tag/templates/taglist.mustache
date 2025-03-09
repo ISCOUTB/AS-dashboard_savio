@@ -41,8 +41,7 @@
         "accesshidelabel": false,
         "tagscount": 3,
         "overflow": 1,
-        "classes": "someadditionalclass",
-        "displaylink": false
+        "classes": "someadditionalclass"
     }
 
 }}
@@ -54,21 +53,13 @@
     <ul class="inline-list">
         {{#tags}}
             <li {{#overlimit}}class="overlimit"{{/overlimit}}>
-                {{#displaylink}}
-                    <a href="{{viewurl}}" class="badge bg-info text-white {{#isstandard}}standardtag{{/isstandard}}">
-                        {{#flag}}
-                            <span class="flagged-tag">{{name}}</span>
-                        {{/flag}}
-                        {{^flag}}
-                            {{name}}
-                        {{/flag}}
-                    </a>
-                {{/displaylink}}
-                {{^displaylink}}
-                    <span class="badge bg-info {{#flag}}flagged-tag{{/flag}} {{^flag}}text-white{{/flag}} {{#isstandard}}standardtag{{/isstandard}}">
-                        {{name}}
-                    </span>
-                {{/displaylink}}
+                <a href="{{viewurl}}" class="badge bg-info text-white {{#isstandard}}standardtag{{/isstandard}}" >
+                {{#flag}}
+                    <span class="flagged-tag">{{name}}</span></a>
+                {{/flag}}
+                {{^flag}}
+                    {{name}}</a>
+                {{/flag}}
             </li>
         {{/tags}}
         {{#overflow}}

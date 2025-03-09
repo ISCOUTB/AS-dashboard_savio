@@ -27,7 +27,7 @@ use question_bank;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \qbank_history\helper
  */
-final class helper_test extends \advanced_testcase {
+class helper_test extends \advanced_testcase {
     /**
      * @var bool|\context|\context_course $context
      */
@@ -60,12 +60,11 @@ final class helper_test extends \advanced_testcase {
         $questiongenerator = $generator->get_plugin_generator('core_question');
         // Create a course.
         $course = $generator->create_course();
-        $qbank = self::getDataGenerator()->create_module('qbank', ['course' => $course->id]);
         $this->courseid = $course->id;
-        $this->context = \context_module::instance($qbank->cmid);
+        $this->context = \context_course::instance($course->id);
         // Create a question in the default category.
         $contexts = new \core_question\local\bank\question_edit_contexts($this->context);
-        $cat = question_get_default_category($contexts->lowest()->id, true);
+        $cat = question_make_default_categories($contexts->all());
         $question = $questiongenerator->create_question('numerical', null,
             ['name' => 'Example question', 'category' => $cat->id]);
         $this->questiondata = question_bank::load_question($question->id);
@@ -80,16 +79,16 @@ final class helper_test extends \advanced_testcase {
     public function test_question_history_url(): void {
         $this->resetAfterTest();
         $filter = urlencode('filters[]');
-        $actionurl = helper::get_question_history_url(
+        $actionurl = helper::question_history_url(
             $this->questiondata->questionbankentryid,
             $this->returnurl,
-            $this->context->instanceid,
+            $this->courseid,
             $filter,
         );
         $params = [
             'entryid' => $this->questiondata->questionbankentryid,
             'returnurl' => $this->returnurl,
-            'cmid' => $this->context->instanceid,
+            'courseid' => $this->courseid,
             'filter' => $filter,
         ];
         $expectedurl = new \moodle_url('/question/bank/history/history.php', $params);
@@ -103,16 +102,16 @@ final class helper_test extends \advanced_testcase {
      */
     public function test_question_history_url_null_filter(): void {
         $this->resetAfterTest();
-        $actionurl = helper::get_question_history_url(
+        $actionurl = helper::question_history_url(
             $this->questiondata->questionbankentryid,
             $this->returnurl,
-            $this->context->instanceid,
+            $this->courseid,
             null,
         );
         $params = [
             'entryid' => $this->questiondata->questionbankentryid,
             'returnurl' => $this->returnurl,
-            'cmid' => $this->context->instanceid,
+            'courseid' => $this->courseid,
         ];
         $expectedurl = new \moodle_url('/question/bank/history/history.php', $params);
         $this->assertEquals($expectedurl, $actionurl);

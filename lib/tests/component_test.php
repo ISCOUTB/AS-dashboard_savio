@@ -16,8 +16,6 @@
 
 namespace core;
 
-use core\exception\coding_exception;
-use core\tests\fake_plugins_test_trait;
 use DirectoryIterator;
 use ReflectionClass;
 use ReflectionProperty;
@@ -33,13 +31,11 @@ use ReflectionProperty;
  * @covers \core\component
  */
 final class component_test extends \advanced_testcase {
-    use fake_plugins_test_trait;
-
     #[\Override]
     public function tearDown(): void {
         parent::tearDown();
 
-        ini_set('error_log', null);
+        component::reset();
     }
 
     /**
@@ -315,10 +311,10 @@ final class component_test extends \advanced_testcase {
         $this->assertSame('datafield_checkbox', component::normalize_componentname('datafield_checkbox'));
 
         // Other plugin types.
-        $this->assertSame('auth_ldap', component::normalize_componentname('auth_ldap'));
+        $this->assertSame('auth_mnet', component::normalize_componentname('auth_mnet'));
         $this->assertSame('enrol_self', component::normalize_componentname('enrol_self'));
         $this->assertSame('block_html', component::normalize_componentname('block_html'));
-        $this->assertSame('auth_oauth2', component::normalize_componentname('auth_oauth2'));
+        $this->assertSame('block_mnet_hosts', component::normalize_componentname('block_mnet_hosts'));
         $this->assertSame('local_amos', component::normalize_componentname('local_amos'));
         $this->assertSame('local_admin', component::normalize_componentname('local_admin'));
 
@@ -393,10 +389,10 @@ final class component_test extends \advanced_testcase {
             [['datafield', 'checkbox'], 'datafield_checkbox'],
 
             // Other plugin types.
-            [['auth', 'ldap'], 'auth_ldap'],
+            [['auth', 'mnet'], 'auth_mnet'],
             [['enrol', 'self'], 'enrol_self'],
             [['block', 'html'], 'block_html'],
-            [['auth', 'oauth2'], 'auth_oauth2'],
+            [['block', 'mnet_hosts'], 'block_mnet_hosts'],
             [['local', 'amos'], 'local_amos'],
             [['local', 'admin'], 'local_admin'],
 
@@ -606,10 +602,10 @@ final class component_test extends \advanced_testcase {
     public function test_get_component_classes_in_namespace(): void {
         // Unexisting.
         $this->assertCount(0, component::get_component_classes_in_namespace('core_unexistingcomponent', 'something'));
-        $this->assertCount(0, component::get_component_classes_in_namespace('auth_db', 'something'));
+        $this->assertCount(0, component::get_component_classes_in_namespace('auth_cas', 'something'));
 
         // Matches the last namespace level name not partials.
-        $this->assertCount(0, component::get_component_classes_in_namespace('auth_db', 'tas'));
+        $this->assertCount(0, component::get_component_classes_in_namespace('auth_cas', 'tas'));
         $this->assertCount(0, component::get_component_classes_in_namespace('core_user', 'course'));
         $this->assertCount(0, component::get_component_classes_in_namespace('mod_forum', 'output\\emaildigest'));
         $this->assertCount(0, component::get_component_classes_in_namespace('mod_forum', '\\output\\emaildigest'));
@@ -665,12 +661,12 @@ final class component_test extends \advanced_testcase {
             ],
             // Prefix with backslash if it doesn\'t come prefixed.
             [
-                ['auth_db', 'task'],
-                'auth_db\task\%s',
+                ['auth_cas', 'task'],
+                'auth_cas\task\%s',
             ],
             [
-                ['auth_db', '\\task'],
-                'auth_db\task\%s',
+                ['auth_cas', '\\task'],
+                'auth_cas\task\%s',
             ],
 
             // Core as a component works, the function can normalise the component name.
@@ -923,7 +919,7 @@ final class component_test extends \advanced_testcase {
                     ],
                 ],
                 'classname' => 'Psr\Http\Message\ServerRequestInterface',
-                'file' => "{$dirroot}/lib/psr/http-message/src/ServerRequestInterface.php",
+                'includedfiles' => "{$dirroot}/lib/psr/http-message/src/ServerRequestInterface.php",
             ],
             'PSR-4 namespaces can come from multiple sources - second source' => [
                 'psr0' => [],
@@ -934,7 +930,7 @@ final class component_test extends \advanced_testcase {
                     ],
                 ],
                 'classname' => 'Psr\Http\Message\ServerRequestFactoryInterface',
-                'file' => "{$dirroot}/lib/psr/http-factory/src/ServerRequestFactoryInterface.php",
+                'includedfiles' => "{$dirroot}/lib/psr/http-factory/src/ServerRequestFactoryInterface.php",
             ],
         ];
     }
@@ -1270,702 +1266,5 @@ final class component_test extends \advanced_testcase {
         $hashes = component::get_all_directory_hashes([$dir]);
         $finalhash = component::get_all_component_hash([$hashes]);
         $this->assertEquals($onefiledirhash, $finalhash);
-    }
-
-    /**
-     * Data provider fetching all third-party lib directories.
-     *
-     * @return array
-     */
-    public static function core_thirdparty_libs_provider(): array {
-        global $CFG;
-
-        $libs = [];
-
-        $xmlpath = $CFG->libdir . '/thirdpartylibs.xml';
-        $xml = simplexml_load_file($xmlpath);
-        foreach ($xml as $lib) {
-            $base = realpath(dirname($xmlpath));
-            $fullpath = "{$base}/{$lib->location}";
-            $relativepath = substr($fullpath, strlen($CFG->dirroot));
-
-            $libs[$relativepath] = [
-                'name' => (string) $lib->name,
-                'fullpath' => $fullpath,
-                'relativepath' => $relativepath,
-            ];
-        }
-
-        return $libs;
-    }
-
-    /**
-     * Data provider fetching all third-party lib directories with a composer.json file.
-     *
-     * @return array
-     */
-    public static function core_thirdparty_libs_with_composer_provider(): array {
-        return array_filter(self::core_thirdparty_libs_provider(), function ($lib) {
-            return file_exists("{$lib['fullpath']}/composer.json");
-        });
-    }
-
-    /**
-     * Summary of test_composer_files
-     *
-     * @dataProvider core_thirdparty_libs_with_composer_provider
-     * @param string $name
-     * @param string $fullpath
-     * @param string $relativepath
-     */
-    public function test_composer_files(
-        string $name,
-        string $fullpath,
-        string $relativepath,
-    ): void {
-        $this->assertFileExists("{$fullpath}/composer.json");
-
-        $composer = json_decode(file_get_contents("{$fullpath}/composer.json"), true);
-
-        $rc = new ReflectionClass(\core\component::class);
-
-        if (array_key_exists('autoload', $composer)) {
-            // Check that the PSR-4 namespaces are present and correct.
-            if (array_key_exists('psr-4', $composer['autoload'])) {
-                $autoloadnamespaces = $rc->getProperty('psr4namespaces')->getValue(null);
-                foreach ($composer['autoload']['psr-4'] as $namespace => $path) {
-                    // Composer PSR-4 namespace autoloads may optionally have a trailing slash. Standardise the value.
-                    $namespace = rtrim($namespace, '\\');
-
-                    // If it exists in the composer.json the namespace must exist in our autoloader.
-                    $this->assertArrayHasKey($namespace, $autoloadnamespaces);
-
-                    // Ours should be standardised to not have a trailing slash.
-                    $this->assertEquals(
-                        rtrim($relativepath, '/'),
-                        $relativepath,
-                        "Moodle PSR-4 namespaces must have no trailing /",
-                    );
-
-                    // The composer.json can specify an array of possible values.
-                    // Standardise the format to the array format.
-                    $paths = is_array($path) ? $path : [$path];
-
-                    foreach ($paths as $path) {
-                        // The composer.json can specify any arbitrary directory within the folder.
-                        // It always contains a leading slash (/) or backslash (\) on Windows.
-                        // It may also have an optional trailing slash (/).
-                        // Concatenate the parts and removes the slashes.
-                        $relativenamespacepath = trim("{$relativepath}/{$path}", '/\\');
-
-                        // The Moodle PSR-4 autoloader data has two formats:
-                        // - a string, for a single source; or
-                        // - an array, for multiple sources.
-                        // Standardise the format to the latter format.
-                        if (!is_array($autoloadnamespaces[$namespace])) {
-                            $autoloadnamespaces[$namespace] = [$autoloadnamespaces[$namespace]];
-                        }
-
-                        // Ensure that the autoloader contains the normalised path.
-                        $this->assertContains(
-                            $relativenamespacepath,
-                            $autoloadnamespaces[$namespace],
-                            "Moodle PSR-4 namespace missing entry for library {$name}: {$namespace} => {$relativenamespacepath}",
-                        );
-                    }
-                }
-            }
-
-            // Check that the composer autoload files are present.
-            if (array_key_exists('files', $composer['autoload'])) {
-                // The Moodle composer file autoloads are a simple string[].
-                $autoloadnamefiles = $rc->getProperty('composerautoloadfiles')->getValue(null);
-                foreach ($composer['autoload']['files'] as $file) {
-                    $this->assertContains(trim($relativepath, '/\\') . "/{$file}", $autoloadnamefiles);
-                }
-            }
-        }
-    }
-
-    /**
-     * Test that fetching of subtype data throws an exception when a subplugins.php is present without a json equivalent.
-     */
-    public function test_fetch_subtypes_php_only(): void {
-        $vfileroot = \org\bovigo\vfs\vfsStream::setup('root', null, [
-            'plugintype' => [
-                'exampleplugin' => [
-                    'db' => [
-                        'subplugins.php' => '',
-                    ],
-                ],
-            ],
-        ]);
-
-        $this->expectException(coding_exception::class);
-        $this->expectExceptionMessageMatches('/Use of subplugins.php has been deprecated and is no longer supported/');
-
-        $pluginroot = $vfileroot->getChild('plugintype/exampleplugin');
-
-        $rcm = new \ReflectionMethod(\core\component::class, 'fetch_subtypes');
-        $rcm->invoke(null, $pluginroot->url());
-    }
-
-    /**
-     * Test that fetching of subtype data does not throw an exception when a subplugins.php is present
-     * with a json file equivalent.
-     *
-     * Note: The content of the php file is irrelevant and we no longer use it anyway.
-     */
-    public function test_fetch_subtypes_php_and_json(): void {
-        global $CFG;
-
-        $this->resetAfterTest();
-        $vfileroot = \org\bovigo\vfs\vfsStream::setup('root', null, [
-            'plugintype' => [
-                'exampleplugin' => [
-                    'db' => [
-                        'subplugins.json' => json_encode([
-                            'subplugintypes' => [
-                                'exampleplugina' => 'apples',
-                            ],
-                        ]),
-                        'subplugins.php' => '',
-                    ],
-                    'apples' => [],
-                ],
-            ],
-        ]);
-
-        $CFG->dirroot = $vfileroot->url();
-        $pluginroot = $vfileroot->getChild('plugintype/exampleplugin');
-
-        $rcm = new \ReflectionMethod(\core\component::class, 'fetch_subtypes');
-        $subplugins = $rcm->invoke(null, $pluginroot->url());
-
-        $this->assertEquals([
-            'plugintypes' => [
-                'exampleplugina' => $pluginroot->getChild('apples')->url(),
-            ],
-        ], $subplugins);
-    }
-
-    /**
-     * Test that fetching of subtype data in a file which is missing the new subplugintypes key warns.
-     */
-    public function test_fetch_subtypes_plugintypes_only(): void {
-        global $CFG;
-
-        $this->resetAfterTest();
-        $vfileroot = \org\bovigo\vfs\vfsStream::setup('root', null, [
-            'plugintype' => [
-                'exampleplugin' => [
-                    'db' => [
-                        'subplugins.json' => json_encode([
-                            'plugintypes' => [
-                                'exampleplugina' => 'plugintype/exampleplugin/apples',
-                            ],
-                        ]),
-                        'subplugins.php' => '',
-                    ],
-                    'apples' => [],
-                ],
-            ],
-        ]);
-
-        $CFG->dirroot = $vfileroot->url();
-        $pluginroot = $vfileroot->getChild('plugintype/exampleplugin');
-
-        $logdir = make_request_directory();
-        $logfile = "{$logdir}/error.log";
-        ini_set('error_log', $logfile);
-
-        $rcm = new \ReflectionMethod(\core\component::class, 'fetch_subtypes');
-        $subplugins = $rcm->invoke(null, $pluginroot->url());
-
-        $this->assertEquals([
-            'plugintypes' => [
-                'exampleplugina' => $pluginroot->getChild('apples')->url(),
-            ],
-        ], $subplugins);
-
-        $warnings = file_get_contents($logfile);
-        $this->assertMatchesRegularExpression('/No subplugintypes defined in .*subplugins.json/', $warnings);
-    }
-
-    /**
-     * Ensure that invalid JSON in the subplugins.json file warns appropriately.
-     *
-     * @dataProvider invalid_subplugins_json_provider
-     * @param string[] $expectedwarnings Errors to expect in the exception message
-     * @param array[] $json The contents of the subplugins.json file
-     */
-    public function test_fetch_subtypes_json_invalid_values(
-        array $expectedwarnings,
-        array $json,
-    ): void {
-        global $CFG;
-
-        $this->resetAfterTest();
-        $vfileroot = \org\bovigo\vfs\vfsStream::setup('root', null, [
-            'plugintype' => [
-                'exampleplugin' => [
-                    'db' => [
-                        'subplugins.json' => json_encode($json),
-                        'subplugins.php' => '',
-                    ],
-                    'apples' => [],
-                    'pears' => [],
-                ],
-            ],
-        ]);
-
-        $CFG->dirroot = $vfileroot->url();
-        $pluginroot = $vfileroot->getChild('plugintype/exampleplugin');
-
-        $logdir = make_request_directory();
-        $logfile = "{$logdir}/error.log";
-        ini_set('error_log', $logfile);
-
-        $rcm = new \ReflectionMethod(\core\component::class, 'fetch_subtypes');
-        $rcm->invoke(null, $pluginroot->url());
-
-        $warnings = file_get_contents($logfile);
-        foreach ($expectedwarnings as $expectedwarning) {
-            $this->assertMatchesRegularExpression($expectedwarning, $warnings);
-        }
-    }
-
-    /**
-     * Data provider for invalid subplugins.json files.
-     *
-     * @return array
-     */
-    public static function invalid_subplugins_json_provider(): array {
-        return [
-            'Invalid characters in subtype name' => [
-                'expectedwarnings' => [
-                    "/Invalid subtype .*APPLES.*detected.*invalid characters present/",
-                ],
-                'json' => [
-                    'subplugintypes' => [
-                        'APPLES' => 'plugintype/exampleplugin/apples',
-                    ],
-                ],
-            ],
-
-            'Subplugin which duplicates a core subsystem' => [
-                'expectedwarnings' => [
-                    "/Invalid subtype .*editor.*detected.*duplicates core subsystem/",
-                ],
-                'json' => [
-                    'subplugintypes' => [
-                        'editor' => 'apples',
-                    ],
-                ],
-            ],
-
-            'Subplugin directory does not exist' => [
-                'expectedwarnings' => [
-                    "/Invalid subtype directory/",
-                ],
-                'json' => [
-                    'subplugintypes' => [
-                        'exampleapples' => 'berries',
-                    ],
-                ],
-            ],
-
-            'More subplugintypes than plugintypes' => [
-                'expectedwarnings' => [
-                    "/Subplugintypes and plugintypes are not in sync/",
-                ],
-                'json' => [
-                    'subplugintypes' => [
-                        'apples' => 'pears',
-                    ],
-                    'plugintypes' => [],
-                ],
-            ],
-
-            'More plugintypes than subplugintypes' => [
-                'expectedwarnings' => [
-                    "/Subplugintypes and plugintypes are not in sync /",
-                ],
-                'json' => [
-                    'subplugintypes' => [
-                        'apples' => 'apples',
-                    ],
-                    'plugintypes' => [
-                        'apples' => 'plugintype/exampleplugin/apples',
-                        'pears' => 'plugintype/exampleplugin/pears',
-                    ],
-                ],
-            ],
-
-            'subplugintype not defined in plugintype' => [
-                'expectedwarnings' => [
-                    "/Subplugintypes and plugintypes are not in sync for 'apples'/",
-                ],
-                'json' => [
-                    'subplugintypes' => [
-                        'apples' => 'apples',
-                    ],
-                    'plugintypes' => [
-                        'pears' => 'plugintype/exampleplugin/pears',
-                    ],
-                ],
-            ],
-            'subplugintype does not match plugintype' => [
-                'expectedwarnings' => [
-                    "/Subplugintypes and plugintypes are not in sync for 'apples'/",
-                ],
-                'json' => [
-                    'subplugintypes' => [
-                        'apples' => 'apples',
-                    ],
-                    'plugintypes' => [
-                        'apples' => 'plugintype/exampleplugin/pears',
-                    ],
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * Test various methods when a deprecated plugin type is introduced.
-     *
-     * @runInSeparateProcess
-     * @return void
-     */
-    public function test_core_component_deprecated_plugintype(): void {
-        $this->resetAfterTest();
-
-        // Inject the 'fake' plugin type.
-        $this->add_full_mocked_plugintype(
-            plugintype: 'fake',
-            path: 'lib/tests/fixtures/fakeplugins/fake'
-        );
-
-        $componenthashbefore = component::get_all_component_hash();
-        $versionhashbefore = component::get_all_versions_hash();
-
-        // Deprecation-specific APIs - pre-deprecation.
-        $this->assertArrayHasKey('fake', component::get_plugin_types());
-        $this->assertArrayHasKey('fullfeatured', component::get_plugin_list('fake'));
-        $this->assertFalse(component::is_deprecated_plugin_type('fake'));
-        $this->assertFalse(component::is_deleted_plugin_type('fake'));
-        $this->assertFalse(component::is_plugintype_in_deprecation('fake'));
-        $this->assertArrayNotHasKey('fake', component::get_deprecated_plugin_types());
-        $this->assertArrayNotHasKey('fullfeatured', component::get_deprecated_plugin_list('fake'));
-        $this->assertArrayNotHasKey('fake', component::get_deleted_plugin_types());
-        $this->assertArrayNotHasKey('fullfeatured', component::get_deleted_plugin_list('fake'));
-        $this->assertArrayHasKey('fake', component::get_all_plugin_types());
-        $this->assertArrayHasKey('fullfeatured', component::get_all_plugins_list('fake'));
-
-        // Deprecate the fake plugintype via mocking component sources.
-        $this->deprecate_full_mocked_plugintype('fake');
-
-        // Verify before/after hashes have changed, since the plugintype is no longer part of the hash calcs.
-        $this->assertNotEquals(component::get_all_component_hash(), $componenthashbefore);
-        $this->assertNotEquals(component::get_all_versions_hash(), $versionhashbefore);
-
-        // Deprecation-specific APIs - post-deprecation.
-        $this->assertTrue(component::is_deprecated_plugin_type('fake'));
-        $this->assertFalse(component::is_deleted_plugin_type('fake'));
-        $this->assertTrue(component::is_plugintype_in_deprecation('fake'));
-        $this->assertArrayHasKey('fake', component::get_deprecated_plugin_types());
-        $this->assertArrayHasKey('fullfeatured', component::get_deprecated_plugin_list('fake'));
-        $this->assertArrayNotHasKey('fake', component::get_deleted_plugin_types());
-        $this->assertArrayNotHasKey('fullfeatured', component::get_deleted_plugin_list('fake'));
-        $this->assertArrayHasKey('fake', component::get_all_plugin_types());
-        $this->assertArrayHasKey('fullfeatured', component::get_all_plugins_list('fake'));
-
-        // Deprecated plugins excluded from the following for B/C.
-        $this->assertArrayNotHasKey('fake', component::get_plugin_types());
-        $this->assertArrayNotHasKey('fullfeatured', component::get_plugin_list('fake'));
-        $this->assertArrayNotHasKey('fake', component::get_component_list());
-        $this->assertEmpty(component::get_plugin_list_with_file('fake', 'classes/dummy.php'));
-        $this->assertEmpty(component::get_plugin_list_with_class('fake', 'dummy'));
-
-        // Deprecated plugins excluded by default for B/C, but can be included by request.
-        $this->assertNotContains('fake_fullfeatured', component::get_component_names());
-        $this->assertContains('fake_fullfeatured', component::get_component_names(false, true));
-
-        // Deprecated plugins included in the following.
-        $this->assertIsString(component::get_plugin_directory('fake', 'fullfeatured')); // Used by string manager.
-        $this->assertIsString(component::get_component_directory('fake_fullfeatured')); // Uses get_plugin_directory().
-        $this->assertTrue(component::has_monologo_icon('fake', 'fullfeatured'));  // Uses get_plugin_directory().
-        $this->assertEquals('fake_fullfeatured', component::get_component_from_classname(\fake_fullfeatured\example::class));
-
-        // Class autoloading of deprecated plugins is permitted, to facilitate plugin migration code.
-        $this->assertArrayHasKey('fake_fullfeatured\dummy',
-            component::get_component_classes_in_namespace('fake_fullfeatured'));
-        $this->assertTrue(class_exists(\fake_fullfeatured\dummy::class));
-    }
-
-    /**
-     * Test various core_component APIs when dealing with deleted plugin types.
-     *
-     * @runInSeparateProcess
-     * @return void
-     */
-    public function test_core_component_deleted_plugintype(): void {
-        $this->resetAfterTest();
-
-        // Inject the 'fake' plugin type.
-        $this->add_full_mocked_plugintype(
-            plugintype: 'fake',
-            path: 'lib/tests/fixtures/fakeplugins/fake',
-        );
-
-        // Delete the fake plugintype via mocking component sources.
-        $this->delete_full_mocked_plugintype('fake');
-
-        // Deprecation-specific methods.
-        $this->assertFalse(component::is_deprecated_plugin_type('fake'));
-        $this->assertTrue(component::is_deleted_plugin_type('fake'));
-        $this->assertTrue(component::is_plugintype_in_deprecation('fake'));
-        $this->assertArrayNotHasKey('fake', component::get_deprecated_plugin_types());
-        $this->assertArrayNotHasKey('fullfeatured', component::get_deprecated_plugin_list('fake'));
-        $this->assertArrayHasKey('fake', component::get_deleted_plugin_types());
-        $this->assertArrayHasKey('fullfeatured', component::get_deleted_plugin_list('fake'));
-        $this->assertArrayHasKey('fake', component::get_all_plugin_types());
-        $this->assertArrayHasKey('fullfeatured', component::get_all_plugins_list('fake'));
-
-        // Deleted plugintypes/plugins are not included in other methods.
-        $this->assertArrayNotHasKey('fake', component::get_plugin_types());
-        $this->assertArrayNotHasKey('fullfeatured', component::get_plugin_list('fake'));
-        $this->assertNotContains('fake_fullfeatured', component::get_component_names());
-        $this->assertNotContains('fake_fullfeatured', component::get_component_names(false, true));
-        $this->assertArrayNotHasKey('fake', component::get_component_list());
-        $this->assertEmpty(component::get_plugin_list_with_file('fake', 'classes/dummy.php'));
-        $this->assertEmpty(component::get_plugin_list_with_class('fake', 'dummy'));
-        $this->assertFalse(component::has_monologo_icon('fake', 'fullfeatured'));
-        $this->assertNull(component::get_plugin_directory('fake', 'fullfeatured'));
-        $this->assertNull(component::get_component_directory('fake_fullfeatured'));
-        $this->assertNull(component::get_component_from_classname(\fake_fullfeatured\example::class));
-
-        // Class autoloading of deleted plugins is not supported.
-        $this->assertArrayNotHasKey('fake_fullfeatured\dummy',
-            component::get_component_classes_in_namespace('fake_fullfeatured'));
-        $this->assertFalse(class_exists(fake_fullfeatured\dummy::class));
-    }
-
-    /**
-     * Test various core_component APIs when dealing with deprecated subplugins.
-     *
-     * @runInSeparateProcess
-     * @return void
-     */
-    public function test_core_component_deprecated_subplugintype(): void {
-        $this->resetAfterTest();
-
-        // Inject the 'fake' plugin type. This includes three mock subplugins:
-        // 1. fullsubtype_example: a regular plugin type, not deprecated, nor deleted.
-        // 2. fulldeprecatedsubtype_test: a deprecated subplugin type.
-        // 3. fulldeletedsubtype_demo: a deleted subplugin type.
-        $this->add_full_mocked_plugintype(
-            plugintype: 'fake',
-            path: 'lib/tests/fixtures/fakeplugins/fake',
-            subpluginsupport: true
-        );
-        $this->assert_deprecation_apis_subplugins();
-    }
-
-    /**
-     * Verify that a plugin which supports subplugins cannot be deprecated.
-     *
-     * @runInSeparateProcess
-     * @return void
-     */
-    public function test_core_component_deprecated_subplugintype_supporting_subplugins(): void {
-        $this->resetAfterTest();
-
-        // Inject the 'fake' plugin type. This includes three mock subplugins:
-        // 1. fullsubtype_example: a regular plugin type, not deprecated, nor deleted.
-        // 2. fulldeprecatedsubtype_test: a deprecated subplugin type.
-        // 3. fulldeletedsubtype_demo: a deleted subplugin type.
-        $this->add_full_mocked_plugintype(
-            plugintype: 'fake',
-            path: 'lib/tests/fixtures/fakeplugins/fake',
-            subpluginsupport: true
-        );
-
-        // Try to deprecate the fake plugintype via mocking component sources.
-        $this->deprecate_full_mocked_plugintype('fake');
-
-        // Deprecation unsupported, so verify core_component treats all plugins the same as before the deprecation attempt.
-        // Debugging is expected to be emitted during core_component::init().
-        $this->assert_deprecation_apis_subplugins();
-        $this->assertDebuggingCalled('Deprecation of a plugin type which supports subplugins is not supported. ' .
-            'These plugin types will continue to be treated as active.', DEBUG_DEVELOPER);
-    }
-
-    /**
-     * Verify that a plugin which supports subplugins cannot be deleted.
-     *
-     * @runInSeparateProcess
-     * @return void
-     */
-    public function test_core_component_deleted_subplugintype_supporting_subplugins(): void {
-        $this->resetAfterTest();
-
-        // Inject the 'fake' plugin type. This includes three mock subplugins:
-        // 1. fullsubtype_example: a regular plugin type, not deprecated, nor deleted.
-        // 2. fulldeprecatedsubtype_test: a deprecated subplugin type.
-        // 3. fulldeletedsubtype_demo: a deleted subplugin type.
-        $this->add_full_mocked_plugintype(
-            plugintype: 'fake',
-            path: 'lib/tests/fixtures/fakeplugins/fake',
-            subpluginsupport: true
-        );
-
-        // Try to delete the fake plugintype via mocking component sources.
-        $this->delete_full_mocked_plugintype('fake');
-
-        // Deletion unsupported, so verify core_component treats all plugins the same as before the deletion attempt.
-        // Debugging is expected to be emitted during core_component::init().
-        $this->assert_deprecation_apis_subplugins();
-        $this->assertDebuggingCalled('Deprecation of a plugin type which supports subplugins is not supported. ' .
-            'These plugin types will continue to be treated as active.', DEBUG_DEVELOPER);
-    }
-
-    /**
-     * Helper asserting the returns for various core_component APIs when dealing with deprecated and deleted subplugins.
-     *
-     * @return void
-     */
-    protected function assert_deprecation_apis_subplugins(): void {
-        // Deprecation-specific methods.
-        $this->assertFalse(component::is_deprecated_plugin_type('fake'));
-        $this->assertFalse(component::is_deprecated_plugin_type('fullsubtype'));
-        $this->assertTrue(component::is_deprecated_plugin_type('fulldeprecatedsubtype'));
-        $this->assertFalse(component::is_deprecated_plugin_type('fulldeletedsubtype'));
-
-        $this->assertFalse(component::is_deleted_plugin_type('fake'));
-        $this->assertFalse(component::is_deleted_plugin_type('fullsubtype'));
-        $this->assertFalse(component::is_deleted_plugin_type('fulldeprecatedsubtype'));
-        $this->assertTrue(component::is_deleted_plugin_type('fulldeletedsubtype'));
-
-        $this->assertFalse(component::is_plugintype_in_deprecation('fake'));
-        $this->assertFalse(component::is_plugintype_in_deprecation('fullsubtype'));
-        $this->assertTrue(component::is_plugintype_in_deprecation('fulldeprecatedsubtype'));
-        $this->assertTrue(component::is_plugintype_in_deprecation('fulldeletedsubtype'));
-
-        $this->assertArrayNotHasKey('fake', component::get_deprecated_plugin_types());
-        $this->assertArrayNotHasKey('fullsubtype', component::get_deprecated_plugin_types());
-        $this->assertArrayHasKey('fulldeprecatedsubtype', component::get_deprecated_plugin_types());
-        $this->assertArrayNotHasKey('fulldeletedsubtype', component::get_deprecated_plugin_types());
-
-        $this->assertArrayNotHasKey('fullfeatured', component::get_deprecated_plugin_list('fake'));
-        $this->assertArrayNotHasKey('example', component::get_deprecated_plugin_list('fullsubtype'));
-        $this->assertArrayHasKey('test', component::get_deprecated_plugin_list('fulldeprecatedsubtype'));
-        $this->assertArrayNotHasKey('demo', component::get_deprecated_plugin_list('fulldeletedsubtype'));
-
-        $this->assertArrayNotHasKey('fake', component::get_deleted_plugin_types());
-        $this->assertArrayNotHasKey('fullsubtype', component::get_deleted_plugin_types());
-        $this->assertArrayNotHasKey('fulldeprecatedsubtype', component::get_deleted_plugin_types());
-        $this->assertArrayHasKey('fulldeletedsubtype', component::get_deleted_plugin_types());
-
-        $this->assertArrayNotHasKey('fullfeatured', component::get_deleted_plugin_list('fake'));
-        $this->assertArrayNotHasKey('example', component::get_deleted_plugin_list('fullsubtype'));
-        $this->assertArrayNotHasKey('test', component::get_deleted_plugin_list('fulldeprecatedsubtype'));
-        $this->assertArrayHasKey('demo', component::get_deleted_plugin_list('fulldeletedsubtype'));
-
-        $this->assertArrayHasKey('fake', component::get_all_plugin_types());
-        $this->assertArrayHasKey('fullsubtype', component::get_all_plugin_types());
-        $this->assertArrayHasKey('fulldeprecatedsubtype', component::get_all_plugin_types());
-        $this->assertArrayHasKey('fulldeletedsubtype', component::get_all_plugin_types());
-
-        $this->assertArrayHasKey('fullfeatured', component::get_all_plugins_list('fake'));
-        $this->assertArrayHasKey('example', component::get_all_plugins_list('fullsubtype'));
-        $this->assertArrayHasKey('test', component::get_all_plugins_list('fulldeprecatedsubtype'));
-        $this->assertArrayHasKey('demo', component::get_all_plugins_list('fulldeletedsubtype'));
-
-        // Deprecated and deleted plugins excluded from the following for B/C.
-        $this->assertArrayHasKey('fake', component::get_plugin_types());
-        $this->assertArrayHasKey('fullsubtype', component::get_plugin_types());
-        $this->assertArrayNotHasKey('fulldeprecatedsubtype', component::get_plugin_types());
-        $this->assertArrayNotHasKey('fulldeletedsubtype', component::get_plugin_types());
-
-        $this->assertNotEmpty(component::get_plugin_list('fake'));
-        $this->assertNotEmpty(component::get_plugin_list('fullsubtype'));
-        $this->assertEmpty(component::get_plugin_list('fulldeprecatedsubtype'));
-        $this->assertEmpty(component::get_plugin_list('fulldeletedsubtype'));
-
-        $this->assertArrayHasKey('fake', component::get_component_list());
-        $this->assertArrayHasKey('fullsubtype', component::get_component_list());
-        $this->assertArrayNotHasKey('fulldeprecatedsubtype', component::get_component_list());
-        $this->assertArrayNotHasKey('fulldeletedsubtype', component::get_component_list());
-
-        $this->assertArrayHasKey('fullfeatured', component::get_plugin_list_with_file('fake', 'classes/dummy.php'));
-        $this->assertArrayHasKey('example', component::get_plugin_list_with_file('fullsubtype', 'classes/dummy.php'));
-        $this->assertEmpty(component::get_plugin_list_with_file('fulldeprecatedsubtype', 'classes/dummy.php'));
-        $this->assertEmpty(component::get_plugin_list_with_file('fulldeletedsubtype', 'classes/dummy.php'));
-
-        $this->assertArrayHasKey('fake_fullfeatured', component::get_plugin_list_with_class('fake', 'dummy'));
-        $this->assertArrayHasKey('fullsubtype_example', component::get_plugin_list_with_class('fullsubtype', 'dummy'));
-        $this->assertEmpty(component::get_plugin_list_with_class('fulldeprecatedsubtype', 'dummy'));
-        $this->assertEmpty(component::get_plugin_list_with_class('fulldeletedsubtype', 'dummy'));
-
-        $this->assertArrayHasKey('fullsubtype', component::get_subplugins('fake_fullfeatured'));
-        $this->assertContains('example', component::get_subplugins('fake_fullfeatured')['fullsubtype']);
-        $this->assertArrayNotHasKey('fulldeprecatedsubtype', component::get_subplugins('fake_fullfeatured'));
-        $this->assertArrayNotHasKey('fulldeletedsubtype', component::get_subplugins('fake_fullfeatured'));
-
-        $this->assertArrayHasKey('fullsubtype', component::get_all_subplugins('fake_fullfeatured'));
-        $this->assertContains('example', component::get_all_subplugins('fake_fullfeatured')['fullsubtype']);
-        $this->assertContains('test', component::get_all_subplugins('fake_fullfeatured')['fulldeprecatedsubtype']);
-        $this->assertContains('demo', component::get_all_subplugins('fake_fullfeatured')['fulldeletedsubtype']);
-
-        // Deprecated plugins excluded by default for B/C, but can be included by request.
-        // Deleted plugins are always excluded.
-        $this->assertContains('fake_fullfeatured', component::get_component_names());
-        $this->assertContains('fullsubtype_example', component::get_component_names());
-        $this->assertNotContains('fulldeprecatedsubtype_test', component::get_component_names());
-        $this->assertNotContains('fulldeletedsubtype_demo', component::get_component_names());
-        $this->assertContains('fulldeprecatedsubtype_test', component::get_component_names(false, true));
-        $this->assertNotContains('fulldeletedsubtype_demo', component::get_component_names(false, true));
-
-        // Deprecated plugins included in the following, but deleted plugins are excluded.
-        $this->assertIsString(component::get_plugin_directory('fake', 'fullfeatured')); // Used by string manager.
-        $this->assertIsString(component::get_plugin_directory('fullsubtype', 'example'));
-        $this->assertIsString(component::get_plugin_directory('fulldeprecatedsubtype', 'test'));
-        $this->assertNull(component::get_plugin_directory('fulldeletedsubtype', 'demo'));
-
-        $this->assertIsString(component::get_component_directory('fake_fullfeatured')); // Uses get_plugin_directory().
-        $this->assertIsString(component::get_component_directory('fullsubtype_example'));
-        $this->assertIsString(component::get_component_directory('fulldeprecatedsubtype_test'));
-        $this->assertNull(component::get_component_directory('fulldeletedsubtype_demo'));
-
-        $this->assertTrue(component::has_monologo_icon('fullsubtype', 'example')); // Uses get_plugin_directory().
-        $this->assertTrue(component::has_monologo_icon('fulldeprecatedsubtype', 'test'));
-        $this->assertFalse(component::has_monologo_icon('fulldeletedsubtype', 'demo'));
-
-        $this->assertEquals('fake_fullfeatured', component::get_component_from_classname(\fake_fullfeatured\example::class));
-        $this->assertEquals('fullsubtype_example',
-            component::get_component_from_classname(\fullsubtype_example\example::class));
-        $this->assertEquals('fulldeprecatedsubtype_test',
-            component::get_component_from_classname(\fulldeprecatedsubtype_test\example::class));
-        $this->assertNull(component::get_component_from_classname(\fulldeletedsubtype_demo\example::class));
-
-        // Deprecated and deleted plugins included in the following.
-        $this->assertEquals('fake_fullfeatured', component::get_subtype_parent('fullsubtype'));
-        $this->assertEquals('fake_fullfeatured', component::get_subtype_parent('fulldeprecatedsubtype'));
-        $this->assertEquals('fake_fullfeatured', component::get_subtype_parent('fulldeletedsubtype'));
-
-        // Class autoloading of deprecated plugins is permitted, to facilitate plugin migration code, but not for deleted plugins.
-        $this->assertArrayHasKey('fake_fullfeatured\dummy',
-            component::get_component_classes_in_namespace('fake_fullfeatured'));
-        $this->assertArrayHasKey('fullsubtype_example\dummy',
-            component::get_component_classes_in_namespace('fullsubtype_example'));
-        $this->assertArrayHasKey('fulldeprecatedsubtype_test\dummy',
-            component::get_component_classes_in_namespace('fulldeprecatedsubtype_test'));
-        $this->assertEquals([], component::get_component_classes_in_namespace('fulldeletedsubtype_demo'));
-
-        $this->assertTrue(class_exists(\fake_fullfeatured\dummy::class));
-        $this->assertTrue(class_exists(\fullsubtype_example\dummy::class));
-        $this->assertTrue(class_exists(\fulldeprecatedsubtype_test\dummy::class));
-        $this->assertFalse(class_exists(\fulldeletedsubtype_demo\dummy::class));
     }
 }

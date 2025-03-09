@@ -1133,11 +1133,6 @@ class manager {
                 'visiblevalue' => $visiblevalue,
             ];
 
-            if ($plugininfo && $plugininfo->is_deprecated()) {
-                $skipped[] = $data;
-                continue;
-            }
-
             if ($pluginclass == '\core\plugininfo\orphaned') {
                 $skipped[] = $data;
                 continue;

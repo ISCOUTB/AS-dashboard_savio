@@ -2641,13 +2641,7 @@ function get_deprecated_capability_info($capabilityname) {
         foreach ($allcaps as $cap) {
             if (!in_array($cap['component'], $components)) {
                 $components[] = $cap['component'];
-
-                $componentdir = core_component::get_component_directory($cap['component']);
-                if ($componentdir === null) {
-                    continue;
-                }
-
-                $defpath = "{$componentdir}/db/access.php";
+                $defpath = core_component::get_component_directory($cap['component']).'/db/access.php';
                 if (file_exists($defpath)) {
                     $deprecatedcapabilities = [];
                     require($defpath);
@@ -4411,6 +4405,11 @@ function role_switch($roleid, context $context) {
         load_all_capabilities();
     }
 
+    // Make sure that course index is refreshed.
+    if ($coursecontext = $context->get_course_context()) {
+        core_courseformat\base::session_cache_reset(get_course($coursecontext->instanceid));
+    }
+
     // Add the switch RA
     if ($roleid == 0) {
         unset($USER->access['rsw'][$context->path]);
@@ -4419,12 +4418,6 @@ function role_switch($roleid, context $context) {
 
     $USER->access['rsw'][$context->path] = $roleid;
 
-    // Dispatch the hook for post user switch.
-    $hook = new \core\hook\access\after_role_switched(
-            context: $context,
-            roleid: $roleid
-        );
-    \core\di::get(\core\hook\manager::class)->dispatch($hook);
     return true;
 }
 

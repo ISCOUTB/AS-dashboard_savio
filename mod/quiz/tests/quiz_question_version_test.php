@@ -34,7 +34,7 @@ require_once(__DIR__ . '/quiz_question_helper_test_trait.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers \mod_quiz\question\bank\qbank_helper
  */
-final class quiz_question_version_test extends \advanced_testcase {
+class quiz_question_version_test extends \advanced_testcase {
     use \quiz_question_helper_test_trait;
 
     /** @var \stdClass user record. */
@@ -97,7 +97,6 @@ final class quiz_question_version_test extends \advanced_testcase {
         $this->assertEquals(4, $slot->version);
         // Now change the version using the external service.
         $versions = qbank_helper::get_version_options($slot->questionid);
-        $this->assertDebuggingCalled();
         // We don't want the current version.
         $selectversions = [];
         foreach ($versions as $version) {
@@ -158,7 +157,6 @@ final class quiz_question_version_test extends \advanced_testcase {
         $slot = reset($slots);
         // Now change the version using the external service.
         $versions = qbank_helper::get_version_options($slot->questionid);
-        $this->assertDebuggingCalled();
         // We dont want the current version.
         $selectversions = [];
         foreach ($versions as $version) {

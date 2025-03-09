@@ -782,8 +782,6 @@ function choice_reset_userdata($data) {
 }
 
 /**
- * Get response data for a choice and group.
- *
  * @global object
  * @global object
  * @global object
@@ -792,21 +790,18 @@ function choice_reset_userdata($data) {
  * @param object $cm
  * @param int $groupmode
  * @param bool $onlyactive Whether to get response data for active users only.
- * @param int $groupid Group id, null for current group if choice has groups.
  * @return array
  */
-function choice_get_response_data($choice, $cm, $groupmode, $onlyactive, ?int $groupid = null) {
+function choice_get_response_data($choice, $cm, $groupmode, $onlyactive) {
     global $CFG, $USER, $DB;
 
     $context = context_module::instance($cm->id);
 
+/// Get the current group
     if ($groupmode > 0) {
-        if (is_null($groupid)) {
-            // Get the current group.
-            $groupid = groups_get_activity_group($cm);
-        }
+        $currentgroup = groups_get_activity_group($cm);
     } else {
-        $groupid = 0;
+        $currentgroup = 0;
     }
 
 /// Initialise the returned array, which is a matrix:  $allresponses[responseid][userid] = responseobject
@@ -817,7 +812,7 @@ function choice_get_response_data($choice, $cm, $groupmode, $onlyactive, ?int $g
     // TODO Does not support custom user profile fields (MDL-70456).
     $userfieldsapi = \core_user\fields::for_identity($context, false)->with_userpic();
     $userfields = $userfieldsapi->get_sql('u', false, '', '', false)->selects;
-    $allresponses[0] = get_enrolled_users($context, 'mod/choice:choose', $groupid,
+    $allresponses[0] = get_enrolled_users($context, 'mod/choice:choose', $currentgroup,
             $userfields, null, 0, 0, $onlyactive);
 
 /// Get all the recorded responses for this choice

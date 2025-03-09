@@ -23,7 +23,8 @@ abstract class ExtendedInformationExtraField
             new PackField(format: 'v', value: self::TAG),
             new PackField(
                 format: 'v',
-                value: ($originalSize === null ? 0 : 8) +
+                value:
+                    ($originalSize === null ? 0 : 8) +
                     ($compressedSize === null ? 0 : 8) +
                     ($relativeHeaderOffset === null ? 0 : 8) +
                     ($diskStartNumber === null ? 0 : 4)

@@ -27,7 +27,7 @@ use core_sms\message;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \smsgateway_aws\gateway
  */
-final class gateway_test extends \advanced_testcase {
+class gateway_test extends \advanced_testcase {
 
     public function test_update_message_status(): void {
         $this->resetAfterTest();

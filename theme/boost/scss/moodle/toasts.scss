@@ -1,5 +1,5 @@
 @mixin toast-icon($content) {
-    font: var(--fa-font-solid);
+    @extend .fa-solid;
     margin: 2px 5px 0 0;
     content: fa-content($content);
 }

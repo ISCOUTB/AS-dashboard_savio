@@ -26,7 +26,7 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \core_courseformat\local\sectionactions
  */
-final class sectionactions_test extends \advanced_testcase {
+class sectionactions_test extends \advanced_testcase {
     /**
      * Setup to ensure that fixtures are loaded.
      */
@@ -268,27 +268,27 @@ final class sectionactions_test extends \advanced_testcase {
     public static function create_if_missing_provider(): array {
         return [
             'existing section' => [
-                'sectionnums' => [1],
+                'sectionnum' => [1],
                 'expected' => false,
             ],
             'unexisting section' => [
-                'sectionnums' => [3],
+                'sectionnum' => [3],
                 'expected' => true,
             ],
             'several existing sections' => [
-                'sectionnums' => [1, 2],
+                'sectionnum' => [1, 2],
                 'expected' => false,
             ],
             'several unexisting sections' => [
-                'sectionnums' => [3, 4],
+                'sectionnum' => [3, 4],
                 'expected' => true,
             ],
             'empty array' => [
-                'sectionnums' => [],
+                'sectionnum' => [],
                 'expected' => false,
             ],
             'existent and unexistent sections' => [
-                'sectionnums' => [1, 2, 3, 4],
+                'sectionnum' => [1, 2, 3, 4],
                 'expected' => true,
             ],
         ];

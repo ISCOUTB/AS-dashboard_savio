@@ -61,7 +61,7 @@ class index implements renderable {
         $table = new html_table();
 
         if (course_format_uses_sections($this->course->format)) {
-            $sectionheading = course_get_format($this->course)->get_generic_section_name();
+            $sectionheading = get_string('sectionname', "format_{$this->course->format}");
         } else {
             $sectionheading = '';
         }
@@ -78,9 +78,7 @@ class index implements renderable {
         ];
         $table->align = ['center', 'left', 'center', 'center', 'center', 'center', 'center'];
 
-        $modinfo = get_fast_modinfo($this->course);
-        foreach ($modinfo->instances['bigbluebuttonbn'] as $cm) {
-            $instance = $this->instances[$cm->id];
+        foreach ($this->instances as $instance) {
             $this->add_instance_to_table($output, $table, $instance);
         }
 

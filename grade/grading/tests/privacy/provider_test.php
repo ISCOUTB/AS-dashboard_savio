@@ -40,7 +40,7 @@ use core_grading\privacy\provider;
  * @copyright  2018 Sara Arjona <sara@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class provider_test extends provider_testcase {
+class provider_test extends provider_testcase {
 
     /** @var stdClass User without data. */
     protected $user0;

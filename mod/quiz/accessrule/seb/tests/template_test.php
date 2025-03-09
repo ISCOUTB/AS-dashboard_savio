@@ -28,7 +28,7 @@ require_once(__DIR__ . '/test_helper_trait.php');
  * @copyright 2020 Catalyst IT
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class template_test extends \advanced_testcase {
+class template_test extends \advanced_testcase {
     use \quizaccess_seb_test_helper_trait;
 
     /**
@@ -171,7 +171,7 @@ final class template_test extends \advanced_testcase {
         $data->name = 'Test name';
         $data->description = 'Test description';
         $data->enabled = 1;
-        $data->content = file_get_contents(self::get_fixture_path(__NAMESPACE__, 'unencrypted.seb'));
+        $data->content = file_get_contents(__DIR__ . '/fixtures/unencrypted.seb');
         $template = new template(0, $data);
         $template->save();
 

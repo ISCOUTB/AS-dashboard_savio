@@ -124,14 +124,13 @@ define('OPEN_BADGES_V2_TYPE_ASSERTION', 'Assertion');
 define('OPEN_BADGES_V2_TYPE_BADGE', 'BadgeClass');
 define('OPEN_BADGES_V2_TYPE_ISSUER', 'Issuer');
 define('OPEN_BADGES_V2_TYPE_ENDORSEMENT', 'Endorsement');
+define('OPEN_BADGES_V2_TYPE_AUTHOR', 'Author');
 
 define('BACKPACK_MOVE_UP', -1);
 define('BACKPACK_MOVE_DOWN', 1);
 
 // Global badge class has been moved to the component namespace.
 class_alias('\core_badges\badge', 'badge');
-
-use core_badges\png_metadata_handler;
 
 /**
  * Sends notifications to users about awarded badges.
@@ -446,14 +445,11 @@ function badges_prepare_badge_for_external(stdClass $badge, stdClass $user): obj
             'dateexpire'    => $badge->dateexpire,
             'version'       => $badge->version,
             'language'      => $badge->language,
+            'imageauthorname'  => $badge->imageauthorname,
+            'imageauthoremail' => $badge->imageauthoremail,
+            'imageauthorurl'   => $badge->imageauthorurl,
             'imagecaption'     => $badge->imagecaption,
         ];
-    }
-
-    // Course.
-    if ($badge->type == BADGE_TYPE_COURSE) {
-        $course = get_course($context->instanceid);
-        $badge->coursefullname = \core_external\util::format_string($course->fullname, $context);
     }
 
     // Recipient (the badge was awarded to this person).
@@ -470,26 +466,19 @@ function badges_prepare_badge_for_external(stdClass $badge, stdClass $user): obj
     // Create a badge instance to be able to get the endorsement and other info.
     $badgeinstance = new badge($badge->id);
     $endorsement   = $badgeinstance->get_endorsement();
+    $alignments    = $badgeinstance->get_alignments();
     $relatedbadges = $badgeinstance->get_related_badges();
-    $alignments    = [];
-    foreach ($badgeinstance->get_alignments() as $alignment) {
-        $alignmentobj = (object) [
-            'id' => $alignment->id,
-            'badgeid' => $alignment->badgeid,
-            'targetName' => $alignment->targetname,
-            'targetUrl' => $alignment->targeturl,
-        ];
-        // Include only the properties visible by the user.
-        if ($canconfiguredetails) {
-            $alignmentobj->targetDescription = $alignment->targetdescription;
-            $alignmentobj->targetFramework = $alignment->targetframework;
-            $alignmentobj->targetCode = $alignment->targetcode;
-        }
-        $alignments[] = $alignmentobj;
-    }
 
     if (!$canconfiguredetails) {
         // Return only the properties visible by the user.
+        if (!empty($alignments)) {
+            foreach ($alignments as $alignment) {
+                unset($alignment->targetdescription);
+                unset($alignment->targetframework);
+                unset($alignment->targetcode);
+            }
+        }
+
         if (!empty($relatedbadges)) {
             foreach ($relatedbadges as $relatedbadge) {
                 unset($relatedbadge->version);
@@ -518,7 +507,6 @@ function badges_prepare_badge_for_external(stdClass $badge, stdClass $user): obj
 function badges_prepare_badgeclass_for_external(core_badges\output\badgeclass $badgeclass): stdClass {
     global $PAGE;
     $context = $badgeclass->context;
-    $canconfiguredetails = has_capability('moodle/badges:configuredetails', $context);
 
     $badgeurl = new \moodle_url('/badges/badgeclass.php', [
         'id' => $badgeclass->badge->id,
@@ -543,39 +531,24 @@ function badges_prepare_badgeclass_for_external(core_badges\output\badgeclass $b
         'hostedUrl'     => $badgeclass->badge->issuerurl,
         'image'         => $image,
     ];
-
-    // Course.
-    if ($badgeclass->badge->type == BADGE_TYPE_COURSE) {
-        $course = get_course($badgeclass->badge->courseid);
-        $badge->coursefullname = \core_external\util::format_string($course->fullname, $context);
-        if ($canconfiguredetails) {
-            $badge->courseid = $course->id;
-        }
-    }
-
     // Create a badge instance to be able to get the endorsement and other info.
     $badgeinstance = new badge($badgeclass->badge->id);
     $endorsement   = $badgeinstance->get_endorsement();
+    $alignments    = $badgeinstance->get_alignments();
     $relatedbadges = $badgeinstance->get_related_badges();
-    $alignments = [];
-    foreach ($badgeinstance->get_alignments() as $alignment) {
-        $alignmentobj = (object) [
-            'id' => $alignment->id,
-            'badgeid' => $alignment->badgeid,
-            'targetName' => $alignment->targetname,
-            'targetUrl' => $alignment->targeturl,
-        ];
-        // Include only the properties visible by the user.
-        if ($canconfiguredetails) {
-            $alignmentobj->targetDescription = $alignment->targetdescription;
-            $alignmentobj->targetFramework = $alignment->targetframework;
-            $alignmentobj->targetCode = $alignment->targetcode;
-        }
-        $alignments[] = $alignmentobj;
-    }
+
+    $canconfiguredetails = has_capability('moodle/badges:configuredetails', $context);
 
     if (!$canconfiguredetails) {
         // Return only the properties visible by the user.
+        if (!empty($alignments)) {
+            foreach ($alignments as $alignment) {
+                unset($alignment->targetdescription);
+                unset($alignment->targetframework);
+                unset($alignment->targetcode);
+            }
+        }
+
         if (!empty($relatedbadges)) {
             foreach ($relatedbadges as $relatedbadge) {
                 unset($relatedbadge->version);
@@ -677,6 +650,11 @@ function badges_process_badge_image(badge $badge, $iconfile) {
     if (!empty($CFG->gdversion)) {
         process_new_icon($badge->get_context(), 'badges', 'badgeimage', $badge->id, $iconfile, true);
         @unlink($iconfile);
+
+        // Clean up file draft area after badge image has been saved.
+        $context = context_user::instance($USER->id, MUST_EXIST);
+        $fs = get_file_storage();
+        $fs->delete_area_files($context->id, 'user', 'draft');
     }
 }
 
@@ -709,6 +687,7 @@ function print_badge_image(badge $badge, stdClass $context, $size = 'small') {
  */
 function badges_bake($hash, $badgeid, $userid = 0, $pathhash = false) {
     global $CFG, $USER;
+    require_once(__DIR__ . '/../badges/lib/bakerlib.php');
 
     $badge = new badge($badgeid);
     $badge_context = $badge->get_context();
@@ -720,7 +699,7 @@ function badges_bake($hash, $badgeid, $userid = 0, $pathhash = false) {
         if ($file = $fs->get_file($badge_context->id, 'badges', 'badgeimage', $badge->id, '/', 'f3.png')) {
             $contents = $file->get_content();
 
-            $filehandler = new png_metadata_handler($contents);
+            $filehandler = new PNG_MetaDataHandler($contents);
             // For now, the site backpack OB version will be used as default.
             $obversion = badges_open_badges_backpack_api();
             $assertion = new core_badges_assertion($hash, $obversion);

@@ -26,7 +26,7 @@ namespace core;
  * @copyright  2016 Jake Dallimore <jrhdallimore@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class curl_security_helper_test extends \advanced_testcase {
+class curl_security_helper_test extends \advanced_testcase {
     /**
      * Test for \core\files\curl_security_helper::url_is_blocked().
      *
@@ -62,7 +62,7 @@ final class curl_security_helper_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function curl_security_url_data_provider(): array {
+    public function curl_security_url_data_provider() {
         $simpledns = ['localhost' => ['127.0.0.1']];
         $multiplerecorddns = [
             'sub.example.com' => ['1.2.3.4', '5.6.7.8']
@@ -180,7 +180,7 @@ final class curl_security_helper_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function curl_security_settings_data_provider(): array {
+    public function curl_security_settings_data_provider() {
         // Format: blocked hosts, allowed ports, expected result.
         return [
             ["", "", false],
@@ -212,7 +212,7 @@ final class curl_security_helper_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function curl_security_host_data_provider(): array {
+    public function curl_security_host_data_provider() {
         return [
             // IPv4 hosts.
             ["127.0.0.1", "127.0.0.1", true],
@@ -266,7 +266,7 @@ final class curl_security_helper_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function curl_security_port_data_provider(): array {
+    public function curl_security_port_data_provider() {
         return [
             ["", "80\n443", true],
             [" ", "80\n443", true],

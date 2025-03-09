@@ -1575,7 +1575,7 @@ class qformat_xml extends qformat_default {
 
             if (!empty($tagobjects)) {
                 $context = context::instance_by_id($contextid);
-                $sortedtagobjects = question_sort_tags($tagobjects, $context);
+                $sortedtagobjects = question_sort_tags($tagobjects, $context, [$this->course]);
 
                 if (!empty($sortedtagobjects->coursetags)) {
                     // Set them on the form to be rendered as existing tags.

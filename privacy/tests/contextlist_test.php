@@ -36,7 +36,7 @@ use \core_privacy\local\request\contextlist;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \core_privacy\local\request\contextlist
  */
-final class contextlist_test extends advanced_testcase {
+class contextlist_test extends advanced_testcase {
 
     /**
      * Ensure that valid SQL results in the relevant contexts being added.
@@ -137,7 +137,7 @@ final class contextlist_test extends advanced_testcase {
      *
      * @return array
      */
-    public static function data_guess_id_field_from_sql(): array {
+    public function data_guess_id_field_from_sql() {
         return [
             'easy' => [
                 'SELECT contextid FROM {foo}',

@@ -28,6 +28,9 @@
  * @return bool
  */
 function xmldb_assignsubmission_comments_upgrade($oldversion) {
+    // Automatically generated Moodle v4.1.0 release upgrade line.
+    // Put any upgrade step following this.
+
     // Automatically generated Moodle v4.2.0 release upgrade line.
     // Put any upgrade step following this.
 
@@ -35,9 +38,6 @@ function xmldb_assignsubmission_comments_upgrade($oldversion) {
     // Put any upgrade step following this.
 
     // Automatically generated Moodle v4.4.0 release upgrade line.
-    // Put any upgrade step following this.
-
-    // Automatically generated Moodle v4.5.0 release upgrade line.
     // Put any upgrade step following this.
 
     return true;

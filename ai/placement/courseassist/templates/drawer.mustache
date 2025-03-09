@@ -22,21 +22,25 @@
     Context variables required for this template:
     * userid - User ID
     * contextid - Context ID
+    * content - Content to display
 
     Example context (json):
     {
         "userid": "1",
-        "contextid": "1"
+        "contextid": "1",
+        "content": "<p>Content to display</p>"
     }
 }}
 <div class="ai-drawer" id="ai-drawer">
     <div class="ai-drawer-header">
-        <button id="ai-drawer-close" class="btn ai-drawer-button" type="button">
+        <button id="ai-drawer-close" class="btn ai-drawer-button" type="button" data-action="course-summarise">
             {{#pix}} e/cancel, core {{/pix}}
-            <span class="visually-hidden">{{#str}} closedrawer, core {{/str}}</span>
+            <span class="sr-only">{{#str}} closedrawer, core {{/str}}</span>
         </button>
     </div>
-    <div class="ai-drawer-body" data-cancelled="0"></div>
+    <div class="ai-drawer-body" data-hasdata="0" data-cancelled="0">
+        {{{content}}}
+    </div>
 </div>
 {{#js}}
     require(['aiplacement_courseassist/placement'], function(AICourseAssist) {

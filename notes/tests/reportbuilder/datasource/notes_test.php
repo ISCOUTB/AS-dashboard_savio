@@ -20,8 +20,13 @@ namespace core_notes\reportbuilder\datasource;
 
 use core_notes_generator;
 use core_reportbuilder_generator;
+use core_reportbuilder_testcase;
 use core_reportbuilder\local\filters\{date, select, text};
-use core_reportbuilder\tests\core_reportbuilder_testcase;
+
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+require_once("{$CFG->dirroot}/reportbuilder/tests/helpers.php");
 
 /**
  * Unit tests for notes datasource
@@ -31,7 +36,7 @@ use core_reportbuilder\tests\core_reportbuilder_testcase;
  * @copyright   2022 Paul Holden <paulh@moodle.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class notes_test extends core_reportbuilder_testcase {
+class notes_test extends core_reportbuilder_testcase {
 
     /**
      * Load required test libraries
@@ -132,7 +137,7 @@ final class notes_test extends core_reportbuilder_testcase {
      *
      * @return array[]
      */
-    public static function datasource_filters_provider(): array {
+    public function datasource_filters_provider(): array {
         return [
             'Filter content' => ['content', 'Cool', 'note:content', [
                 'note:content_operator' => text::IS_EQUAL_TO,

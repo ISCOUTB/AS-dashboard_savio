@@ -38,7 +38,7 @@ $CFG = new stdClass();
 // will be stored.  This database must already have been created         //
 // and a username/password created to access it.                         //
 
-$CFG->dbtype    = 'pgsql';      // 'pgsql', 'mariadb', 'mysqli', 'auroramysql', or 'sqlsrv'
+$CFG->dbtype    = 'pgsql';      // 'pgsql', 'mariadb', 'mysqli', 'auroramysql', 'sqlsrv' or 'oci'
 $CFG->dblibrary = 'native';     // 'native' only at the moment
 $CFG->dbhost    = 'localhost';  // eg 'localhost' or 'db.isp.com' or IP
 $CFG->dbname    = 'moodle';     // database name, eg moodle
@@ -110,41 +110,41 @@ $CFG->dboptions = array(
                                 // Currently supported only with mysqli, mariadb, and aurora drivers.
     /*
     'connecttimeout' => null, // Set connect timeout in seconds. Not all drivers support it.
-    'readonly' => [          // Set to read-only replica details, to get safe reads
-                             // from there instead of the primary node. Optional.
+    'readonly' => [          // Set to read-only slave details, to get safe reads
+                             // from there instead of the master node. Optional.
                              // Currently supported by pgsql and mysqli variety classes.
                              // If not supported silently ignored.
-      'instance' => [        // Readonly replica connection parameters
+      'instance' => [        // Readonly slave connection parameters
         [
-          'dbhost' => 'replica.dbhost',
-          'dbport' => '',    // Defaults to primary port
-          'dbuser' => '',    // Defaults to primary user
-          'dbpass' => '',    // Defaults to primary password
+          'dbhost' => 'slave.dbhost',
+          'dbport' => '',    // Defaults to master port
+          'dbuser' => '',    // Defaults to master user
+          'dbpass' => '',    // Defaults to master password
         ],
         [...],
       ],
 
     Instance(s) can alternatively be specified as:
 
-      'instance' => 'replica.dbhost',
-      'instance' => ['replica.dbhost1', 'replica.dbhost2'],
-      'instance' => ['dbhost' => 'replica.dbhost', 'dbport' => '', 'dbuser' => '', 'dbpass' => ''],
+      'instance' => 'slave.dbhost',
+      'instance' => ['slave.dbhost1', 'slave.dbhost2'],
+      'instance' => ['dbhost' => 'slave.dbhost', 'dbport' => '', 'dbuser' => '', 'dbpass' => ''],
 
-      'connecttimeout' => 2, // Set read-only replica connect timeout in seconds. See above.
-      'latency' => 0.5,      // Set read-only replica sync latency in seconds.
+      'connecttimeout' => 2, // Set read-only slave connect timeout in seconds. See above.
+      'latency' => 0.5,      // Set read-only slave sync latency in seconds.
                              // When 'latency' seconds have lapsed after an update to a table
-                             // it is deemed safe to use readonly replica for reading from the table.
+                             // it is deemed safe to use readonly slave for reading from the table.
                              // It is optional, defaults to 1 second. If you want once written to a table
-                             // to always use primary handle for reading set it to something ridiculosly big,
+                             // to always use master handle for reading set it to something ridiculosly big,
                              // eg 10.
                              // Lower values increase the performance, but setting it too low means
-                             // missing the primary-replica sync.
-      'exclude_tables' => [  // Tables to exclude from read-only replica feature.
+                             // missing the master-slave sync.
+      'exclude_tables' => [  // Tables to exclude from read-only slave feature.
           'table1',          // Should not be used, unless in rare cases when some area of the system
           'table2',          // is malfunctioning and you still want to use readonly feature.
       ],                     // Then one can exclude offending tables while investigating.
 
-    More info available in lib/dml/moodle_read_replica_trait.php where the feature is implemented.
+    More info available in lib/dml/moodle_read_slave_trait.php where the feature is implemented.
     ]
      */
 // For all database config settings see https://docs.moodle.org/en/Database_settings
@@ -370,8 +370,6 @@ $CFG->admin = 'admin';
 //      $CFG->session_redis_lock_expire = 7200;              // Optional, defaults to session timeout.
 //      $CFG->session_redis_lock_retry = 100;                // Optional wait between lock attempts in ms, default is 100.
 //                                                           // After 5 seconds it will throttle down to once per second.
-//      $CFG->session_redis_connection_timeout = 3;          // Optional, default is 3.
-//      $CFG->session_redis_maxretries = 3;                  // Optional, default is 3.
 //
 //      Use the igbinary serializer instead of the php default one. Note that phpredis must be compiled with
 //      igbinary support to make the setting to work. Also, if you change the serializer you have to flush the database!
@@ -607,7 +605,7 @@ $CFG->admin = 'admin';
 //
 // Moodle 2.7 introduces a locking api for critical tasks (e.g. cron).
 // The default locking system to use is DB locking for Postgres, MySQL, MariaDB and
-// file locking for SQLServer. If $CFG->preventfilelocking is set, then the
+// file locking for Oracle and SQLServer. If $CFG->preventfilelocking is set, then the
 // default will always be DB locking. It can be manually set to one of the lock
 // factory classes listed below, or one of your own custom classes implementing the
 // \core\lock\lock_factory interface.
@@ -791,31 +789,16 @@ $CFG->admin = 'admin';
 // polling should be done and latest update retrieved.
 // If no value is set, then it will default to 5 seconds.
 //
-//      $CFG->progresspollinterval = 5;
-//
-// Default question bank module
-//
-//      $CFG->corequestion_defaultqbankmod = 'qbank'
-//
-// Question banks are only stored at activity module context and this setting defines which module type will
-// be used for creating question banks by default. This is in circumstances such as quiz backup & restores when
-// no target context can be found and the system needs to create a question bank to store the categories and questions.
-//
-// Set limit for grade items that can be shown on a single page of the grader
-// report. Browsers struggle when the number of grade items is very large and
-// one tries to view all students.
-//
-//      $CFG->maxgradesperpage = 200000;
-//
-//
+// $CFG->progresspollinterval = 5;
+
 //=========================================================================
 // 7. SETTINGS FOR DEVELOPMENT SERVERS - not intended for production use!!!
 //=========================================================================
 //
 // Force a debugging mode regardless the settings in the site administration
-// @error_reporting(E_ALL); // NOT FOR PRODUCTION SERVERS!
+// @error_reporting(E_ALL | E_STRICT); // NOT FOR PRODUCTION SERVERS!
 // @ini_set('display_errors', '1');    // NOT FOR PRODUCTION SERVERS!
-// $CFG->debug = (E_ALL);   // === DEBUG_DEVELOPER - NOT FOR PRODUCTION SERVERS!
+// $CFG->debug = (E_ALL | E_STRICT);   // === DEBUG_DEVELOPER - NOT FOR PRODUCTION SERVERS!
 // $CFG->debugdisplay = 1;             // NOT FOR PRODUCTION SERVERS!
 //
 // Display exceptions using the 'pretty' Whoops! utility.
@@ -906,15 +889,6 @@ $CFG->admin = 'admin';
 //
 // Force result of checks used to determine whether a site is considered "public" or not (such as for site registration).
 // $CFG->site_is_public = false;
-//
-// The mod_subsection feature has been added in 4.5 but is disabled by default. For new 5.0 sites, however, it will be enabled
-// by default. When upgrading from an earlier version to 5.0 or later, mod_subsection will also be enabled unless the
-// 'keepsubsectiondisabled' setting is set to true. In that case, the status of mod_subsection will remain unchanged during the
-// upgrade process.
-// This setting applies only to upgrades from version 4.5 where subsections already exist. It does not affect other upgrades or
-// new installations.
-// Note that the 'keepsubsectiondisabled' setting will be removed in version 6.0. (MDL-83791)
-// $CFG->keepsubsectiondisabled = false;
 //
 //=========================================================================
 // 8. FORCED SETTINGS

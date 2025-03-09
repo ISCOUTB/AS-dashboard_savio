@@ -35,7 +35,7 @@ use zip_archive;
  * @runTestsInSeparateProcesses
  * @covers \core_h5p\file_storage
  */
-final class file_storage_test extends \advanced_testcase {
+class file_storage_test extends \advanced_testcase {
 
     /** @var \core_h5p\file_storage H5P file storage instance */
     protected $h5p_file_storage;
@@ -476,7 +476,7 @@ final class file_storage_test extends \advanced_testcase {
     public function test_saveFileFromZip(): void {
 
         $ziparchive = new zip_archive();
-        $path = self::get_fixture_path(__NAMESPACE__, 'h5ptest.zip');
+        $path = __DIR__ . '/fixtures/h5ptest.zip';
         $result = $ziparchive->open($path, file_archive::OPEN);
 
         $files = $ziparchive->list_files();
@@ -563,7 +563,7 @@ final class file_storage_test extends \advanced_testcase {
         $admin = get_admin();
 
         // Prepare a valid .H5P file.
-        $path = self::get_fixture_path(__NAMESPACE__, $filename);
+        $path = __DIR__ . '/fixtures/'.$filename;
 
         // Libraries can be updated when the file has been created by admin, even when the current user is not the admin.
         $this->setUser($admin);
@@ -597,7 +597,7 @@ final class file_storage_test extends \advanced_testcase {
      *
      * @return array
      */
-    public static function get_icon_url_provider(): array {
+    public function get_icon_url_provider(): array {
         return [
             'Icon included' => [
                 'filltheblanks.h5p',
